@@ -538,9 +538,13 @@ function Telep() {
 
 		function progress(e) {
 			if (e.lengthComputable) {
-				var percentComplete = e.loaded / e.total;
-				percent.innerHTML = Math.round(percentComplete*100) + '% uploaded';
-				//link.style.background = 'rgba(100, 255, 100', '+percentComplete+')';
+				var progress = e.loaded / e.total;
+				percent.innerHTML = Math.floor(progress*100) + '% uploaded';
+				if(progress == 1) { /// safe?
+					// complete();
+				}
+
+				//link.style.background = 'rgba(100, 255, 100', '+progress+')';
 			} else {
 				//console.log('total size is unknown');
 			}
@@ -553,6 +557,7 @@ function Telep() {
 			var r = JSON.parse(d);
 
 			console.log(r);
+			console.log('???');
 
 			nsid = r.sid;
 			placer.id = 's'+nsid;
