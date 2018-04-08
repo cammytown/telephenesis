@@ -27,7 +27,7 @@ app.set('view engine', 'jade');
 app.use(express.static('public'));
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ limit: "2400mb", extended: true }));
 
 app.use(cookieParser(config.sessionSecret));
 
