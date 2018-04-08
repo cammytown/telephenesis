@@ -223,6 +223,8 @@ a.menuToggle {
   white-space: nowrap;
   /*.inverse & { color: #222; }*/
   /*.inverse & .text { background-color: #fcfcfc; }*/ }
+  .star.moving {
+    z-index: -1; }
   .star:hover {
     z-index: 2; }
   .star > a {
@@ -534,22 +536,27 @@ textarea#code {
   z-index: 3;
   margin: -5px 0 0 3px;
   background: rgba(0, 0, 0, 0.8); }
+  .menu a {
+    width: 125px;
+    padding: 3px 10px;
+    font-size: 1.2em; }
+    .menu a.create {
+      color: #9e9; }
+      .menu a.create:hover {
+        background-color: rgba(0, 150, 0, 0.3); }
+    .menu a.admin {
+      color: #e77; }
+      .menu a.admin:hover {
+        color: #f8c7c7;
+        background-color: rgba(150, 0, 0, 0.3); }
 
-.menu a {
-  width: 125px;
-  padding: 3px 10px;
-  font-size: 1.2em; }
-
-.menu a.create {
-  color: #aea; }
-
-.menu a.create:hover {
-  background-color: rgba(0, 150, 0, 0.3); }
-
-.create {
+.create, .admin {
   display: none; }
 
-.in.creator .menu .create {
+.creator .create {
+  display: block; }
+
+.adminor .admin {
   display: block; }
 
 .menu a:hover {

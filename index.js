@@ -45,8 +45,6 @@ app.use(session({
 
 
 app.use(function(i, o, n) {
-	console.log('someone connected');
-
 	usr.in(i.cookies.usr_ss, function(user) {
 		i.user = user;
 		n();
@@ -84,7 +82,7 @@ app.post('/ajax/upload/:starid', upload.single('submission'), function(i, o) { /
 		return false; ///
 	}
 
-	i.socket.setTimeout(1000 * 60 * 100);
+	// i.socket.setTimeout(1000 * 60 * 100);
 
 	// src.pipe(dest);
 	// src.on('end', function() {
@@ -151,6 +149,58 @@ app.post('/ajax/:operation', function(i, o) {
 		// 	break;
 		// } break;
 
+		case 'recolor': {
+			var sid = parseInt(i.body.sid)
+			telep.getStar(sid, function(err, star) {
+				if(err) {
+					///
+					return false;
+				}
+
+				if(!i.user || (i.user.id != star.uid && i.user.lv != 7)) {
+					o.json({ error: "not logged in" });
+					return false;
+				}
+
+				telep.recolor(sid, i.body.rgb, function(err, result) {
+					if(err) {
+						o.json({ error: "couldn't move..." }); ///
+						return false;
+					}
+
+					o.json({ error: 0 });
+				});
+			});
+		} break;
+
+
+		case 'move': {
+			var sid = parseInt(i.body.sid)
+			telep.getStar(sid, function(err, star) {
+				if(err) {
+					///
+					return false;
+				}
+
+				if(!i.user || (i.user.id != star.uid && i.user.lv != 7)) {
+					o.json({ error: "not logged in" });
+					return false;
+				}
+
+				var x = parseInt(i.body.x);
+				var y = -1 * parseInt(i.body.y);
+
+				telep.move(sid, x, y, function(err, result) {
+					if(err) {
+						o.json({ error: "couldn't move..." }); ///
+						return false;
+					}
+
+					o.json({ error: 0 });
+				});
+			});
+		} break;
+
 		case 'place': {
 			var sid = parseInt(i.body.sid)
 			telep.getStar(sid, function(err, star) {
@@ -171,7 +221,6 @@ app.post('/ajax/:operation', function(i, o) {
 				telep.place(sid, x, y, rgb, function(err, result) {
 					if(err) {
 						o.json({ error: "did not place" });
-						// exit(); ///
 						return false;
 					}
 
@@ -204,7 +253,8 @@ app.post('/ajax/:operation', function(i, o) {
 				i.ip,
 				function(err, sessionCode) {
 					if(err.length) {
-						o.render('login', { p: i.body, errors: err });
+						o.json({ error: err });
+						// o.render('login', { p: i.body, errors: err });
 					} else {
 						o.cookie('usr_ss', sessionCode, {
 							// secure: true /// https only

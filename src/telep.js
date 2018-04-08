@@ -61,8 +61,8 @@ function Telep() {
 				var sourceId = star.getAttribute('data-prev');
 				if(parseInt(sourceId) > 0) {
 					var sourceStar = document.getElementById('s' + sourceId);
-					// var starTier = parseInt(star.getAttribute('data-tier'));
-					// if(!starTier) starTier = 0;
+
+					sourceStar.setAttribute('data-next', star.id.split('s')[1]);
 
 					queuedLines.push({
 						startX: parseInt(sourceStar.style.left),
@@ -259,21 +259,33 @@ function Telep() {
 			case 'invite':
 			case 'create':
 			case 'recreate':
-			case 'help':
+			case 'help': {
 				clear(); ///
 				close();
 				open(operation);
-				break;
+			} break;
 
-			case 'logout':
+			case 'moveStar': {
+				console.log('try');
+				initializeMove();
+				// return true;
+			} break;
+
+			case 'recolorStar': {
+				initializeRecolor();
+				// return true;
+			} break;
+
+			case 'logout': {
 				close();
 				logout();
 				return true;
-				break;
+			} break;
 
-			default:
+			default: {
 				close();
 				spc.s = 'active';
+			}
 		}
 
 		if(state.updating) {
@@ -305,6 +317,84 @@ function Telep() {
 			Anm.fadeIn(box);
 			spc.flt(true)
 		}
+	}
+
+	function initializeRecolor() {
+		/// consolidate:
+
+		var colorwheel = document.getElementById('colorwheel');
+		acting_star.appendChild(colorwheel);
+		Anm.fadeIn(colorwheel);
+
+		var x = parseInt(acting_star.style.left);
+		var y = parseInt(acting_star.style.top);
+		spc.ctr(x, y); /// create callback function for ctr? currently using placeable fadeOut delay
+
+		//// preventmovement?
+
+		var starLink = acting_star.getElementsByTagName('a')[0];
+
+		cor.al(colorwheel, 'mousemove', getColor);
+		cor.al(colorwheel, 'click', function() {
+			cor.rl(colorwheel, 'mousemove', getColor);
+
+			var newrgb = starLink.style.backgroundColor.substr(4).slice(0, -1); /// bad code / maybe unreliable
+			Anm.fadeOut(colorwheel);
+
+			var p = 'rgb='+newrgb+'&sid='+acting_star.id.split('s')[1];
+			ajx('/ajax/recolor', p, function(d) {
+				var r = JSON.parse(d);
+			});
+
+			acting_star = false;
+		});
+
+		function getColor(e) {
+			var cx = -(x + (spc.map.offsetLeft - e.clientX));
+			var cy = (y + (spc.map.offsetTop - e.clientY));
+
+			var angle = -Math.atan2(cy, cx) * 180 / Math.PI + 180;
+
+			var selectedhue;
+			if(angle>0 && angle<60) selectedhue = 110;
+			else if(angle>60 && angle<120) selectedhue = 60;
+			else if(angle>120 && angle<180) selectedhue = 25;
+			else if(angle>180 && angle<240) selectedhue = 0;
+			else if(angle>240 && angle<300) selectedhue = 270;
+			else if(angle>300) selectedhue = 240;
+
+			starLink.style.backgroundColor = 'hsl('+selectedhue+', 45%, 80%)';
+		}
+	}
+
+	function initializeMove() {
+		cor.ac(acting_star, 'moving');
+
+		setTimeout(function() { ////
+			cor.al(spc.e, 'click', clickStarMove);
+		}, 200);
+		cor.al(spc.e, 'mousemove', mouseMoveStarMove);
+
+		function mouseMoveStarMove(e) {
+			acting_star.style.left = e.clientX + 'px'; /// new variable; moving_star ?
+			acting_star.style.top = e.clientY + 'px'; /// new variable; moving_star ?
+		}
+
+		function clickStarMove(e) {
+			console.log('?2');
+			var x = e.clientX - spc.map.offsetLeft;
+			var y = e.clientY - spc.map.offsetTop;
+			var p = 'x='+x+'&y='+y+'&sid='+acting_star.id.split('s')[1];
+			ajx('/ajax/move', p, function(d) {
+				var r = JSON.parse(d);
+			}); /// could be confused with place
+
+			acting_star = false;
+
+			cor.rl(spc.e, 'mousemove', mouseMoveStarMove);
+			cor.rl(spc.e, 'click', clickStarMove);
+		}
+
 	}
 
 	function context(e) {
@@ -489,7 +579,44 @@ function Telep() {
 
 			spc.ctr(x, y); /// create callback function for ctr? currently using placeable fadeOut delay
 
-			if(lsid) {
+			//// prevent movement??
+
+			if(!lsid) {
+				cor.rl(spc.e, 'mousemove', placermove);
+				cor.rl(spc.e, 'click', placerclick);
+
+				var colorwheel = document.getElementById('colorwheel');
+				placer.appendChild(colorwheel);
+				Anm.fadeIn(colorwheel);
+
+				cor.al(colorwheel, 'mousemove', getColor);
+				cor.al(colorwheel, 'click', function() {
+					cor.rl(colorwheel, 'mousemove', getColor);
+
+					newrgb = link.style.backgroundColor.substr(4).slice(0, -1); /// bad code / maybe unreliable
+					Anm.fadeOut(colorwheel);
+
+					if(!uploaded) placed = true;
+					else finish(placer.id.split('s')[1], x, y, newrgb);
+				});
+
+				function getColor(e) {
+					var cx = -(x + (spc.map.offsetLeft - e.clientX));
+					var cy = (y + (spc.map.offsetTop - e.clientY));
+
+					var angle = -Math.atan2(cy, cx) * 180 / Math.PI + 180;
+
+					var selectedhue;
+					if(angle>0 && angle<60) selectedhue = 110;
+					else if(angle>60 && angle<120) selectedhue = 60;
+					else if(angle>120 && angle<180) selectedhue = 25;
+					else if(angle>180 && angle<240) selectedhue = 0;
+					else if(angle>240 && angle<300) selectedhue = 270;
+					else if(angle>300) selectedhue = 240;
+
+					link.style.backgroundColor = 'hsl('+selectedhue+', 45%, 80%)';
+				}
+			} else {
 				cor.rl(placeable, 'mousemove', placermove);
 				cor.rl(placeable, 'click', placerclick);
 
@@ -525,42 +652,6 @@ function Telep() {
 						else finish(placer.id.split('s')[1], x, y, newrgb);
 					});
 				});
-			} else {
-				cor.rl(spc.e, 'mousemove', placermove);
-				cor.rl(spc.e, 'click', placerclick);
-
-				var colorwheel = document.getElementById('colorwheel');
-				placer.appendChild(colorwheel);
-				Anm.fadeIn(colorwheel);
-
-				cor.al(colorwheel, 'mousemove', getColor);
-				cor.al(colorwheel, 'click', function() {
-					cor.rl(colorwheel, 'mousemove', getColor);
-
-					newrgb = link.style.backgroundColor.substr(4).slice(0, -1); /// bad code / maybe unreliable
-					Anm.fadeOut(colorwheel);
-					console.log(newrgb);
-
-					if(!uploaded) placed = true;
-					else finish(placer.id.split('s')[1], x, y, newrgb);
-				});
-
-				function getColor(e) {
-					var cx = -(x + (spc.map.offsetLeft - e.clientX));
-					var cy = (y + (spc.map.offsetTop - e.clientY));
-
-					var angle = -Math.atan2(cy, cx) * 180 / Math.PI + 180;
-
-					var selectedhue;
-					if(angle>0 && angle<60) selectedhue = 110;
-					else if(angle>60 && angle<120) selectedhue = 60;
-					else if(angle>120 && angle<180) selectedhue = 25;
-					else if(angle>180 && angle<240) selectedhue = 0;
-					else if(angle>240 && angle<300) selectedhue = 270;
-					else if(angle>300) selectedhue = 240;
-
-					link.style.backgroundColor = 'hsl('+selectedhue+', 45%, 80%)';
-				}
 			}
 
 			// 	guide.innerHTML = "Now choose a color. You can only shift the color 11 degrees from the previous star.";
@@ -571,9 +662,7 @@ function Telep() {
 
 			///cor.al(link, 'click', )
 
-			var p = 'x='+x+'&y='+y+'&rgb='+rgb+'&sid='+sid;
-			//if(lsid)
-			console.log(p);
+			var p = 'x='+x+'&y='+y+'&rgb='+rgb+'&sid='+sid; ///
 			ajx('/ajax/place', p, function(d) {
 				// console.log(d);
 				var r = JSON.parse(d);

@@ -249,6 +249,10 @@ $inactiveBorderWidth: 1px;
 	font-size: 1.25em;
 	white-space: nowrap;
 
+	&.moving {
+		z-index: -1; ///
+	}
+
 	&:hover {
 		z-index: 2;
 	}
@@ -603,18 +607,35 @@ textarea#code {
 	z-index: 3;
 	margin: -5px 0 0 3px;
 	background: rgba(0, 0, 0, 0.8);
-}
-.menu a {
-	width: 125px;
-	padding: 3px 10px;
-	font-size: 1.2em;
+
+	a {
+		width: 125px;
+		padding: 3px 10px;
+		font-size: 1.2em;
+
+		&.create {
+			color: #9e9;
+
+			&:hover {
+				background-color: rgba(0, 150, 0, 0.3);
+			}
+		}
+
+		&.admin {
+			color: #e77;
+
+			&:hover {
+				color: #f8c7c7;
+				background-color: rgba(150, 0, 0, 0.3);
+			}
+		}
+	}
+
 }
 
-.menu a.create { color: #aea; }
-.menu a.create:hover { background-color: rgba(0, 150, 0, 0.3); }
-
-.create { display: none; }
-.in.creator .menu .create { display: block; }
+.create, .admin { display: none; }
+.creator .create { display: block; }
+.adminor .admin { display: block; }
 
 .menu a:hover {
 	background-color: #334;

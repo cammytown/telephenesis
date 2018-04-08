@@ -18,8 +18,11 @@ html(lang="en")
 	if(user)
 		- className = "in"
 
-		if(user.lv > 0)
+		if user.lv > 0
 			- className += " creator"
+		if user.lv == 7
+			- className += " adminor"
+
 
 	body(class=className)
 		a#logo Telephenesis
@@ -62,6 +65,9 @@ html(lang="en")
 				.user
 					//- a Bookmark
 					a.create(href="/create") Recreate
+					a.admin(href="/moveStar") Move
+					a.admin(href="/recolorStar") Recolor
+					a.admin(href="#") Delete
 
 				.guest
 					a(href="/login") login

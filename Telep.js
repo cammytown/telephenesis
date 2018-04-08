@@ -89,6 +89,26 @@ module.exports = function(db) {
 		});
 	}
 
+	me.recolor = function(starId, rgb, callback) {
+		planets.update(
+			{ id: starId },
+			{ $set: { rgb } },
+			function(err, result) {
+				callback(err, result);
+			}
+		);
+	}
+
+	me.move = function(starId, x, y, callback) {
+		planets.update(
+			{ id: starId },
+			{ $set: { x, y } },
+			function(err, result) {
+				callback(err, result);
+			}
+		);
+	}
+
 	me.place = function(starId, x, y, rgb, callback) {
 		planets.update(
 			{ id: starId },
