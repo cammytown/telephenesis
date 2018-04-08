@@ -500,7 +500,7 @@ function Telep() {
 
 		state.updating = false;
 		navigate('/');
-		document.body.className = null;
+		// document.body.className = null;
 		//spc.ctr(0, 0);
 
 		var lsid = acting_star ? parseInt(acting_star.id.split('s')[1]) : 0;

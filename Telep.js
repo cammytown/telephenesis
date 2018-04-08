@@ -71,6 +71,7 @@ module.exports = function(db) {
 
 		planets.insertOne({
 			id: newPlanetId,
+			// uid,
 			sourceId,
 			sourceX, ///
 			sourceY, ///

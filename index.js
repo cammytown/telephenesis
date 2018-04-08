@@ -150,14 +150,15 @@ app.post('/ajax/:operation', function(i, o) {
 		// } break;
 
 		case 'recolor': {
-			var sid = parseInt(i.body.sid)
+			/// consolidate:
+			var sid = parseInt(i.body.sid);
 			telep.getStar(sid, function(err, star) {
 				if(err) {
 					///
 					return false;
 				}
 
-				if(!i.user || (i.user.id != star.uid && i.user.lv != 7)) {
+				if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
 					o.json({ error: "not logged in" });
 					return false;
 				}
@@ -175,14 +176,14 @@ app.post('/ajax/:operation', function(i, o) {
 
 
 		case 'move': {
-			var sid = parseInt(i.body.sid)
+			var sid = parseInt(i.body.sid);
 			telep.getStar(sid, function(err, star) {
 				if(err) {
 					///
 					return false;
 				}
 
-				if(!i.user || (i.user.id != star.uid && i.user.lv != 7)) {
+				if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
 					o.json({ error: "not logged in" });
 					return false;
 				}
@@ -202,14 +203,14 @@ app.post('/ajax/:operation', function(i, o) {
 		} break;
 
 		case 'place': {
-			var sid = parseInt(i.body.sid)
+			var sid = parseInt(i.body.sid);
 			telep.getStar(sid, function(err, star) {
 				if(err) {
 					///
 					return false;
 				}
 
-				if(!i.user || i.user.id != star.uid) {
+				if(!i.user || i.user.id != star.creatorId) {
 					o.json({ error: "not logged in" });
 					return false;
 				}
@@ -218,15 +219,11 @@ app.post('/ajax/:operation', function(i, o) {
 				var y = -1 * parseInt(i.body.y);
 				var rgb = i.body.rgb;
 
-				console.log(['place', sid, x, y, rgb])
-
 				telep.place(sid, x, y, rgb, function(err, result) {
 					if(err) {
 						o.json({ error: "did not place" });
 						return false;
 					}
-
-					console.log(['placed', sid, x, y, rgb])
 
 					if(star.lsid) {
 						// $lstar = telep.sid($star['lsid']);
