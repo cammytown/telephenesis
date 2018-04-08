@@ -26,7 +26,7 @@ app.set('views', './views');
 app.set('view engine', 'jade');
 app.use(express.static('public'));
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "2400mb" }));
 app.use(bodyParser.urlencoded({ limit: "2400mb", extended: true }));
 
 app.use(cookieParser(config.sessionSecret));
