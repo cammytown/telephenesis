@@ -38,11 +38,11 @@ module.exports = function(db, vl, bcrypt) {
 		}
 	});
 
-	this.in = function(ss, cb) {
-		if(!ss) {
+	this.in = function(sessionString, cb) {
+		if(!sessionString) {
 			cb(false);
 		} else {
-			collection.findOne({ ss: ss }, function(err, doc) {
+			collection.findOne({ ss: sessionString }, function(err, doc) {
 				if(err) {
 					// console.log(err);
 					return false;
@@ -91,7 +91,7 @@ module.exports = function(db, vl, bcrypt) {
 			// var ts = doc.ts;
 			// var s = sl(em, ts);
 			// var cr = bcrypt.hashSync(pw, s);
-			var s = ss(16);
+			var s = generateString(16);
 
 			collection.update(
 				{ em: em },
@@ -117,7 +117,7 @@ module.exports = function(db, vl, bcrypt) {
 			var ts = Date.now();
 			var s = sl(em, ts);
 			var cr = bcrypt.hashSync(pw+s, bcrypt.genSaltSync(12)); /// use async? ///// increase rounds?
-			var s = ss(16);
+			var s = generateString(16);
 
 			collection.findOne({em: em}, function(err, doc) {
 				if(err) {
@@ -142,7 +142,7 @@ module.exports = function(db, vl, bcrypt) {
 					}, function(err, results) {
 						console.log(results);
 						var doc = results[0];
-						cb(errors, doc, ss); /// separate ss from rg/li?
+						cb(errors, doc, s); /// separate ss from rg/li?
 					});
 				}
 			});
@@ -214,7 +214,7 @@ module.exports = function(db, vl, bcrypt) {
 		return sl;
 	}
 
-	function ss(length) {
+	function generateString(length) {
 		var s = "";
 
 		function s4() {
