@@ -45,27 +45,27 @@ function Upl(u, i, p, c) {
 
 
 
-	me.p = function(e) {
-		console.log('t');
-		if(e.lengthComputable) {
-			var percentComplete = e.loaded / e.total;
-			progress.innerHTML = Math.round(percentComplete*100) + '% uploaded';
-			//link.style.background = 'rgba(100, 255, 100, '+percentComplete+')';
-		} else {
-			console.log('total size is unknown');
-		}
-	}
+	// me.p = function(e) {
+	// 	console.log('t');
+	// 	if(e.lengthComputable) {
+	// 		var percentComplete = e.loaded / e.total;
+	// 		progress.innerHTML = Math.round(percentComplete*100) + '% uploaded';
+	// 		//link.style.background = 'rgba(100, 255, 100, '+percentComplete+')';
+	// 	} else {
+	// 		console.log('total size is unknown');
+	// 	}
+	// }
 
-	me.c = function(e) {
-		window.onbeforeunload = false;
-		/// check for errors
-		console.log('e');
-		//console.log(r.responseText);
-		// var r = JSON.parse(r.responseText);
-		// placer.id = 's'+r.sid;
-		// if(!placed) uploaded = true;
-		// else finish(r.sid, parseInt(placer.style.left), parseInt(placer.style.top), rgb);
-	}
+	// me.c = function(e) {
+	// 	window.onbeforeunload = false;
+	// 	/// check for errors
+	// 	console.log('e');
+	// 	//console.log(r.responseText);
+	// 	// var r = JSON.parse(r.responseText);
+	// 	// placer.id = 's'+r.sid;
+	// 	// if(!placed) uploaded = true;
+	// 	// else finish(r.sid, parseInt(placer.style.left), parseInt(placer.style.top), rgb);
+	// }
 
 	me.f = function(e) {
 		console.log("An error occurred while transferring the file.");

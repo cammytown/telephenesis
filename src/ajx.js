@@ -12,6 +12,7 @@ function ajx(url, params, callback, multipart) {
 
 	if(callback) httpRequest.onreadystatechange = function() {
 		if (httpRequest.readyState === 4 && httpRequest.status === 200){
+			console.log(httpRequest.responseText);
 			callback(httpRequest.responseText);
 		}
 	};

@@ -556,9 +556,6 @@ function Telep() {
 			var d = e.target.responseText;
 			var r = JSON.parse(d);
 
-			console.log(r);
-			console.log('???');
-
 			nsid = r.sid;
 			placer.id = 's'+nsid;
 			placer.setAttribute('data-prev', lsid);
