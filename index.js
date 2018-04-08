@@ -10,8 +10,8 @@ var MongoStore = require('connect-mongo')(session);
 var multer = require('multer');
 var upload = multer({ dest: 'uploads/' });
 var fs = require('fs');
-var connect = require('connect');
-var timeout = require('connect-timeout');
+// var connect = require('connect');
+// var timeout = require('connect-timeout');
 
 const app = express();
 
