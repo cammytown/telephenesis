@@ -302,4 +302,8 @@ app.get('/', (i, o) => {
 	});
 });
 
+if(app.get('env') == 'production') {
+	app.set('trust proxy', 'loopback');
+}
+
 app.listen(config.port, () => console.log('telephenesis: listening on port ' + config.port));
