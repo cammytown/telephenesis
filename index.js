@@ -10,6 +10,8 @@ var MongoStore = require('connect-mongo')(session);
 var multer = require('multer');
 var upload = multer({ dest: 'uploads/' });
 var fs = require('fs');
+var connect = require('connect');
+var timeout = require('connect-timeout');
 
 const app = express();
 
@@ -75,7 +77,14 @@ MongoClient.connect("mongodb://localhost:27017", function(error, client) {
 	// testcollection = db.collection('test');
 });
 
-app.post('/ajax/upload/:starid', upload.single('submission'), function(i, o) { /// could maybe just use .post('/create/:starid')
+
+function haltOnTimedout (i, o, n) {
+	if(!i.timedout) {
+		n();
+	}
+}
+
+app.post('/ajax/upload/:starid', timeout('1000s'), haltOnTimedOut, upload.single('submission'), function(i, o) { /// could maybe just use .post('/create/:starid')
 	if(!i.user) {
 		o.json({ error: "not logged in" });
 		return false; ///
