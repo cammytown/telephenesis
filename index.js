@@ -78,18 +78,13 @@ MongoClient.connect("mongodb://localhost:27017", function(error, client) {
 });
 
 
-function haltOnTimedout (i, o, n) {
-	if(!i.timedout) {
-		n();
-	}
-}
-
-app.post('/ajax/upload/:starid', timeout('1000s'), haltOnTimedOut, upload.single('submission'), function(i, o) { /// could maybe just use .post('/create/:starid')
+app.post('/ajax/upload/:starid', upload.single('submission'), function(i, o) { /// could maybe just use .post('/create/:starid')
 	if(!i.user) {
 		o.json({ error: "not logged in" });
 		return false; ///
 	}
 
+	i.socket.setTimeout(1000 * 60 * 100);
 
 	// src.pipe(dest);
 	// src.on('end', function() {
