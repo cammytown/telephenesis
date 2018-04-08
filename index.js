@@ -43,6 +43,8 @@ app.use(session({
 
 
 app.use(function(i, o, n) {
+	console.log('someone connected');
+
 	usr.in(i.cookies.usr_ss, function(user) {
 		i.user = user;
 		n();
