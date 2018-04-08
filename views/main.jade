@@ -1,0 +1,173 @@
+doctype html
+
+html(lang="en")
+	head
+		title= pageTitle
+		//- :javascript
+		//- 	|	if (foo) {
+		//- 	|		bar()
+		//- 	|	}
+
+		meta(charset="utf-8")
+
+		script(src="/telephenesis.js" type="text/javascript")
+		link(href="https://fonts.googleapis.com/css?family=Strait|Monda" rel="stylesheet" type="text/css")
+		link(href="/constellations.css" rel="stylesheet" type="text/css")
+
+	- var className = ""
+	if(user)
+		- className = "in"
+
+		if(user.lv > 0)
+			- className += " creator"
+
+	body(class=className)
+		a#logo Telephenesis
+		a.menuToggle |||
+
+		#menu
+			.user
+				a.create(href="/settings") profile
+				a(href="/logout") logout
+
+			.guest
+				a(href="/login") login
+				a(href="/register") register
+
+			a(href="/help") help
+
+		#spcE
+			canvas#uiEffects
+
+			div.lyr.a
+			div.lyr.b
+			div.lyr.c
+
+			#map
+				each planet, i in planets
+					//- .planet(data-prev=planet.lsid data-next=planet.)
+					.star(
+						id = "s" + planet.id
+						data-prev = planet.sourceId
+						data-tier = planet.tier
+						style = "left: " + planet.x + "px; top: " + -planet.y + "px"
+					)
+						a(href=planet.id style="background-color: rgb(" + planet.rgb + ')')
+						//- span.text.name 
+						span.text.time
+
+		#limbo
+			//- #ticket
+			#starMenu.menu
+				.user
+					//- a Bookmark
+					a.create(href="/create") Recreate
+
+				.guest
+					a(href="/login") login
+					a(href="/register") register
+
+			#galaxyMenu.menu
+				.user
+					//- a Bookmark
+					a.create(href="/create") Create Constellation
+
+				.guest
+					a(href="/login") login
+					a(href="/register") register
+
+			form#create.uibox(method="POST")
+				h2 Create
+
+				p Create a new star. Something unique, honest, and without legal ties.
+				p.
+					Recreate this star. It can be a cover, a re-orchestration... 
+					the goal is to transform and the challenge is to maintain a 
+					perceivable thread.
+
+				button.btn.g.upload
+					input#submission(name="submission" type="file")
+					| Upload <small>(mp3)</small>
+
+				a.btn.r.close close
+
+			form#settings.uibox(method="POST")
+				input.bad.init(name="name" type="text")
+				input.bad.init(name="password" placeholder="password")
+				input.bad.init(name="password-confirm" placeholder="password again")
+				button.btn(type="submit") register
+
+			form#login.uibox(action="/login" method="POST")
+				input.bad.init(type="text" name="email" placeholder="email")
+				input.bad.init(type="password" name="password" placeholder="password")
+				button.btn(type="submit") login
+
+			form#register.uibox(action="/register" method="POST")
+				input.bad.init(type="text" name="email" placeholder="email")
+				input.bad.init(type="password" name="password" placeholder="password")
+				input.bad.init(type="password" name="password-confirm" placeholder="password again")
+				button.btn(type="submit") register
+
+			#help.uibox
+				p.
+					Telephenesis is a visualization of the metamorphosis of a musical 
+					idea as it is reinterpreted and recreated by different artists.
+
+				.control
+					.mouse.left
+						span
+						span
+						span
+
+					div Play / Pause
+
+				.control
+					.mouse.right
+						span
+						span
+						span
+
+					div Menu
+					div(style="color: #aea;") Create
+
+				.control
+					span.key &larr;
+					span Previous
+
+				.control
+					span.key &rarr;
+					span Next
+
+				.control.space
+					span.key
+					span Pause / Play
+
+				p.
+					The ability to contribute to Telephenesis is by invite only. Feel 
+					free to send us a link to your music.
+
+				p
+					a(href="contact@telephenesis.com") contact@telephenesis.com
+
+			.placement
+				#placeable.placement
+				#placer.star.placer
+					a
+					span.text.name
+					span.text.time
+				#colorer
+					.down
+					.up
+
+				#colorwheel
+
+			audio#aud
+
+			script
+				//- | al(window, 'load', function() {
+
+				//- if c == 'auth' || c == 'admin'
+				//- 	| anm.fadeOut(spc.map);
+				//- 	| spc.flt(true);
+
+				//- | });
