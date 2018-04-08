@@ -2,6 +2,7 @@ node_modules/
 .sass-cache/
 *.css.map
 
+.cammyflow
 telep.config.js
 uploads/*
 public/music/*

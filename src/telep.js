@@ -266,7 +266,6 @@ function Telep() {
 			} break;
 
 			case 'moveStar': {
-				console.log('try');
 				initializeMove();
 				// return true;
 			} break;
@@ -381,7 +380,6 @@ function Telep() {
 		}
 
 		function clickStarMove(e) {
-			console.log('?2');
 			var x = e.clientX - spc.map.offsetLeft;
 			var y = e.clientY - spc.map.offsetTop;
 			var p = 'x='+x+'&y='+y+'&sid='+acting_star.id.split('s')[1];

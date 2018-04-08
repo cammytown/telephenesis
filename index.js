@@ -218,12 +218,15 @@ app.post('/ajax/:operation', function(i, o) {
 				var y = -1 * parseInt(i.body.y);
 				var rgb = i.body.rgb;
 
+				console.log(['place', sid, x, y, rgb])
+
 				telep.place(sid, x, y, rgb, function(err, result) {
 					if(err) {
 						o.json({ error: "did not place" });
 						return false;
 					}
 
+					console.log(['placed', sid, x, y, rgb])
 
 					if(star.lsid) {
 						// $lstar = telep.sid($star['lsid']);
@@ -298,6 +301,12 @@ app.post('/ajax/:operation', function(i, o) {
 
 			o.json({ error: 0 });
 		} break;
+
+		default: {
+			/// log something maybe
+
+			o.json({ error: 1 });
+		}
 	}
 });
 
