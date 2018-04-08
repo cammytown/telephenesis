@@ -1,3 +1,5 @@
+const Lame = require('node-lame').Lame;
+
 module.exports = function(db) {
 	var planets = db.collection('MLplanets'); /// safe name?
 
@@ -52,7 +54,7 @@ module.exports = function(db) {
 		});
 	}
 
-	me.createStar = function(uid, sourceStar, callback) {
+	me.createStar = function(uid, sourceStar, multerFile, callback) {
 		var sourceId = false;
 		var sourceX = false;
 		var sourceY = false;
@@ -68,6 +70,55 @@ module.exports = function(db) {
 		var newPlanetId = MLPcurrentPlanetIndex;
 		MLPcurrentPlanetIndex += 1;
 		MLMeta.updateOne({ id: "persistors" }, { $inc: {currentPlanetIndex: 1} });
+
+		var starFileName = newPlanetId;
+		switch(multerFile.mimetype) {
+			case 'audio/aiff':
+			case 'audio/wav':
+			{
+				starFileName += '.mp3';
+
+				const encoder = new Lame({
+					"output": "./public/music/" + starFileName,
+					"bitrate": 256
+				}).setFile('./' + multerFile.path);
+
+				encoder.encode().then(() => {
+					console.log('Encoding finished');
+				}).catch((error) => {
+					console.log(error);
+					console.log('Something went wrong');
+				});
+
+			} break;
+
+			case 'audio/mp3': {
+				starFileName += '.mp3';
+				var target_path = 'public/music/' + starFileName;
+				fs.copyFile(multerFile.path, target_path, function(err) {
+					if(err) {
+						console.log(err);
+						///
+					}
+				});
+			} break;
+
+			case 'audio/ogg': {
+				/// convert?
+				starFileName += '.ogg';
+				var target_path = 'public/music/' + starFileName;
+				fs.copyFile(multerFile.path, target_path, function(err) {
+					if(err) {
+						console.log(err);
+						///
+					}
+				});
+			} break;
+
+			default: {
+				console.warn("WARNING: Didn't know what to do with file of mimetype " + multerFile.mimetype);
+			}
+		}
 
 		planets.insertOne({
 			id: newPlanetId,

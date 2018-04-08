@@ -10,6 +10,7 @@ var MongoStore = require('connect-mongo')(session);
 var multer = require('multer');
 var upload = multer({ dest: 'uploads/' });
 var fs = require('fs');
+const Lame = require('node-lame').Lame;
 // var connect = require('connect');
 // var timeout = require('connect-timeout');
 
@@ -70,7 +71,7 @@ MongoClient.connect("mongodb://localhost:27017", function(error, client) {
 	db = client.db('telephenesis');
 
 	usr = new Usr(db, validator, bcrypt, );
-	telep = new Telep(db);
+	telep = new Telep(db, Lame);
 
 	// testcollection = db.collection('test');
 });
@@ -82,46 +83,27 @@ app.post('/ajax/upload/:starid', upload.single('submission'), function(i, o) { /
 		return false; ///
 	}
 
-	// i.socket.setTimeout(1000 * 60 * 100);
+	if(!i.user.lv) {
+		o.json({ error: "no creator credentials" });
+		return false; ///
+	}
 
-	// src.pipe(dest);
-	// src.on('end', function() {
-		var tmp_path = i.file.path;
-		// var src = fs.createReadStream(tmp_path);
-		// var dest = fs.createWriteStream(target_path);
+	/// consider putting objects in memory if we care about deep optimization later https://github.com/expressjs/multer#memorystorage
 
-		var starId = parseInt(i.params.starid);
+	var starId = parseInt(i.params.starid);
 
-		///:
-		if(starId > 0) { ///
-			telep.getStar(starId, function(err, sourceStar) {
-				telep.createStar(i.user.id, sourceStar, function(star) {
-					var target_path = 'public/music/' + star.id + '.mp3';
-					fs.copyFile(tmp_path, target_path, function(err) {
-						if(err) {
-							console.log(err);
-							///
-						}
-					});
-
-					o.json({ error: 0, sid: star.id });
-				});
-			});
-		} else {
-			telep.createStar(i.user.id, false, function(star) {
-				var target_path = 'public/music/' + star.id + '.mp3';
-				fs.copyFile(tmp_path, target_path, function(err) {
-					if(err) {
-						console.log(err);
-						///
-					}
-				});
-
+	///:
+	if(starId > 0) { ///
+		telep.getStar(starId, function(err, sourceStar) {
+			telep.createStar(i.user.id, sourceStar, i.file, function(star) {
 				o.json({ error: 0, sid: star.id });
 			});
-		}
-
-	// });
+		});
+	} else {
+		telep.createStar(i.user.id, false, i.file, function(star) {
+			o.json({ error: 0, sid: star.id });
+		});
+	}
 
 	// src.on('error', function(err) {
 	// 	o.json({ error: 1 });
