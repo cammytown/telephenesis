@@ -83,7 +83,7 @@ function Telep() {
 			for (var lineIndex = 0; lineIndex < queuedLines.length; lineIndex++) {
 				var line = queuedLines[lineIndex];
 
-				var progress = (elapsedms - ((line.tier - 1) * 500)) / 1000;
+				var progress = (elapsedms - ((line.tier - 1) * 300)) / 1000;
 				if(progress < 0) {
 					continue;
 				}
@@ -625,8 +625,8 @@ function Telep() {
 				var colorer = document.getElementById('colorer');
 				var rgb = acting_star.children[0].style.backgroundColor.substr(4).split(',');
 				var hsl = Clr.rgb(rgb[0], rgb[1], parseInt(rgb[2]));
-				colorer.children[0].style.background = 'hsl('+(hsl[0]-11)+', 45%, 80%)';
-				colorer.children[1].style.background = 'hsl('+(hsl[0]+11)+', 45%, 80%)';
+				colorer.children[0].style.background = 'hsl('+(hsl[0]-17)+', 45%, 80%)';
+				colorer.children[1].style.background = 'hsl('+(hsl[0]+17)+', 45%, 80%)';
 				placer.appendChild(colorer);
 
 				Anm.fadeIn(colorer, 250, function() {
