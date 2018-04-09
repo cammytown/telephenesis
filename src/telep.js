@@ -103,7 +103,9 @@ function Telep() {
 			for (var lineIndex = 0; lineIndex < queuedLines.length; lineIndex++) {
 				var line = queuedLines[lineIndex];
 
-				var progress = (elapsedms - (((line.tier - 1) / 4) * 1000)) / 1000;
+				var delay = ((line.tier) * 1000) - (line.tier * 800);
+
+				var progress = (elapsedms - delay) / 1000;
 				if(progress < 0) {
 					continue;
 				}
@@ -119,12 +121,13 @@ function Telep() {
 
 				// console.log(lineVector);
 
-				var drawVec = [
-					line.startX + lineVector.x,
-					line.startY + lineVector.y
-				];
 
-				var lineGradient = uictx.createLinearGradient(0,0,170,0);
+				var drawVec = new spc.Vec2(line.startX + lineVector.x, line.startY + lineVector.y);
+
+				// var lineGradient = uictx.createLinearGradient(0,0,170,0);
+				// var lineGradient = uictx.createLinearGradient(line.startX,line.startY,line.endX,line.endY);
+				// var lineGradient = uictx.createLinearGradient(0, 0, line.endX + line.startX, line.endY + line.startY);
+				var lineGradient = uictx.createLinearGradient(line.startX + spc.x, line.startY + spc.y, drawVec.x + spc.x, drawVec.y + spc.y);
 				lineGradient.addColorStop("0", line.startColor);
 				lineGradient.addColorStop("1.0", line.endColor);
 
@@ -132,7 +135,7 @@ function Telep() {
 				uictx.strokeStyle = lineGradient;
 				uictx.beginPath();
 				uictx.moveTo(line.startX + spc.x, line.startY + spc.y);
-				uictx.lineTo(drawVec[0] + spc.x, drawVec[1] + spc.y);
+				uictx.lineTo(drawVec.x + spc.x, drawVec.y + spc.y);
 				uictx.stroke();
 			}
 

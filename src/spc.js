@@ -91,8 +91,11 @@ function Spc(e) {
 		var curPos = new me.Vec2(me.x, me.y); /// use globally later
 		var diff = targetCenter.subtract(curPos);
 		var distance = diff.getMagnitude();
-		var speed = 10;
-		if(distance > 1) {
+		// console.log(distance);
+		// var speed = 9;
+		var speed = Math.max(Math.min(distance / 25, 25), 1);
+
+		if(distance > speed) {
 			var change = diff.normalize().scale(speed);
 			me.set(me.x + change.x, me.y + change.y); ///
 			window.requestAnimationFrame(stepCenter);
@@ -100,12 +103,16 @@ function Spc(e) {
 			me.set(targetCenter.x, targetCenter.y);
 			centering = false;
 		}
-
 	}
 
 	/// requires anm
 	/// if ctr is called again before anm is finished, stop first anm and start a new one
 	me.ctr = function(x, y) {
+		/// get rid of these / fix up architecture:
+		x = -x; y = -y;
+		x += window.innerWidth/2;
+		y += window.innerHeight/2;
+
 		targetCenter = new me.Vec2(x, y);
 
 		if(!centering) {
@@ -113,9 +120,6 @@ function Spc(e) {
 			window.requestAnimationFrame(stepCenter);
 		}
 
-		// x = -x; y = -y;
-		// x += window.innerWidth/2;
-		// y += window.innerHeight/2;
 		// for(var i = lyr.length - 1; i >= 0; i--) {
 		// 	Anm.animate(lyr[i], 'backgroundPosition', x/(1+i*0.5)+'px '+y/(1+i*0.5)+'px');
 		// }
