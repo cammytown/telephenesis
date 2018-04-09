@@ -17,7 +17,6 @@ function Aud(eid) {
 	aud.d = null; aud.m = null; aud.s = null;
 
 	aud.pl = function() {
-		console.log('tryin');
 		aud.d = aud.e.duration | 0;
 		aud.m = aud.d / 60 | 0;
 		aud.s = aud.d - aud.m*60 + '';
@@ -40,16 +39,12 @@ function Aud(eid) {
 
 	aud.ld = function(src, autoplay = true) {
 		if(autoplay) {
-			console.log('yes?');
 			cor.al(aud.e, 'canplay', aud.pl);
 			cor.al(aud.e, 'error', aud.er);
 		} else {
-			console.log('no?');
 			cor.rl(aud.e, 'canplay', aud.pl);
 			cor.rl(aud.e, 'error', aud.er);
 		}
-
-		console.log(src);
 
 		aud.e.setAttribute('src', src);
 		//aud.play();

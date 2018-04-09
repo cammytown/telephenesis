@@ -269,11 +269,11 @@ $inactiveBorderWidth: 1px;
 		// border-width: $inactiveBorderWidth;
 		border-style: solid;
 		border-color: #000;
-		// transition:
-		// 	left 0.3s, top 0.3s,
-		// 	width 0.3s, height 0.3s,
-		// 	background-color 0.5s,
-		// 	border-width 0.3s, border-color 0.5s;
+		transition:
+			left 0.3s, top 0.3s,
+			width 0.3s, height 0.3s,
+			background-color 0.5s,
+			border-width 0.3s, border-color 0.5s;
 
 		&:hover {
 			background-color: #e7e7f7 !important;
@@ -365,7 +365,7 @@ $inactiveBorderWidth: 1px;
 
 	.text {
 		display: none;
-		margin: -12px 0 0 18px;
+		margin: -12px 0 0 22px;
 		padding: 2px 5px 2px 3px;
 		background-color: rgba(0, 0, 0, 0.6);
 		transition: background-color 0.2s;

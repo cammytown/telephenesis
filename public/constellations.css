@@ -239,7 +239,8 @@ a.menuToggle {
     color: #bbe;
     background-color: #ff6;
     border-style: solid;
-    border-color: #000; }
+    border-color: #000;
+    transition: left 0.3s, top 0.3s, width 0.3s, height 0.3s, background-color 0.5s, border-width 0.3s, border-color 0.5s; }
     .star > a:hover {
       background-color: #e7e7f7 !important; }
   .star.active {
@@ -309,7 +310,7 @@ a.menuToggle {
     border-color: #9c7751; } }
   .star .text {
     display: none;
-    margin: -12px 0 0 18px;
+    margin: -12px 0 0 22px;
     padding: 2px 5px 2px 3px;
     background-color: rgba(0, 0, 0, 0.6);
     transition: background-color 0.2s; }

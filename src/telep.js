@@ -36,6 +36,16 @@ function Telep() {
 		aud = new Aud('aud');
 		spc = new Spc('spcE');
 
+		cor.al(aud.e, 'timeupdate', function() {
+			// if(time) {
+				playing_star.getElementsByClassName('time')[0].innerHTML = aud.t;
+			// }
+		});
+
+		cor.al(aud.e, 'ended', function() {
+			cor.rc(playing_star, 'active');
+		});
+
 		var canvas = document.getElementById('uiEffects');
 		canvas.width = document.body.offsetWidth;
 		canvas.height = document.body.offsetHeight;
@@ -445,9 +455,6 @@ function Telep() {
 
 			aud.ld('/music/'+sid+'.mp3');
 
-			cor.al(aud.e, 'timeupdate', function() {
-				if(time) time.innerHTML = aud.t;
-			});
 		}
 	}
 
