@@ -8,13 +8,13 @@ var telep;
 var clr;
 var limbo;
 
-import cor from './cor.js';
+import cor from './minlab/cor.js';
 // import './upl.js';
 // import './ajx.js';
 // import Aud from './aud.js';
 // import { Spc } from './spc.js';
-import { Val } from './val.js';
-import Anm from './anm';
+import { Val } from './minlab/val.js';
+import Anm from './minlab/anm';
 // import { Clr } from './clr.js';
 import { Telep } from './telep.js';
 
@@ -27,6 +27,6 @@ cor.al(window, 'load', function() {
 	// clr = new Clr();
 	// spc = new Spc('spc');
 
-	telep = new Telep();
-	telep.init();
+	// telep = new Telep();
+	// telep.init();
 });

@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-	entry: './src/_frontend.js',
+	entry: './src/telep.js',
 	mode: 'development',
 	output: {
 		filename: 'telephenesis.js',

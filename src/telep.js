@@ -1,12 +1,16 @@
 export { Telep };
 
-import cor from './cor';
-import Spc from './spc';
-import Anm from './anm';
-import Aud from './aud';
-import Upl from './upl';
-import {ajx} from './ajx';
-import Clr from './clr';
+import cor from './minlab/cor';
+import Spc from './minlab/spc';
+import Anm from './minlab/anm';
+import Aud from './minlab/aud';
+import Upl from './minlab/upl';
+import {ajx} from './minlab/ajx';
+import Clr from './minlab/clr';
+
+cor.al(window, 'load', function() {
+	new Telep().init(); /// change architecture after pondering on it some more
+});
 
 function Telep() {
 	var me = this;
@@ -24,7 +28,7 @@ function Telep() {
 
 	var queuedLines = [];
 
-	me.init = function() {
+	me.init = function() { /// doesn't need to be property
 		// cor.al(spc.e, 'mousedown', function() {  });
 		// cor.al(spc.e, 'mousemove', function() { dragged++; dragged = true; });
 		// var dragged = 0;
