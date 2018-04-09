@@ -103,7 +103,7 @@ function Telep() {
 			for (var lineIndex = 0; lineIndex < queuedLines.length; lineIndex++) {
 				var line = queuedLines[lineIndex];
 
-				var progress = (elapsedms - ((line.tier - 1) * 300)) / 1000;
+				var progress = (elapsedms - (((line.tier - 1) / 4) * 1000)) / 1000;
 				if(progress < 0) {
 					continue;
 				}
@@ -113,12 +113,15 @@ function Telep() {
 					// queuedLines.splice(queuedLines.indexOf(line), 1);
 				}
 
-				var vec = [line.endX - line.startX, line.endY - line.startY];
-				var mag = Math.sqrt(vec[0] * vec[0], vec[1] * vec[1]);
-				var currentDistance = mag * progress;
+				var lineVector = new spc.Vec2(line.endX - line.startX, line.endY - line.startY)
+					// .normalize()
+					.scale(progress);
+
+				// console.log(lineVector);
+
 				var drawVec = [
-					line.startX + (vec[0] / mag * currentDistance),
-					line.startY + (vec[1] / mag * currentDistance)
+					line.startX + lineVector.x,
+					line.startY + lineVector.y
 				];
 
 				var lineGradient = uictx.createLinearGradient(0,0,170,0);

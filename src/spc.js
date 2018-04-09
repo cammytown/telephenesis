@@ -13,6 +13,7 @@ export default Spc;
 import cor from './cor';
 import Anm from './anm';
 
+
 function Spc(e) {
 	/// a blurred animation for going to a point over space that isn't loaded
 	/// make mov() generic so you can get places without using the formula
@@ -27,6 +28,9 @@ function Spc(e) {
 
 	me.x = me.map.offsetLeft;
 	me.y = me.map.offsetTop;
+
+	var targetCenter = false;
+	var centering = false;
 
 	var bfr = 3; ///
 	var seg = 500; ///
@@ -44,7 +48,34 @@ function Spc(e) {
 
 	me.moveCallbacks = [];
 
+	me.Vec2 = class {
+		constructor(x, y) {
+			this.x = x;
+			this.y = y;
+		}
+
+		subtract(otherVec2) {
+			return new me.Vec2(this.x - otherVec2.x, this.y - otherVec2.y);
+		}
+
+		scale(amount) {
+			return new me.Vec2(this.x * amount, this.y * amount);
+		}
+
+		getMagnitude() {
+			return Math.sqrt(this.x * this.x + this.y * this.y);
+		}
+
+		normalize() {
+			var magnitude = this.getMagnitude();
+			return new me.Vec2(this.x / magnitude, this.y / magnitude);
+		}
+	}
+
 	me.set = function(x, y) {
+		me.x = x;
+		me.y = y;
+
 		me.map.style.left = x+'px'; me.map.style.top = y+'px';
 
 		for(var i = lyr.length - 1; i >= 0; i--) {
@@ -56,18 +87,41 @@ function Spc(e) {
 		}
 	}
 
+	function stepCenter(ms) {
+		var curPos = new me.Vec2(me.x, me.y); /// use globally later
+		var diff = targetCenter.subtract(curPos);
+		var distance = diff.getMagnitude();
+		var speed = 10;
+		if(distance > 1) {
+			var change = diff.normalize().scale(speed);
+			me.set(me.x + change.x, me.y + change.y); ///
+			window.requestAnimationFrame(stepCenter);
+		} else {
+			me.set(targetCenter.x, targetCenter.y);
+			centering = false;
+		}
+
+	}
+
 	/// requires anm
 	/// if ctr is called again before anm is finished, stop first anm and start a new one
 	me.ctr = function(x, y) {
-		x = -x; y = -y;
-		x += window.innerWidth/2;
-		y += window.innerHeight/2;
-		for(var i = lyr.length - 1; i >= 0; i--) {
-			Anm.animate(lyr[i], 'backgroundPosition', x/(1+i*0.5)+'px '+y/(1+i*0.5)+'px');
+		targetCenter = new me.Vec2(x, y);
+
+		if(!centering) {
+			centering = true;
+			window.requestAnimationFrame(stepCenter);
 		}
 
-		Anm.animate(me.map, 'left', x+'px');
-		Anm.animate(me.map, 'top', y+'px');
+		// x = -x; y = -y;
+		// x += window.innerWidth/2;
+		// y += window.innerHeight/2;
+		// for(var i = lyr.length - 1; i >= 0; i--) {
+		// 	Anm.animate(lyr[i], 'backgroundPosition', x/(1+i*0.5)+'px '+y/(1+i*0.5)+'px');
+		// }
+
+		// Anm.animate(me.map, 'left', x+'px');
+		// Anm.animate(me.map, 'top', y+'px');
 	}
 
 	var fltVelocity = { x: 0, y: 0 };
@@ -77,10 +131,10 @@ function Spc(e) {
 		if(me.s == 'flt') { me.s = 'active'; return false; }
 		me.s = 'flt';
 
-		fltStart = new Date();
+		fltStart = performance.now();
 
-		function l() {
-			var msSinceStart = new Date() - fltStart;
+		function l(ms) {
+			var msSinceStart = performance.now() - fltStart;
 
 			/// optimization:
 			if(msSinceStart < 1000) {
@@ -111,7 +165,8 @@ function Spc(e) {
 
 			me.set(x, y);
 
-			if(me.s == 'flt') setTimeout(l, 50);
+			if(me.s == 'flt') window.requestAnimationFrame(l);
+			// if(me.s == 'flt') setTimeout(l, 50);
 		}
 
 		l();
@@ -128,7 +183,8 @@ function Spc(e) {
 
 			me.set(x, y);
 
-			if(me.s == 'hvr') setTimeout(l1, 200);
+			if(me.s == 'hvr') window.requestAnimationFrame(l);
+			// if(me.s == 'hvr') setTimeout(l1, 200);
 		}
 
 		function l2() {
@@ -153,12 +209,16 @@ function Spc(e) {
 	function drg(e) {
 		var x = e.clientX - xl + me.x;
 		var y = e.clientY - yl + me.y;
-		me.x = x;
-		me.y = y;
+		// me.x = x;
+		// me.y = y;
 
 		xl = e.clientX; yl = e.clientY;
 
-		mov(x, y);
+		me.set(x, y);
+		// me.ctr(Math.floor(x), Math.floor(y));
+		// centering = true;
+		// targetCenter = new me.Vec2(x, y);
+		// mov(x, y);
 	}
 
 	function mov(x, y) { /// x and y just added

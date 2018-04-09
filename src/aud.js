@@ -40,8 +40,6 @@ function Aud(eid) {
 	}
 
 	cor.al(aud.e, 'canplay', function() {
-		console.log('come on');
-
 		if(autoplaying) {
 			aud.pl();
 		}
