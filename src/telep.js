@@ -74,11 +74,18 @@ function Telep() {
 
 					sourceStar.setAttribute('data-next', star.id.split('s')[1]);
 
+					if(sourceStar.getElementsByTagName('a')[0].style.backgroundColor == '') {
+						console.log(sourceStar);
+						console.log('???');
+					}
+
 					queuedLines.push({
 						startX: parseInt(sourceStar.style.left),
 						startY: parseInt(sourceStar.style.top),
+						startColor: sourceStar.getElementsByTagName('a')[0].style.backgroundColor, ///
 						endX: parseInt(star.style.left),
 						endY: parseInt(star.style.top),
+						endColor: star.getElementsByTagName('a')[0].style.backgroundColor, ///
 						tier: parseInt(star.getAttribute('data-tier'))
 					});
 				}
@@ -111,7 +118,12 @@ function Telep() {
 					line.startY + (vec[1] / mag * currentDistance)
 				];
 
-				uictx.strokeStyle = 'rgb(200, 200, 200)';
+				var lineGradient = uictx.createLinearGradient(0,0,170,0);
+				lineGradient.addColorStop("0", line.startColor);
+				lineGradient.addColorStop("1.0", line.endColor);
+
+				// uictx.strokeStyle = 'rgb(200, 200, 200)';
+				uictx.strokeStyle = lineGradient;
 				uictx.beginPath();
 				uictx.moveTo(line.startX, line.startY);
 				uictx.lineTo(drawVec[0], drawVec[1]);

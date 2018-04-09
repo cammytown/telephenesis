@@ -1,4 +1,5 @@
 const Lame = require('node-lame').Lame;
+const fs = require('fs');
 
 module.exports = function(db) {
 	var planets = db.collection('MLplanets'); /// safe name?
