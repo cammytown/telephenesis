@@ -362,6 +362,25 @@ app.post('/login', function(i, o) {
 	);
 });
 
+app.get('/:page', function(i, o, n) {
+	var realPages = ['help', 'login', 'register', 'settings'];
+
+	if(
+		realPages.indexOf(i.params.page) == -1
+		&& isNaN(parseInt(i.params.page))
+	) { /// isNaN necessary?
+		o.status(404).send("Sorry, no page exists there."); ///
+	} else {
+		telep.getPlanets(false, function(planets) { /// consolidate
+			o.render('main', {
+				pageTitle: 'telephenesis : ' + i.params.page, /// not if it is a number
+				planets,
+				user: i.user
+			});
+		});
+	}
+});
+
 app.get('/', (i, o) => {
 	telep.getPlanets(false, function(planets) {
 		o.render('main', {

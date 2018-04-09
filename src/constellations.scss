@@ -4,17 +4,24 @@
  * v0.06
  ***/
 
+$create: #9e9;
+$admin: #e7e;
+$header: #ecb;
+
+$link: #bae;
+$linkHover: #dee7f7;
+
 html, body { height: 100%; margin: 0; }
 body { font-size: 10px; font-family: 'Monda', sans-serif; }
 a {
-	display: block;
-	color: #cbe;
+	// display: block;
+	color: $link;
 	text-decoration: none;
 	cursor: pointer;
 	transition: color 0.3s;
 
 	&:hover {
-		color: #dee7f7;
+		color: $linkHover;
 	}
 }
 
@@ -47,7 +54,7 @@ a.menuToggle {
 	width: 15px;
 	height: 15px;
 	padding: 5px;
-	color: #cbe;
+	color: $link;
 	font-size: 1.25em;
 	text-align: center;
 	line-height: 15px;
@@ -57,7 +64,7 @@ a.menuToggle {
 	-webkit-transform: rotate(90deg);
 	-ms-transform: rotate(90deg);
 
-	&:hover { background: #cbe; color: #111; }
+	&:hover { background: $link; color: #111; }
 	&.active {
 		transform: none;
 		-webkit-transform: none;
@@ -479,57 +486,75 @@ textarea#code {
 
 /* help */
 /*/// naming could use attention*/
-#help .control {
-	float: left;
-	width: 50%;
-	padding: 10px 0;
-}
+#help {
+	.control {
+		float: left;
+		width: 50%;
+		padding: 10px 0;
 
-#help .control .key, #help .control .mouse {
-	display: block;
-	float: left;
-	margin-right: 10px;
-}
+		.key, .mouse {
+			display: block;
+			float: left;
+			margin-right: 10px;
+		}
 
-#help .control .key {
-	display: inline-block;
-	width: 20px;
-	height: 20px;
-	padding: 5px;
-	background: #eee;
-	border: 1px solid #eee;
-	border-radius: 2px;
-	color: #111;
-}
-#help .control.space { float: none; clear: both; width: 100%; }
-#help .control.space .key { width: 128px; }
+		.key {
+			display: inline-block;
+			width: 20px;
+			height: 20px;
+			padding: 5px;
+			background: #eee;
+			border: 1px solid #eee;
+			border-radius: 2px;
+			color: #111;
+		}
+		&.space { float: none; clear: both; width: 100%; }
+		&.space .key { width: 128px; }
 
-#help .control .mouse span {
-	display: block;
-	float: left;
-	width: 15px;
-	height: 15px;
-	background: #eee;
-	/*border: 1px solid #111;*/
-	box-sizing: border-box;
+		.mouse span {
+			display: block;
+			float: left;
+			width: 15px;
+			height: 15px;
+			background: #eee;
+			/*border: 1px solid #111;*/
+			box-sizing: border-box;
+		}
+		.mouse span:nth-child(1) {
+			margin: 0 1px 1px 0;
+			border-radius: 4px 0 0 0;
+		}
+		.mouse span:nth-child(2) {
+			margin: 0 0 1px 1px;
+			border-radius: 0 4px 0 0;
+		}
+		.mouse span:nth-child(3) {
+			float: none;
+			clear: both;
+			width: 32px;
+			height: 26px;
+			border-radius: 0 0 4px 4px;
+		}
+		.mouse.left span:nth-child(1),
+		.mouse.right span:nth-child(2) { background: $link; }
+	}
+
+	.credits {
+		margin-top: 10px;
+		text-align: right;
+
+		h3 {
+			margin-bottom: 4px;
+			font-size: 1em;
+			color: $header;
+			text-transform: uppercase;
+		}
+
+		a {
+			display: block;
+		}
+	}
 }
-#help .control .mouse span:nth-child(1) {
-	margin: 0 1px 1px 0;
-	border-radius: 4px 0 0 0;
-}
-#help .control .mouse span:nth-child(2) {
-	margin: 0 0 1px 1px;
-	border-radius: 0 4px 0 0;
-}
-#help .control .mouse span:nth-child(3) {
-	float: none;
-	clear: both;
-	width: 32px;
-	height: 26px;
-	border-radius: 0 0 4px 4px;
-}
-#help .control .mouse.left span:nth-child(1),
-#help .control .mouse.right span:nth-child(2) { background: #cbe; }
 
 
 /* tutorial */
@@ -614,7 +639,7 @@ textarea#code {
 		font-size: 1.2em;
 
 		&.create {
-			color: #9e9;
+			color: $create;
 
 			&:hover {
 				background-color: rgba(0, 150, 0, 0.3);
@@ -622,7 +647,7 @@ textarea#code {
 		}
 
 		&.admin {
-			color: #e7e;
+			color: $admin;
 
 			&.danger {
 				color: #e77;
@@ -749,7 +774,11 @@ textarea#code {
 
 
 
-
+#menu .user { ///
+	a {
+		display: block;
+	}
+}
 
 /* /// refactor: */
 .user, .create { display: none; }

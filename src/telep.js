@@ -489,7 +489,6 @@ function Telep() {
 		var activeStarIdInputs = document.getElementsByClassName('activeStarIdInput');
 		for (var inputIndex = 0; inputIndex < activeStarIdInputs.length; inputIndex++) {
 			var input = activeStarIdInputs[inputIndex];
-			console.log('?');
 			input.value = acting_star.id.split('s')[1];
 		}
 
