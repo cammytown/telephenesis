@@ -55,12 +55,17 @@ function Telep() {
 		uictx = canvas.getContext('2d');
 
 		// spc.moveCallbacks.push(function(ox, oy) {
-		spc.moveCallbacks.push(function(x, y) {
-			canvas.style.left = x + 'px';
-			canvas.style.top = y + 'px';
-			// uictx.style.left = parseInt();
-			// uictx.style.top = parseInt(uictx.style.top) + oy + 'px';
-		});
+		// spc.moveCallbacks.push(function(x, y) {
+		// 	canvas.style.left = x + 'px';
+		// 	canvas.style.top = y + 'px';
+		// 	// uictx.style.left = parseInt();
+		// 	// uictx.style.top = parseInt(uictx.style.top) + oy + 'px';
+		// });
+
+		cor.al(window, 'resize', function() {
+			canvas.width = document.body.offsetWidth;
+			canvas.height = document.body.offsetHeight;
+		})
 
 		/// temporary?:
 		var active_check = document.getElementsByClassName('active uibox');
@@ -123,15 +128,15 @@ function Telep() {
 				// uictx.strokeStyle = 'rgb(200, 200, 200)';
 				uictx.strokeStyle = lineGradient;
 				uictx.beginPath();
-				uictx.moveTo(line.startX, line.startY);
-				uictx.lineTo(drawVec[0], drawVec[1]);
+				uictx.moveTo(line.startX + spc.x, line.startY + spc.y);
+				uictx.lineTo(drawVec[0] + spc.x, drawVec[1] + spc.y);
 				uictx.stroke();
 			}
 
 			/// optimize
-			if(queuedLines.length) {
+			// if(queuedLines.length) {
 				window.requestAnimationFrame(drawLineStep); ////
-			}
+			// }
 		}
 
 		window.requestAnimationFrame(drawLineStep);
