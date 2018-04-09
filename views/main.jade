@@ -98,12 +98,12 @@ html(lang="en")
 
 				a.btn.r.close close
 
-			form#renameStar.uibox(method="POST")
+			form#renameStar.uibox(action="/renameStar" method="POST")
 				h2 Rename Star
 				input.bad.init(name="creatorName" type="text" placeholder="Creator Name")
-				input.activeStarField(name="sid")
+				input.activeStarIdInput(name="sid" type="hidden")
 				button.btn(type="submit") submit
-				a.btn.r.close close
+				//- a.btn.r.close close
 
 			form#settings.uibox(method="POST")
 				input.bad.init(name="name" type="text")

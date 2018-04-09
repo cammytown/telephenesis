@@ -162,6 +162,16 @@ module.exports = function(db) {
 		);
 	}
 
+	me.renameStar = function(starId, creatorName, callback) {
+		planets.update(
+			{ id: starId },
+			{ $set: { creatorName } },
+			function(err, result) {
+				callback(err, result);
+			}
+		);
+	}
+
 	me.place = function(starId, x, y, rgb, callback) {
 		planets.update(
 			{ id: starId },

@@ -485,6 +485,14 @@ function Telep() {
 	function pidgeon(e) { // converts all form elements to ajax
 		e.preventDefault();
 
+		/// quick-fix:
+		var activeStarIdInputs = document.getElementsByClassName('activeStarIdInput');
+		for (var inputIndex = 0; inputIndex < activeStarIdInputs.length; inputIndex++) {
+			var input = activeStarIdInputs[inputIndex];
+			console.log('?');
+			input.value = acting_star.id.split('s')[1];
+		}
+
 		var form = e.target;
 		var children = form.children;
 		var op = form.id;

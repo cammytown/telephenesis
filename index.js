@@ -146,7 +146,7 @@ app.post('/ajax/:operation', function(i, o) {
 					return false;
 				}
 
-				telep.renameStar(sid, i.body.rgb, function(err, result) {
+				telep.renameStar(sid, i.body.creatorName, function(err, result) {
 					if(err) {
 						o.json({ error: "couldn't move..." }); ///
 						return false;
@@ -312,7 +312,7 @@ app.post('/ajax/:operation', function(i, o) {
 		default: {
 			/// log something maybe
 
-			o.json({ error: 1 });
+			o.json({ error: "unhandled ajax operation: " +  operation}); /// safe to let people know?
 		}
 	}
 });
