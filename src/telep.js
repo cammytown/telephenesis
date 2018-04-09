@@ -103,7 +103,11 @@ function Telep() {
 			for (var lineIndex = 0; lineIndex < queuedLines.length; lineIndex++) {
 				var line = queuedLines[lineIndex];
 
+				////
+				// var delay = (line.tier * 1000) - (line.tier * 350);
 				var delay = ((line.tier) * 1000) - (line.tier * 800);
+				// var delay = (line.tier * 1000) / (line.tier / 2);
+				// var delay = ((line.tier * line.tier / 2) * 1000) - (line.tier * line.tier * 475);
 
 				var progress = (elapsedms - delay) / 1000;
 				if(progress < 0) {
