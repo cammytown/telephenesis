@@ -14,6 +14,8 @@ function Aud(eid) {
 	aud.dec = null;
 	aud.aut = true;
 
+	var autoplaying = false;
+
 	aud.d = null; aud.m = null; aud.s = null;
 
 	aud.pl = function() {
@@ -37,17 +39,21 @@ function Aud(eid) {
 		return true;
 	}
 
-	aud.ld = function(src, autoplay = true) {
-		if(autoplay) {
-			cor.al(aud.e, 'canplay', aud.pl);
-			cor.al(aud.e, 'error', aud.er);
-		} else {
-			cor.rl(aud.e, 'canplay', aud.pl);
-			cor.rl(aud.e, 'error', aud.er);
+	cor.al(aud.e, 'canplay', function() {
+		console.log('come on');
+
+		if(autoplaying) {
+			aud.pl();
 		}
+	});
+	cor.al(aud.e, 'error', aud.er);
+	// cor.rl(aud.e, 'canplay', aud.pl);
+
+	aud.ld = function(src, autoplay = true) {
+		autoplaying = autoplay;
 
 		aud.e.setAttribute('src', src);
-		//aud.play();
+		aud.e.load();
 	}
 
 	aud.er = function() {
@@ -66,6 +72,6 @@ function Aud(eid) {
 		aud.dec = t/aud.d;
 	}
 
-	if(aud.e.addEventListener) aud.e.addEventListener('timeupdate', aud.up, false);
+	if(aud.e.addEventListener) aud.e.addEventListener('timeupdate', aud.up);
 	else if(aud.e.attachEvent) aud.e.attachEvent('ontimeupdate', aud.up);
 }

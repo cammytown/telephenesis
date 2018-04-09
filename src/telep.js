@@ -36,15 +36,18 @@ function Telep() {
 		aud = new Aud('aud');
 		spc = new Spc('spcE');
 
-		cor.al(aud.e, 'timeupdate', function() {
+		function playerUpdate() {
 			// if(time) {
 				playing_star.getElementsByClassName('time')[0].innerHTML = aud.t;
 			// }
-		});
+		}
 
-		cor.al(aud.e, 'ended', function() {
+		function playerFinish() {
 			cor.rc(playing_star, 'active');
-		});
+		}
+
+		cor.al(aud.e, 'timeupdate', playerUpdate);
+		cor.al(aud.e, 'ended', playerFinish);
 
 		var canvas = document.getElementById('uiEffects');
 		canvas.width = document.body.offsetWidth;
@@ -73,11 +76,6 @@ function Telep() {
 					var sourceStar = document.getElementById('s' + sourceId);
 
 					sourceStar.setAttribute('data-next', star.id.split('s')[1]);
-
-					if(sourceStar.getElementsByTagName('a')[0].style.backgroundColor == '') {
-						console.log(sourceStar);
-						console.log('???');
-					}
 
 					queuedLines.push({
 						startX: parseInt(sourceStar.style.left),
@@ -281,6 +279,7 @@ function Telep() {
 			case 'invite':
 			case 'create':
 			case 'recreate':
+			case 'renameStar':
 			case 'help': {
 				clear(); ///
 				close();
@@ -483,7 +482,7 @@ function Telep() {
 		});
 	}
 
-	function pidgeon(e) {
+	function pidgeon(e) { // converts all form elements to ajax
 		e.preventDefault();
 
 		var form = e.target;
@@ -504,11 +503,18 @@ function Telep() {
 
 				///
 				window.history.go(-1);
-				if(state.path.split('/')[1] == 'invite') window.reload();
 				//navigate('/'); /// previous screen
 
-				if(op == 'register' || op == 'login') cor.ac(document.body, 'in');
-				if(op == 'login' && r.lv) cor.ac(document.body, 'creator');
+				///
+				if(state.path.split('/')[1] == 'invite') window.reload();
+
+				if(op == 'register' || op == 'login') {
+					cor.ac(document.body, 'in');
+				}
+
+				if(op == 'login' && r.lv) {
+					cor.ac(document.body, 'creator');
+				}
 			}
 		});
 	}

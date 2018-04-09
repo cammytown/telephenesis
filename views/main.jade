@@ -56,7 +56,7 @@ html(lang="en")
 						style = "left: " + planet.x + "px; top: " + -planet.y + "px"
 					)
 						a(href=planet.id style="background-color: rgb(" + planet.rgb + ')')
-						span.text.name 
+						span.text.name= planet.creatorName
 						span.text.time
 
 		#limbo
@@ -67,7 +67,8 @@ html(lang="en")
 					a.create(href="/create") Recreate
 					a.admin(href="/moveStar") Move
 					a.admin(href="/recolorStar") Recolor
-					a.admin(href="#") Delete
+					a.admin(href="/renameStar") Change Creator
+					a.admin.danger(href="#") Delete
 
 				.guest
 					a(href="/login") login
@@ -95,6 +96,13 @@ html(lang="en")
 					input#submission(name="submission" type="file")
 					| Upload <small>(mp3)</small>
 
+				a.btn.r.close close
+
+			form#renameStar.uibox(method="POST")
+				h2 Rename Star
+				input.bad.init(name="creatorName" type="text" placeholder="Creator Name")
+				input.activeStarField(name="sid")
+				button.btn(type="submit") submit
 				a.btn.r.close close
 
 			form#settings.uibox(method="POST")

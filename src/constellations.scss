@@ -622,11 +622,19 @@ textarea#code {
 		}
 
 		&.admin {
-			color: #e77;
+			color: #e7e;
+
+			&.danger {
+				color: #e77;
+				&:hover {
+					color: #f8c7c7;
+					background-color: rgba(150, 0, 0, 0.3);
+				}
+			}
 
 			&:hover {
-				color: #f8c7c7;
-				background-color: rgba(150, 0, 0, 0.3);
+				color: #f8c7f7;
+				background-color: rgba(150, 0, 150, 0.3);
 			}
 		}
 	}

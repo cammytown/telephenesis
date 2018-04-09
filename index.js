@@ -131,6 +131,32 @@ app.post('/ajax/:operation', function(i, o) {
 		// 	break;
 		// } break;
 
+		case 'renameStar': {
+			/// consolidate:
+			var sid = parseInt(i.body.sid);
+			telep.getStar(sid, function(err, star) {
+				if(err) {
+					///
+					return false;
+				}
+
+				// if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
+				if(!i.user || i.user.lv != 7) {
+					o.json({ error: "not logged in" });
+					return false;
+				}
+
+				telep.renameStar(sid, i.body.rgb, function(err, result) {
+					if(err) {
+						o.json({ error: "couldn't move..." }); ///
+						return false;
+					}
+
+					o.json({ error: 0 });
+				});
+			});			
+		} break;
+
 		case 'recolor': {
 			/// consolidate:
 			var sid = parseInt(i.body.sid);
@@ -140,7 +166,8 @@ app.post('/ajax/:operation', function(i, o) {
 					return false;
 				}
 
-				if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
+				// if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
+				if(!i.user || i.user.lv != 7) {
 					o.json({ error: "not logged in" });
 					return false;
 				}
@@ -165,7 +192,8 @@ app.post('/ajax/:operation', function(i, o) {
 					return false;
 				}
 
-				if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
+				// if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
+				if(!i.user || i.user.lv != 7) {
 					o.json({ error: "not logged in" });
 					return false;
 				}
