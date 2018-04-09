@@ -12,8 +12,8 @@ It's like the game "Telephone", but with music.
 
 
 ## Credits
-* **Cameron Steele** - code and game concept - [cameronsteele](https://github.com/cameronsteele)
-* **Chris Marianetti** - game concept - [nopiano.com](https://nopiano.com)
+* **Cameron Steele** - code and game concept - [steelecameron.com](https://steelecameron.com)
+* **Chris Marianetti** - game concept - [nopiano.com](http://nopiano.com)
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
