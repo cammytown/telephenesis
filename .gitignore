@@ -6,3 +6,4 @@ node_modules/
 telep.config.js
 uploads/*
 public/music/*
+!public/music/README
