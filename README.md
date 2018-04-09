@@ -8,7 +8,7 @@ It's like the game "Telephone", but with music.
 * [Node.js](https://nodejs.org/en/)
 * [Express](https://expressjs.com/)
 * [LAME](https://lame.buanzo.org/)
-* [MongoDB] (https://www.mongodb.com/)
+* [MongoDB](https://www.mongodb.com/)
 
 
 ## Credits
