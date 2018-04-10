@@ -1,8 +1,6 @@
 # Telephenesis
 
-Telephenesis is a visualization of the metamorphosis of a musical idea as it is reinterpreted and recreated by different artists.
-
-It's like the game "Telephone", but with music.
+Telephenesis (https://telephenesis.com) is a visualization of the metamorphosis of a musical idea as it is reinterpreted and recreated by different artists. It's like the game "Telephone", but with music.
 
 ## Built using
 * [Node.js](https://nodejs.org/en/)

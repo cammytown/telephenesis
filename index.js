@@ -312,7 +312,7 @@ app.post('/ajax/:operation', function(i, o) {
 		default: {
 			/// log something maybe
 
-			o.json({ error: "unhandled ajax operation: " +  operation}); /// safe to let people know?
+			o.json({ error: "unhandled ajax operation: " +  i.params.operation}); /// safe to let people know?
 		}
 	}
 });
