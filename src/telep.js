@@ -50,7 +50,7 @@ function Telep() {
 			cor.rc(playing_star, 'active');
 
 			if(playing_star.getAttribute('data-next')) {
-				var star = document.getElementById(playing_star.getAttribute('data-next'));
+				var star = document.getElementById('s' + playing_star.getAttribute('data-next'));
 				load(star);
 			} else {
 				playing_star = false;
