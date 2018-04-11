@@ -221,12 +221,9 @@ a.menuToggle {
   color: #eee;
   font-size: 1.25em;
   white-space: nowrap;
-  /*.inverse & { color: #222; }*/
-  /*.inverse & .text { background-color: #fcfcfc; }*/ }
+  /*.inverse & { color: #222; }*/ }
   .star.moving {
     z-index: -1; }
-  .star:hover {
-    z-index: 2; }
   .star > a {
     position: absolute;
     display: block;
@@ -243,6 +240,16 @@ a.menuToggle {
     transition: left 0.3s, top 0.3s, width 0.3s, height 0.3s, background-color 0.5s, border-width 0.3s, border-color 0.5s; }
     .star > a:hover {
       background-color: #e7e7f7 !important; }
+  .star:hover {
+    z-index: 4; }
+  .star.bookmarked > a {
+    left: -11px;
+    top: -11px;
+    width: 14px;
+    height: 14px;
+    border-width: 4px;
+    border-radius: 11px;
+    border-color: #a73292; }
   .star.active {
     z-index: 3; }
     .star.active > a {
@@ -252,12 +259,14 @@ a.menuToggle {
       height: 14px;
       border-width: 14px;
       border-radius: 21px;
-      animation-duration: 500ms, 20s;
+      animation-duration: 450ms, 20s;
       animation-name: starClick, activeStarBorder;
       animation-iteration-count: 1, infinite;
-      animation-delay: 0s, 500ms; }
+      animation-delay: 0s, 450ms; }
+    .star.active:hover {
+      z-index: 1; }
 @keyframes starClick {
-  from {
+  0% {
     left: -8px;
     top: -8px;
     width: 14px;
@@ -265,17 +274,24 @@ a.menuToggle {
     border-width: 1px;
     border-radius: 8px;
     border-color: #000; }
-  to {
+  45% {
+    left: -25px;
+    top: -25px;
+    width: 14px;
+    height: 14px;
+    border-width: 18px;
+    border-radius: 25px; }
+  100% {
     left: -21px;
     top: -21px;
     width: 14px;
     height: 14px;
     border-width: 14px;
     border-radius: 21px;
-    border-color: #9c7751; } }
+    border-color: #c77929; } }
 @keyframes activeStarBorder {
   0% {
-    border-color: #9c7751;
+    border-color: #c77929;
     border-width: 14px; }
   20% {
     border-color: #77a; }
@@ -307,17 +323,35 @@ a.menuToggle {
   80% {
     border-color: #658a58; }
   100% {
-    border-color: #9c7751; } }
-  .star .text {
+    border-color: #c77929; } }
+  .star .meta {
+    position: relative;
+    left: 14px;
+    top: -14px;
     display: none;
-    margin: -12px 0 0 22px;
-    padding: 2px 5px 2px 3px;
-    background-color: rgba(0, 0, 0, 0.6);
-    transition: background-color 0.2s; }
-  .star:hover .name, .star.active .time {
+    margin: 0 4px;
+    transition: left 450ms, top 450ms;
+    /*.inverse & .text { background-color: #fcfcfc; }*/ }
+    .star .meta .text {
+      padding: 2px 5px 2px 3px;
+      background-color: rgba(0, 0, 0, 0.6);
+      transition: background-color 250ms; }
+      .star .meta .text.time {
+        display: none; }
+  .star.active .meta {
+    display: block;
+    left: 22px;
+    top: -22px; }
+    .star.active .meta .time {
+      display: block; }
+  .star:hover .meta {
     display: block; }
-  .star.active .name, .star.menu .name, .star.menu .time {
-    display: none; }
+  .star.active .meta {
+    display: block; }
+    .star.active .meta:hover {
+      z-index: -1; }
+      .star.active .meta:hover .text {
+        color: #4e5767; }
 
 /* forms */
 input, textarea {
@@ -539,6 +573,7 @@ textarea#code {
   margin: -5px 0 0 3px;
   background: rgba(0, 0, 0, 0.8); }
   .menu a {
+    display: block;
     width: 125px;
     padding: 3px 10px;
     font-size: 1.2em; }

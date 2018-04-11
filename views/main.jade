@@ -48,22 +48,25 @@ html(lang="en")
 
 			#map
 				each planet, i in planets
+					planet.id
 					//- .planet(data-prev=planet.lsid data-next=planet.)
 					.star(
 						id = "s" + planet.id
+						class = user.usrMeta.bookmarks.indexOf(planet.id) != -1 ? "bookmarked" : ""
 						data-prev = planet.sourceId
 						data-tier = planet.tier
 						style = "left: " + planet.x + "px; top: " + -planet.y + "px"
 					)
 						a(href=planet.id style="background-color: rgb(" + planet.rgb + ')')
-						span.text.name= planet.creatorName
-						span.text.time
+						div.meta
+							div.text.name= planet.creatorName
+							div.text.time
 
 		#limbo
 			//- #ticket
 			#starMenu.menu
 				.user
-					//- a Bookmark
+					a(href="/bookmark") Bookmark
 					a.create(href="/create") Recreate
 					a.admin(href="/moveStar") Move
 					a.admin(href="/recolorStar") Recolor
@@ -76,7 +79,6 @@ html(lang="en")
 
 			#galaxyMenu.menu
 				.user
-					//- a Bookmark
 					a.create(href="/create") Create Constellation
 
 				.guest

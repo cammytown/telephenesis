@@ -10,6 +10,7 @@ module.exports = function(db) {
 
 	///:
 	var MLMeta = db.collection('MLMeta'); /// do we need to filter MLMeta?
+	var usrMeta = db.collection('usrMeta'); /// do we need to filter MLMeta?
 	var MLPcurrentPlanetIndex;
 	MLMeta.find({ id: 'persistors' }).limit(1).next(function(err, persistorDoc) {
 		if(!persistorDoc) {
@@ -30,6 +31,18 @@ module.exports = function(db) {
 			}
 		}
 	});
+
+	me.getUsrMeta = function(uid, callback) {
+		usrMeta.findOne({ uid }, function(err, doc) {
+			if(err) {
+				console.error(err);
+				///
+				return false;
+			}
+
+			callback(doc);
+		});
+	}
 
 	me.getPlanets = function(userId = false, cb) {
 		planets.find({ initialized: true }).toArray(function(err, results) {
@@ -142,13 +155,21 @@ module.exports = function(db) {
 		});
 	}
 
+	me.bookmark = function(star, uid, callback) {
+		// usrMeta.update(
+		usrMeta.update(
+			{ uid },
+			{ $addToSet: { bookmarks: star.id } },
+			{ upsert: true },
+			callback
+		);
+	}
+
 	me.recolor = function(starId, rgb, callback) {
 		planets.update(
 			{ id: starId },
 			{ $set: { rgb } },
-			function(err, result) {
-				callback(err, result);
-			}
+			callback
 		);
 	}
 
@@ -156,9 +177,7 @@ module.exports = function(db) {
 		planets.update(
 			{ id: starId },
 			{ $set: { x, y } },
-			function(err, result) {
-				callback(err, result);
-			}
+			callback
 		);
 	}
 
@@ -166,9 +185,7 @@ module.exports = function(db) {
 		planets.update(
 			{ id: starId },
 			{ $set: { creatorName } },
-			function(err, result) {
-				callback(err, result);
-			}
+			callback
 		);
 	}
 
@@ -176,9 +193,7 @@ module.exports = function(db) {
 		planets.update(
 			{ id: starId },
 			{ $set: { x, y, rgb, initialized: true, placed: true } },
-			function(err, result) {
-				callback(err, result);
-			}
+			callback
 		);
 	}
 }

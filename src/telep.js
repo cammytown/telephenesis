@@ -16,7 +16,7 @@ function Telep() {
 	var me = this;
 
 	var playing_star = false;
-	var acting_star = false;
+	var acting_star = false; /// TODO: probably create Star class for api to handle interaction with them
 	var active_box = false;
 	var state = { path: window.location.pathname, updating: false, ref: false };
 
@@ -48,6 +48,13 @@ function Telep() {
 
 		function playerFinish() {
 			cor.rc(playing_star, 'active');
+
+			if(playing_star.getAttribute('data-next')) {
+				var star = document.getElementById(playing_star.getAttribute('data-next'));
+				load(star);
+			} else {
+				playing_star = false;
+			}
 		}
 
 		cor.al(aud.e, 'timeupdate', playerUpdate);
@@ -179,8 +186,12 @@ function Telep() {
 					break;
 
 				case 32:
-					//e.preventDefault();
-					///if(e.target)
+					if(!active_box) {
+						e.preventDefault();
+
+						aud.e.paused ? aud.pl() : aud.pa();
+					}
+
 					break;
 
 				case 27:
@@ -239,12 +250,12 @@ function Telep() {
 
 		/* history */
 		cor.al(window, 'popstate', chrono);
-		history.replaceState(state, 'telephenesis', state.path) /// doesn't get title
+		history.replaceState(state, 'telephenesis', state.path) /// TODO: doesn't get title
 
 		if(state.path && state.path != 'login' && state.path != 'register') {
 			//load(document.getElementById('s'+state.path));
 
-			///:
+			/// TODO: reexamine:
 			var parts = state.path.split('/');
 			var operation = parts[1];
 			if(operation == 'invite' || operation=='login' || operation=='register') return false;
@@ -253,7 +264,7 @@ function Telep() {
 		}
 	}
 
-	/// put toggle and menu in same element for active?
+	/// TODO: put toggle and menu in same element for active?
 	function togglemenu(e) {
 		var menu = document.getElementById('menu');
 		var check = cor.cc(menu, 'active');
@@ -269,10 +280,10 @@ function Telep() {
 	}
 
 
-	function chrono(e) {
+	function chrono(e) { // used on popstate; TODO: improve naming?
 		state.updating = false;
 		if(!e.state) {
-			console.log('NOW');
+			// console.log('NOW');
 			navigate(window.location.pathname);
 		}
 		else {
@@ -290,7 +301,7 @@ function Telep() {
 			load(star);
 			if(state.path == path) return true;
 		} else switch(operation) {
-			/// refactor:
+			/// TODO: refactor:
 			case 'help':
 			case 'login':
 			case 'register':
@@ -303,6 +314,10 @@ function Telep() {
 				clear(); ///
 				close();
 				open(operation);
+			} break;
+
+			case 'bookmark': {
+				bookmarkStar(acting_star);
 			} break;
 
 			case 'moveStar': {
@@ -356,6 +371,20 @@ function Telep() {
 			Anm.fadeIn(box);
 			spc.flt(true)
 		}
+	}
+
+	function bookmarkStar(star) {
+		var sid = star.id.split('s')[1];
+		var p = "sid="+sid;
+		ajx('/ajax/bookmark', p, function(d) {
+			var r = JSON.parse(d);
+			if(!r.error) {
+				cor.ac(star, 'bookmarked');
+				limbo.appendChild(document.getElementById('starMenu'));
+			}
+		});
+
+		return false;
 	}
 
 	function initializeRecolor() {
@@ -453,7 +482,7 @@ function Telep() {
 			menu.style.left = parseInt(star.style.left) + 12 + 'px';
 			menu.style.top = parseInt(star.style.top) - 5 + 'px';
 
-			cor.al(menu.children[0], 'click', function() { bookmark(star); });
+			cor.al(menu.children[0], 'click', function() { bookmarkStar(star); });
 			menu.children[1].href = sid+'/recreate';
 
 			spc.map.appendChild(menu);
@@ -879,20 +908,6 @@ function Telep() {
 
 
 
-
-
-	function bookmark(star) {
-		var sid = star.id.split('s')[1];
-		var p = "sid="+sid;
-		ajx('/ajax/bookmark', p, function(d) {
-			var r = JSON.parse(d);
-			if(r.success) {
-				limbo.appendChild(document.getElementById('starMenu'));
-			}
-		});
-
-		return false;
-	}
 
 	// visual functions
 	function clear() {

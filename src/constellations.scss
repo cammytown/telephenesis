@@ -11,6 +11,8 @@ $header: #ecb;
 $link: #bae;
 $linkHover: #dee7f7;
 
+$dimmedText: #4e5767;
+
 html, body { height: 100%; margin: 0; }
 body {
 	background: #000;
@@ -264,10 +266,6 @@ $inactiveBorderWidth: 1px;
 		z-index: -1; ///
 	}
 
-	&:hover {
-		z-index: 2;
-	}
-
 	/*.inverse & { color: #222; }*/
 
 	> a {
@@ -299,6 +297,18 @@ $inactiveBorderWidth: 1px;
 	// 	border-radius: 11px;
 	// }
 
+	&:hover {
+		z-index: 4;
+	}
+
+	&.bookmarked {
+		> a {
+			// border: 2px yellow solid;
+			@include starProps($starSize, $activeBorderWidth - 10);
+			border-color: #a73292;
+		}
+	}
+
 	&.active {
 		z-index: 3;
 
@@ -311,33 +321,40 @@ $inactiveBorderWidth: 1px;
 			// border-color: #9c7751;
 			@include starProps($starSize, $activeBorderWidth);
 
-			animation-duration: 500ms, 20s;
+			animation-duration: 450ms, 20s;
 			animation-name: starClick, activeStarBorder;
 			animation-iteration-count: 1, infinite;
-			animation-delay: 0s, 500ms;
+			animation-delay: 0s, 450ms;
 			// border-width: $activeBorderWidth;
 			// border-radius: $activeBorderWidth * 2;
 		}
+
+		&:hover {
+			z-index: 1;
+		}
 	}
 
-
 	@keyframes starClick {
-		from {
+		0% {
 			@include starProps($starSize, $inactiveBorderWidth);
 
 			border-color: #000;
 		}
 
-		to {
+		45% {
+			@include starProps($starSize, $activeBorderWidth + 4);
+		}
+
+		100% {
 			@include starProps($starSize);
 
-			border-color: #9c7751;
+			border-color: #c77929;
 		}
 	}
 
 	@keyframes activeStarBorder {
 		0%	{
-			border-color: #9c7751;
+			border-color: #c77929;
 			border-width: 14px;
 		}
 
@@ -370,26 +387,69 @@ $inactiveBorderWidth: 1px;
 		}
 
 		100% {
-			border-color: #9c7751;
+			border-color: #c77929;
 		}
 	}
 
-	.text {
+	.meta {
+		position: relative;
+		left: 14px;
+		top: -14px;
 		display: none;
-		margin: -12px 0 0 22px;
-		padding: 2px 5px 2px 3px;
-		background-color: rgba(0, 0, 0, 0.6);
-		transition: background-color 0.2s;
-	}
-	/*.inverse & .text { background-color: #fcfcfc; }*/
+		margin: 0 4px;
+		transition: left 450ms, top 450ms;
 
-	&:hover .name, &.active .time {
+		.text {
+			// display: none;
+			padding: 2px 5px 2px 3px;
+			background-color: rgba(0, 0, 0, 0.6);
+			transition: background-color 250ms;
+
+			&.time {
+				display: none;
+			}
+
+			&.name {
+			}
+		}
+		/*.inverse & .text { background-color: #fcfcfc; }*/
+
+		// &:hover .name, &.active .time {
+	}
+
+	&.active {
+		.meta {
+			display: block;
+			left: 22px;
+			top: -22px;
+
+			.time {
+				display: block;
+			}
+		}
+	}
+
+	&:hover .meta {
 		display: block;
 	}
 
-	&.active .name, &.menu .name, &.menu .time {
-		display: none;
+	&.active .meta {
+		display: block;
+
+		&:hover {
+			// opacity: 0;
+			z-index: -1;
+
+			.text {
+				color: $dimmedText;
+			}
+		}
 	}
+
+
+	// &.active .name, &.menu .name, &.menu .time {
+	// 	display: none;
+	// }
 
 }
 
@@ -638,6 +698,7 @@ textarea#code {
 	background: rgba(0, 0, 0, 0.8);
 
 	a {
+		display: block;
 		width: 125px;
 		padding: 3px 10px;
 		font-size: 1.2em;

@@ -66,7 +66,12 @@ function Aud(eid) {
 		var s = (t-m*60)+'';
 		if(s.length<2) s = "0"+s;
 
-		aud.t = m+':'+s+' / '+aud.m+':'+aud.s;
+		if(aud.m == 'null') {
+			aud.t = 'loading...';
+		} else {
+			aud.t = m+':'+s+' / '+aud.m+':'+aud.s;
+		}
+
 		aud.dec = t/aud.d;
 	}
 
