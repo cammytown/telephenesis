@@ -318,16 +318,17 @@ function Telep() {
 
 			case 'bookmark': {
 				bookmarkStar(acting_star);
+				return true;
 			} break;
 
 			case 'moveStar': {
 				initializeMove();
-				// return true;
+				return true;
 			} break;
 
 			case 'recolorStar': {
 				initializeRecolor();
-				// return true;
+				return true;
 			} break;
 
 			case 'logout': {
@@ -482,7 +483,6 @@ function Telep() {
 			menu.style.left = parseInt(star.style.left) + 12 + 'px';
 			menu.style.top = parseInt(star.style.top) - 5 + 'px';
 
-			cor.al(menu.children[0], 'click', function() { bookmarkStar(star); });
 			menu.children[1].href = sid+'/recreate';
 
 			spc.map.appendChild(menu);

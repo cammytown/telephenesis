@@ -50,7 +50,7 @@ MongoClient.connect("mongodb://localhost:27017", function(error, client) {
 
 	db = client.db('telephenesis');
 
-	usr = new Usr(db, validator, bcrypt, );
+	usr = new Usr(db, validator, bcrypt);
 	telep = new Telep(db, Lame);
 
 	// testcollection = db.collection('test');
@@ -82,6 +82,7 @@ function init() {
 					n();
 				});
 			} else {
+				i.user.usrMeta = {}; ///
 				n();
 			}
 
