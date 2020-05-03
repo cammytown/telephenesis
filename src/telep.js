@@ -534,10 +534,12 @@ function Telep() {
 		e.preventDefault();
 
 		/// quick-fix:
-		var activeStarIdInputs = document.getElementsByClassName('activeStarIdInput');
-		for (var inputIndex = 0; inputIndex < activeStarIdInputs.length; inputIndex++) {
-			var input = activeStarIdInputs[inputIndex];
-			input.value = acting_star.id.split('s')[1];
+		if(acting_star) {
+			var activeStarIdInputs = document.getElementsByClassName('activeStarIdInput');
+			for (var inputIndex = 0; inputIndex < activeStarIdInputs.length; inputIndex++) {
+				var input = activeStarIdInputs[inputIndex];
+				input.value = acting_star.id.split('s')[1];
+			}
 		}
 
 		var form = e.target;
@@ -585,7 +587,7 @@ function Telep() {
 
 		var lsid = acting_star ? parseInt(acting_star.id.split('s')[1]) : 0;
 		var file = document.getElementById('submission');
-		var upl = new Upl('/ajax/upload/'+lsid, file, progress, complete);
+		var upl = new Upl('/ajax/upload/'+lsid, file, progressCallback, completeCallback);
 
 		var placed = false;
 		var uploaded = false;
@@ -616,7 +618,7 @@ function Telep() {
 			cor.al(placeable, 'click', placerclick);
 		}
 
-		function progress(e) {
+		function progressCallback(e) {
 			if (e.lengthComputable) {
 				var progress = e.loaded / e.total;
 				percent.innerHTML = Math.floor(progress*100) + '% uploaded';
@@ -630,11 +632,16 @@ function Telep() {
 			}
 		}
 
-		function complete(e) {
+		function completeCallback(e) {
 			uploaded = true;
 
 			var d = e.target.responseText;
 			var r = JSON.parse(d);
+
+			if(r.error) {
+				console.log(r.error); ////
+				throw(r.error);
+			}
 
 			nsid = r.sid;
 			placer.id = 's'+nsid;

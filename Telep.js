@@ -106,6 +106,7 @@ module.exports = function(db) {
 
 			} break;
 
+			case 'audio/mpeg':
 			case 'audio/mp3': {
 				starFileName += '.mp3';
 				var target_path = 'public/music/' + starFileName;

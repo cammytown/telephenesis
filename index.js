@@ -24,7 +24,7 @@ var Telep = require('./Telep.js');
 var config = require('./telep.config.js');
 
 app.set('views', './views');
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
 app.use(express.static('public'));
 
 app.use(bodyParser.json({ limit: "2400mb" }));
@@ -42,7 +42,7 @@ app.use(cookieParser(config.sessionSecret));
 // });
 
 var db;
-MongoClient.connect("mongodb://localhost:27017", function(error, client) {
+MongoClient.connect("mongodb://localhost:27017", { useUnifiedTopology: true }, function(error, client) {
 	if(error) {
 		console.log(error);
 		return false;
@@ -57,6 +57,23 @@ MongoClient.connect("mongodb://localhost:27017", function(error, client) {
 
 	init();
 });
+
+
+function telepAuth(level) {
+	return function(req, res, next) {
+		if(!req.user) {
+			o.json({ error: "not logged in" });
+			return false; ///
+		}
+
+		if(!req.user.lv) {
+			o.json({ error: "no creator credentials" });
+			return false; ///
+		}
+
+		next();
+	}
+}
 
 function init() {
 	/// placement?:
@@ -89,17 +106,7 @@ function init() {
 		});
 	});
 
-	app.post('/ajax/upload/:starid', upload.single('submission'), function(i, o) { /// could maybe just use .post('/create/:starid')
-		if(!i.user) {
-			o.json({ error: "not logged in" });
-			return false; ///
-		}
-
-		if(!i.user.lv) {
-			o.json({ error: "no creator credentials" });
-			return false; ///
-		}
-
+	app.post('/ajax/upload/:starid', telepAuth('creator'), upload.single('submission'), function(i, o) { /// could maybe just use .post('/create/:starid')
 		/// consider putting objects in memory if we care about deep optimization later https://github.com/expressjs/multer#memorystorage
 
 		var starId = parseInt(i.params.starid);
@@ -130,19 +137,6 @@ function init() {
 
 	app.post('/ajax/:operation', function(i, o) {
 		switch(i.params.operation) {
-			// case 'upload': {
-			// 	if(!i.user) {
-			// 		o.send('{ "error": "not logged in" }');
-			// 		return false; ///
-			// 	}
-
-			// 	$lsid = $v;
-			// 	$file = $_FILES['i'];
-			// 	if(!$ajax->upload($user['id'], $lsid, $file))
-			// 		echo '{ "error": "did not upload" }';
-			// 	break;
-			// } break;
-
 			case 'renameStar': {
 				/// consolidate:
 				var sid = parseInt(i.body.sid);

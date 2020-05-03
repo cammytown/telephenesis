@@ -1,6 +1,8 @@
 node_modules/
 .sass-cache/
+.vagrant
 *.css.map
+*.log
 
 .cammyflow
 telep.config.js

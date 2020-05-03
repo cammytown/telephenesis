@@ -18,7 +18,7 @@ export default Upl;
 
 import cor from './cor';
 
-function Upl(u, i, p, c) {
+function Upl(u, i, progressCallback, completeCallback) {
 	/// ie>=10 only
 
 	var me = this;
@@ -29,21 +29,21 @@ function Upl(u, i, p, c) {
 	d.append(i.name, i.files[0]); /// should we use getAttribute('name') ?
 	var r = new XMLHttpRequest();
 
-	cor.al(r.upload, "progress", p);
-	cor.al(r, "load", c);
-	cor.al(r, "error", me.f);
+	cor.al(r.upload, "progress", progressCallback);
+	cor.al(r, "load", completeCallback);
+	cor.al(r, "error", defaultErrorCallback);
 	cor.al(r, "abort", me.s);
 
 	r.open('POST', u);
 	r.send(d);
 
+	function defaultErrorCallback(e) {
+		console.log("An error occurred while transferring the file.");
+	}
 
-
-
-
-
-
-
+	me.s = function(e) {
+		console.log("The transfer has been canceled by the user.");
+	}
 
 	// me.p = function(e) {
 	// 	console.log('t');
@@ -66,12 +66,4 @@ function Upl(u, i, p, c) {
 	// 	// if(!placed) uploaded = true;
 	// 	// else finish(r.sid, parseInt(placer.style.left), parseInt(placer.style.top), rgb);
 	// }
-
-	me.f = function(e) {
-		console.log("An error occurred while transferring the file.");
-	}
-
-	me.s = function(e) {
-		console.log("The transfer has been canceled by the user.");
-	}
 }
