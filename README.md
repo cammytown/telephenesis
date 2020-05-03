@@ -2,7 +2,11 @@
 
 Telephenesis (https://telephenesis.com) is a visualization of the metamorphosis of a musical idea as it is reinterpreted and recreated by different artists. It's like the game "Telephone", but with music.
 
-One artist composes a piece of music and uploads it in digital form to the website. It is then visualized as a star floating in an outerspace interface. Listeners can click on the stars to listen to the track. Artists can remix or recreate tracks and upload them to be represented as a growing constellation of the progression of musical ideas as they are relayed from one creative mind to another.
+First, someone composes a piece of music and uploads it in digital form to the website. It shows up as a star in an outerspace interface. When a user clicks the star, the track plays.
+
+Then, other artists can come along and remix or recreate a star's music. They upload their version and it, too, is represented as a star; this time with a line to its origin.
+
+Listeners and browse through a growing constellation of the progression of musical ideas as they are relayed from one mind to another.
 
 ## Built using
 * [Node.js](https://nodejs.org/en/)
