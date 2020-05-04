@@ -694,7 +694,7 @@ textarea#code {
   font-size: 1.5em;
   text-align: center; }
 
-#menu .user a {
+#menu .user a, #menu .guest a {
   display: block; }
 
 /* /// refactor: */

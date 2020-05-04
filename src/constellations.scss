@@ -840,7 +840,7 @@ textarea#code {
 
 
 
-#menu .user { ///
+#menu .user, #menu .guest { ///
 	a {
 		display: block;
 	}
@@ -848,7 +848,7 @@ textarea#code {
 
 /* /// refactor: */
 .user, .create { display: none; }
-.in .user { display: block; }
+.in .user, { display: block; }
 .in.creator .create { display: block; }
 .in .guest { display: none; }
 

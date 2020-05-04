@@ -17,9 +17,9 @@ module.exports = function(db) {
 			// persistorDoc = {}; /// quick-fix
 			MLMeta.insertOne({
 				id: 'persistors',
-				userIndex: 0,
-				currentConstellationIndex: 0,
-				currentPlanetIndex: 0
+				userIndex: 1,
+				currentConstellationIndex: 1,
+				currentPlanetIndex: 1
 			}, function() {
 				
 			});
