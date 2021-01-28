@@ -157,8 +157,7 @@ module.exports = function(db) {
 	}
 
 	me.bookmark = function(star, uid, callback) {
-		// usrMeta.update(
-		usrMeta.update(
+		usrMeta.updateOne(
 			{ uid },
 			{ $addToSet: { bookmarks: star.id } },
 			{ upsert: true },
@@ -167,7 +166,7 @@ module.exports = function(db) {
 	}
 
 	me.recolor = function(starId, rgb, callback) {
-		planets.update(
+		planets.updateOne(
 			{ id: starId },
 			{ $set: { rgb } },
 			callback
@@ -175,7 +174,7 @@ module.exports = function(db) {
 	}
 
 	me.move = function(starId, x, y, callback) {
-		planets.update(
+		planets.updateOne(
 			{ id: starId },
 			{ $set: { x, y } },
 			callback
@@ -183,7 +182,7 @@ module.exports = function(db) {
 	}
 
 	me.renameStar = function(starId, creatorName, callback) {
-		planets.update(
+		planets.updateOne(
 			{ id: starId },
 			{ $set: { creatorName } },
 			callback
@@ -191,7 +190,7 @@ module.exports = function(db) {
 	}
 
 	me.place = function(starId, x, y, rgb, callback) {
-		planets.update(
+		planets.updateOne(
 			{ id: starId },
 			{ $set: { x, y, rgb, initialized: true, placed: true } },
 			callback

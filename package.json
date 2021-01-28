@@ -2,7 +2,7 @@
   "name": "telephenesis-nodejs",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "private": true,
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
@@ -10,20 +10,20 @@
     "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
-    "mongodb": "^3.5.7",
+    "mongodb": "^3.6.3",
     "multer": "^1.4.2",
     "node-lame": "^1.2.2",
-    "npm": "^6.14.4",
-    "pug": "^2.0.4",
-    "validator": "^13.0.0"
+    "npm": "^6.14.11",
+    "pug": "^3.0.0",
+    "validator": "^13.5.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.9.6",
-    "@babel/preset-env": "^7.9.6",
-    "babel-loader": "^8.1.0",
-    "nodemon": "^2.0.3",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11"
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "babel-loader": "^8.2.2",
+    "nodemon": "^2.0.7",
+    "webpack": "^5.16.0",
+    "webpack-cli": "^4.4.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

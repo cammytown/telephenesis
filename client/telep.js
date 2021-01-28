@@ -9,6 +9,7 @@ import {ajx} from './minlab/ajx';
 import Clr from './minlab/clr';
 
 cor.al(window, 'load', function() {
+	console.log("??");
 	new Telep().init(); /// change architecture after pondering on it some more
 });
 
@@ -554,7 +555,7 @@ function Telep() {
 
 		ajx('/ajax/'+op, p, function(d) {
 			var r = JSON.parse(d);
-			if(r.error) console.log(r.error);
+			if(r.error) throw new Error(r.error);
 			else {
 				state.updating = true;
 

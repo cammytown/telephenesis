@@ -6,6 +6,8 @@ export { ajx };
 function ajx(url, params, callback, multipart) {
 	multipart = (typeof multpart === "undefined") ? false : multipart;
 
+	console.log(url);
+
 	var httpRequest;
 	if(window.XMLHttpRequest) httpRequest = new XMLHttpRequest();
 	else return false;

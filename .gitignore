@@ -1,3 +1,5 @@
+#///TODO check if we're still using these files/directories
+
 node_modules/
 .sass-cache/
 .vagrant
@@ -5,9 +7,12 @@ node_modules/
 *.log
 
 .cammyflow
-telep.config.js
+telepServer.config.js
 uploads/*
 public/music/*
 !public/music/README
 
 *.sublime-workspace
+
+#/// temporary, probably:
+mongodata/*

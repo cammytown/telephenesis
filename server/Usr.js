@@ -6,14 +6,14 @@ TODO
 	- don't use if(!$sh->execute()) return false;
 	- add a column, "on" for active or not?
 	- remove bcrypt param somehow?
-
 */
-//// dont release anything here that could hurt the security of sf
 
 module.exports = function(db, vl, bcrypt) {
 	var collection;
 	// collection = db.collection('usr'); /// safe name?
 	collection = db.collection('MLusers'); /// safe name?
+
+	var MLPuserIndex;
 
 	this.grr = false;
 

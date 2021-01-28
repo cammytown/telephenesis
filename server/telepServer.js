@@ -19,13 +19,13 @@ const app = express();
 var Usr = require('./Usr.js');
 var usr;
 
-var Telep = require('./Telep.js');
+var TelepAPI = require('./TelepAPI.js');
 
-var config = require('./telep.config.js');
+var config = require('./telepServer.config.js');
 
 app.set('views', './views');
 app.set('view engine', 'pug');
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public'));
 
 app.use(bodyParser.json({ limit: "2400mb" }));
 app.use(bodyParser.urlencoded({ limit: "2400mb", extended: true }));
@@ -42,7 +42,7 @@ app.use(cookieParser(config.sessionSecret));
 // });
 
 var db;
-MongoClient.connect("mongodb://localhost:27017", { useUnifiedTopology: true }, function(error, client) {
+MongoClient.connect("mongodb://mongo:27017", { useUnifiedTopology: true }, function(error, client) {
 	if(error) {
 		console.log(error);
 		return false;
@@ -51,10 +51,11 @@ MongoClient.connect("mongodb://localhost:27017", { useUnifiedTopology: true }, f
 	db = client.db('telephenesis');
 
 	usr = new Usr(db, validator, bcrypt);
-	telep = new Telep(db, Lame);
+	api = new TelepAPI(db, Lame);
 
 	// testcollection = db.collection('test');
 
+	console.log("Database connection established. Initializing Telephenesis...")
 	init();
 });
 
@@ -62,12 +63,12 @@ MongoClient.connect("mongodb://localhost:27017", { useUnifiedTopology: true }, f
 function telepAuth(level) {
 	return function(req, res, next) {
 		if(!req.user) {
-			o.json({ error: "not logged in" });
+			res.json({ error: "not logged in" });
 			return false; ///
 		}
 
 		if(!req.user.lv) {
-			o.json({ error: "no creator credentials" });
+			res.json({ error: "no creator credentials" });
 			return false; ///
 		}
 
@@ -82,7 +83,7 @@ function init() {
 		resave: false,
 		saveUninitialized: false, ///
 		store: new MongoStore({
-			url: "mongodb://localhost:27017/telephenesis",
+			url: "mongodb://mongo:27017/telephenesis",
 			// db: db /// ??? not working?
 		})
 		//cookie: { secure: true } /// HTTPS only
@@ -90,11 +91,13 @@ function init() {
 
 
 	app.use(function(i, o, n) {
+		console.log(i.originalUrl);
+
 		usr.in(i.cookies.usr_ss, function(user) {
 			i.user = user;
 
 			if(user) {
-				telep.getUsrMeta(i.user.id, function(doc) {
+				api.getUsrMeta(i.user.id, function(doc) {
 					i.user.usrMeta = doc;
 					n();
 				});
@@ -113,13 +116,13 @@ function init() {
 
 		///:
 		if(starId > 0) { ///
-			telep.getStar(starId, function(err, sourceStar) {
-				telep.createStar(i.user.id, sourceStar, i.file, function(star) {
+			api.getStar(starId, function(err, sourceStar) {
+				api.createStar(i.user.id, sourceStar, i.file, function(star) {
 					o.json({ error: 0, sid: star.id });
 				});
 			});
 		} else {
-			telep.createStar(i.user.id, false, i.file, function(star) {
+			api.createStar(i.user.id, false, i.file, function(star) {
 				o.json({ error: 0, sid: star.id });
 			});
 		}
@@ -140,7 +143,7 @@ function init() {
 			case 'renameStar': {
 				/// consolidate:
 				var sid = parseInt(i.body.sid);
-				telep.getStar(sid, function(err, star) {
+				api.getStar(sid, function(err, star) {
 					if(err) {
 						///
 						return false;
@@ -152,7 +155,7 @@ function init() {
 						return false;
 					}
 
-					telep.renameStar(sid, i.body.creatorName, function(err, result) {
+					api.renameStar(sid, i.body.creatorName, function(err, result) {
 						if(err) {
 							o.json({ error: "couldn't move..." }); ///
 							return false;
@@ -165,7 +168,7 @@ function init() {
 
 			case 'bookmark': {
 				var sid = parseInt(i.body.sid);
-				telep.getStar(sid, function(err, star) {
+				api.getStar(sid, function(err, star) {
 					if(err) {
 						///
 						console.error(err);
@@ -178,7 +181,7 @@ function init() {
 						return false;
 					}
 
-					telep.bookmark(star, i.user.id, function(err, result) {
+					api.bookmark(star, i.user.id, function(err, result) {
 						if(err) {
 							///
 							console.error(err);
@@ -196,7 +199,7 @@ function init() {
 			case 'recolor': {
 				/// consolidate:
 				var sid = parseInt(i.body.sid);
-				telep.getStar(sid, function(err, star) {
+				api.getStar(sid, function(err, star) {
 					if(err) {
 						///
 						return false;
@@ -208,7 +211,7 @@ function init() {
 						return false;
 					}
 
-					telep.recolor(sid, i.body.rgb, function(err, result) {
+					api.recolor(sid, i.body.rgb, function(err, result) {
 						if(err) {
 							o.json({ error: "couldn't move..." }); ///
 							return false;
@@ -222,7 +225,7 @@ function init() {
 
 			case 'move': {
 				var sid = parseInt(i.body.sid);
-				telep.getStar(sid, function(err, star) {
+				api.getStar(sid, function(err, star) {
 					if(err) {
 						///
 						return false;
@@ -237,7 +240,7 @@ function init() {
 					var x = parseInt(i.body.x);
 					var y = -1 * parseInt(i.body.y);
 
-					telep.move(sid, x, y, function(err, result) {
+					api.move(sid, x, y, function(err, result) {
 						if(err) {
 							o.json({ error: "couldn't move..." }); ///
 							return false;
@@ -250,7 +253,7 @@ function init() {
 
 			case 'place': {
 				var sid = parseInt(i.body.sid);
-				telep.getStar(sid, function(err, star) {
+				api.getStar(sid, function(err, star) {
 					if(err) {
 						///
 						return false;
@@ -265,16 +268,16 @@ function init() {
 					var y = -1 * parseInt(i.body.y);
 					var rgb = i.body.rgb;
 
-					telep.place(sid, x, y, rgb, function(err, result) {
+					api.place(sid, x, y, rgb, function(err, result) {
 						if(err) {
 							o.json({ error: "did not place" });
 							return false;
 						}
 
 						if(star.lsid) {
-							// $lstar = telep.sid($star['lsid']);
+							// $lstar = api.sid($star['lsid']);
 							// $luser = $usr->gt($lstar['uid']);
-							// $lmeta = telep.meta($lstar['uid']);
+							// $lmeta = api.meta($lstar['uid']);
 
 							// $content = "Hello, ".$lmeta['name'].".\n\n";
 							// $content .= "Someone has recreated your star on Telephenesis! Check it out here:\n\n";
@@ -282,7 +285,7 @@ function init() {
 							// $content .= "Exciting!\n\n";
 							// $content .= "Don't want these messages? Just reply to this email letting us know."; ///
 
-							// telep.email($luser['em'], 'Someone recreated your star', $content);
+							// api.email($luser['em'], 'Someone recreated your star', $content);
 						}
 
 						// o.json({ creator: umeta.name });
@@ -407,7 +410,7 @@ function init() {
 		) { /// isNaN necessary?
 			o.status(404).send("Sorry, no page exists there."); ///
 		} else {
-			telep.getPlanets(i.user, function(planets) { /// consolidate
+			api.getPlanets(i.user, function(planets) { /// consolidate
 				o.render('main', {
 					pageTitle: 'telephenesis : ' + i.params.page, /// not if it is a number
 					planets,
@@ -418,7 +421,7 @@ function init() {
 	});
 
 	app.get('/', (i, o) => {
-		telep.getPlanets(i.user, function(planets) {
+		api.getPlanets(i.user, function(planets) {
 			o.render('main', {
 				pageTitle: 'telephenesis : musical exploration',
 				planets,

@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+    server:
+        container_name: telep-server
+        build: .
+        ports:
+            - "8777:8777"
+        # links:
+        #     - mongo
+        # depends_on:
+        #     - mongo
+        restart: unless-stopped
+        networks:
+            - app-network
+        volumes:
+            - .:/usr/src/app #/// probably change for production
+            - node_modules:/usr/src/app/node_modules # named volume to keep node_modules persistent
+        working_dir: ./server
+        command: /usr/src/app/node_modules/.bin/nodemon server/telepServer.js --verbose
+    mongo:
+        container_name: telep-mongo
+        image: mongo:latest
+        volumes:
+            - ./mongodata:/data/db
+        ports:
+            - "27017:27017"
+        networks:
+            - app-network
+networks:
+    app-network:
+        driver: bridge
+volumes:
+    node_modules:
