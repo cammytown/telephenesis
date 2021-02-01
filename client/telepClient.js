@@ -23,97 +23,93 @@ function Telep() {
 
 	var aud;
 	var spc;
-	var uictx;
+	var canvasContext;
 
 	var menuToggleElement = document.getElementsByClassName('menuToggle')[0]; ////
 
-	var queuedLines = [];
+	var queuedConstellationLines = [];
 
 	me.init = function() { /// doesn't need to be property
-		// cor.al(spc.e, 'mousedown', function() {  });
-		// cor.al(spc.e, 'mousemove', function() { dragged++; dragged = true; });
-		// var dragged = 0;
-		// function placerdown(e) {
-		// 	dragged = false;
-		// 	cor.al(spc.e, 'mouseup', placerclick);
-		// }
-
-		aud = new Aud('aud');
 		spc = new Spc('spcE');
 
-		function playerUpdate() {
-			// if(time) {
-				playing_star.getElementsByClassName('time')[0].innerHTML = aud.t;
-			// }
-		}
-
-		function playerFinish() {
-			cor.rc(playing_star, 'active');
-
-			if(playing_star.getAttribute('data-next')) {
-				var star = document.getElementById('s' + playing_star.getAttribute('data-next'));
-				load(star);
-			} else {
-				playing_star = false;
-			}
-		}
-
-		cor.al(aud.e, 'timeupdate', playerUpdate);
-		cor.al(aud.e, 'ended', playerFinish);
-
-		var canvas = document.getElementById('uiEffects');
-		canvas.width = document.body.offsetWidth;
-		canvas.height = document.body.offsetHeight;
-		uictx = canvas.getContext('2d');
-
-		// spc.moveCallbacks.push(function(ox, oy) {
-		// spc.moveCallbacks.push(function(x, y) {
-		// 	canvas.style.left = x + 'px';
-		// 	canvas.style.top = y + 'px';
-		// 	// uictx.style.left = parseInt();
-		// 	// uictx.style.top = parseInt(uictx.style.top) + oy + 'px';
-		// });
-
-		cor.al(window, 'resize', function() {
-			canvas.width = document.body.offsetWidth;
-			canvas.height = document.body.offsetHeight;
-		})
+		initializeAudio();
+		initializeInterface();
 
 		/// temporary?:
-		var active_check = document.getElementsByClassName('active uibox');
-		if(active_check) active_box = active_check[0];
+		// var active_check = document.getElementsByClassName('active uibox');
+		// if(active_check) {
+		// 	active_box = active_check[0];
+		// }
 
-		/* stars */
-		var stars = document.getElementsByClassName('star');
-		for (var starIndex = 0; starIndex < stars.length; starIndex++) {
-			var star = stars[starIndex];
-			if(star.getAttribute('data-prev')) {
-				var sourceId = star.getAttribute('data-prev');
-				if(parseInt(sourceId) > 0) {
-					var sourceStar = document.getElementById('s' + sourceId);
+		function initializeInterface() {
+			var uiCanvas = document.getElementById('uiEffects');
+			uiCanvas.width = document.body.offsetWidth;
+			uiCanvas.height = document.body.offsetHeight;
+			canvasContext = uiCanvas.getContext('2d');
 
-					sourceStar.setAttribute('data-next', star.id.split('s')[1]);
+			cor.al(window, 'resize', function() {
+				uiCanvas.width = document.body.offsetWidth;
+				uiCanvas.height = document.body.offsetHeight;
+			});
 
-					queuedLines.push({
-						startX: parseInt(sourceStar.style.left),
-						startY: parseInt(sourceStar.style.top),
-						startColor: sourceStar.getElementsByTagName('a')[0].style.backgroundColor, ///
-						endX: parseInt(star.style.left),
-						endY: parseInt(star.style.top),
-						endColor: star.getElementsByTagName('a')[0].style.backgroundColor, ///
-						tier: parseInt(star.getAttribute('data-tier'))
-					});
+			generateConstellationLines();
+		}
+
+		function initializeAudio() {
+			aud = new Aud('aud');
+
+			cor.al(aud.e, 'timeupdate', playerUpdate);
+			cor.al(aud.e, 'ended', playerFinish);
+
+			function playerUpdate() {
+				// if(time) {
+					playing_star.getElementsByClassName('time')[0].innerHTML = aud.t;
+				// }
+			}
+
+			function playerFinish() {
+				cor.rc(playing_star, 'active');
+
+				if(playing_star.getAttribute('data-next')) {
+					var star = document.getElementById('s' + playing_star.getAttribute('data-next'));
+					load(star);
+				} else {
+					playing_star = false;
 				}
 			}
 		}
 
-		var startms = performance.now();
-		function drawLineStep(ms) {
-			uictx.clearRect(0, 0, canvas.width, canvas.height);
+		function generateConstellationLines() {
+			/* stars */
+			var starElements = document.getElementsByClassName('star');
+			for (var starIndex = 0; starIndex < starElements.length; starIndex++) {
+				var starElement = starElements[starIndex];
+				if(starElement.getAttribute('data-prev')) {
+					var sourceId = starElement.getAttribute('data-prev');
+					if(parseInt(sourceId) > 0) {
+						var rootStar = document.getElementById('s' + sourceId);
+						rootStar.setAttribute('data-next', starElement.id.split('s')[1]);
+						queuedConstellationLines.push({
+							startX: parseInt(rootStar.style.left),
+							startY: parseInt(rootStar.style.top),
+							startColor: rootStar.getElementsByTagName('a')[0].style.backgroundColor, ///
+							endX: parseInt(starElement.style.left),
+							endY: parseInt(starElement.style.top),
+							endColor: starElement.getElementsByTagName('a')[0].style.backgroundColor, ///
+							tier: parseInt(starElement.getAttribute('data-tier'))
+						});
+					}
+				}
+			}
+		}
 
-			var elapsedms = ms - startms;
-			for (var lineIndex = 0; lineIndex < queuedLines.length; lineIndex++) {
-				var line = queuedLines[lineIndex];
+		var msStart = performance.now();
+		function drawLineStep(ms) {
+			canvasContext.clearRect(0, 0, uiCanvas.width, uiCanvas.height);
+
+			var elapsedms = ms - msStart;
+			for (var lineIndex = 0; lineIndex < queuedConstellationLines.length; lineIndex++) {
+				var line = queuedConstellationLines[lineIndex];
 
 				////
 				// var delay = (line.tier * 1000) - (line.tier * 350);
@@ -128,7 +124,7 @@ function Telep() {
 
 				if(progress >= 1) {
 					progress = 1;
-					// queuedLines.splice(queuedLines.indexOf(line), 1);
+					// queuedConstellationLines.splice(queuedConstellationLines.indexOf(line), 1);
 				}
 
 				var lineVector = new spc.Vec2(line.endX - line.startX, line.endY - line.startY)
@@ -140,23 +136,23 @@ function Telep() {
 
 				var drawVec = new spc.Vec2(line.startX + lineVector.x, line.startY + lineVector.y);
 
-				// var lineGradient = uictx.createLinearGradient(0,0,170,0);
-				// var lineGradient = uictx.createLinearGradient(line.startX,line.startY,line.endX,line.endY);
-				// var lineGradient = uictx.createLinearGradient(0, 0, line.endX + line.startX, line.endY + line.startY);
-				var lineGradient = uictx.createLinearGradient(line.startX + spc.x, line.startY + spc.y, drawVec.x + spc.x, drawVec.y + spc.y);
+				// var lineGradient = canvasContext.createLinearGradient(0,0,170,0);
+				// var lineGradient = canvasContext.createLinearGradient(line.startX,line.startY,line.endX,line.endY);
+				// var lineGradient = canvasContext.createLinearGradient(0, 0, line.endX + line.startX, line.endY + line.startY);
+				var lineGradient = canvasContext.createLinearGradient(line.startX + spc.x, line.startY + spc.y, drawVec.x + spc.x, drawVec.y + spc.y);
 				lineGradient.addColorStop("0", line.startColor);
 				lineGradient.addColorStop("1.0", line.endColor);
 
-				// uictx.strokeStyle = 'rgb(200, 200, 200)';
-				uictx.strokeStyle = lineGradient;
-				uictx.beginPath();
-				uictx.moveTo(line.startX + spc.x, line.startY + spc.y);
-				uictx.lineTo(drawVec.x + spc.x, drawVec.y + spc.y);
-				uictx.stroke();
+				// canvasContext.strokeStyle = 'rgb(200, 200, 200)';
+				canvasContext.strokeStyle = lineGradient;
+				canvasContext.beginPath();
+				canvasContext.moveTo(line.startX + spc.x, line.startY + spc.y);
+				canvasContext.lineTo(drawVec.x + spc.x, drawVec.y + spc.y);
+				canvasContext.stroke();
 			}
 
 			/// optimize
-			// if(queuedLines.length) {
+			// if(queuedConstellationLines.length) {
 				window.requestAnimationFrame(drawLineStep); ////
 			// }
 		}
@@ -166,7 +162,7 @@ function Telep() {
 		/* shortcuts */
 		cor.al(window, 'keydown', function(e) {
 			switch(e.keyCode) {
-				case 39:
+				case 39: // right arrow
 					e.preventDefault();
 					if(playing_star) {
 						var nsid = playing_star.getAttribute('data-next');
@@ -176,17 +172,17 @@ function Telep() {
 					}
 					break;
 
-				case 37:
+				case 37: // left arrow
 					e.preventDefault();
 					if(playing_star) {
-						var lsid = playing_star.getAttribute('data-prev');
+						var previousStarID = playing_star.getAttribute('data-prev');
 						/// if prev star isn't loaded?
-						var lstar = document.getElementById('s'+lsid);
-						load(lstar);
+						var previousStar = document.getElementById('s'+previousStarID);
+						load(previousStar);
 					}
 					break;
 
-				case 32:
+				case 32: // spacebar
 					if(!active_box) {
 						e.preventDefault();
 
@@ -195,7 +191,7 @@ function Telep() {
 
 					break;
 
-				case 27:
+				case 27: // escape key
 					state.updating = true;
 					navigate('/');
 					break;
@@ -303,7 +299,6 @@ function Telep() {
 			if(state.path == path) return true;
 		} else switch(operation) {
 			/// TODO: refactor:
-			case 'help':
 			case 'login':
 			case 'register':
 			case 'settings':
@@ -311,7 +306,8 @@ function Telep() {
 			case 'create':
 			case 'recreate':
 			case 'renameStar':
-			case 'help': {
+			case 'help':
+			{
 				clear(); ///
 				close();
 				open(operation);
@@ -340,7 +336,8 @@ function Telep() {
 
 			default: {
 				close();
-				spc.s = 'active';
+				// spc.flt(false);
+				// spc.s = 'active';
 			}
 		}
 
@@ -364,6 +361,8 @@ function Telep() {
 					limbo.appendChild(box);
 				});
 			}
+
+			// spc.flt(false);
 		}
 
 		function open(box) {
@@ -371,7 +370,7 @@ function Telep() {
 			active_box = box;
 			document.body.appendChild(box);
 			Anm.fadeIn(box);
-			spc.flt(true)
+			// spc.flt(true);
 		}
 	}
 
@@ -389,6 +388,10 @@ function Telep() {
 		return false;
 	}
 
+
+	/***
+	** ADMIN FUNCTIONS
+	***/
 	function initializeRecolor() {
 		/// consolidate:
 
@@ -958,7 +961,7 @@ function Telep() {
 		var ticket = document.getElementById('ticket');
 		document.body.appendChild(ticket, limbo);
 		Anm.fadeIn(ticket, 2750); ///
-		spc.flt(true);
+		// spc.flt(true);
 
 		e.preventDefault();
 	}

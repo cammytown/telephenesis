@@ -8,7 +8,7 @@ var cookieParser = require('cookie-parser');
 var MongoClient = require('mongodb').MongoClient;
 var MongoStore = require('connect-mongo')(session);
 var multer = require('multer');
-var upload = multer({ dest: 'uploads/' });
+var upload = multer({ dest: '../uploads/' });
 var fs = require('fs');
 const Lame = require('node-lame').Lame;
 // var connect = require('connect');
@@ -25,7 +25,7 @@ var config = require('./telepServer.config.js');
 
 app.set('views', './views');
 app.set('view engine', 'pug');
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/../public'));
 
 app.use(bodyParser.json({ limit: "2400mb" }));
 app.use(bodyParser.urlencoded({ limit: "2400mb", extended: true }));

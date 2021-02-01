@@ -130,50 +130,59 @@ function Spc(e) {
 
 	var fltVelocity = { x: 0, y: 0 };
 	var fltDirection = -1;
-	var fltStart;
-	me.flt = function() {
-		if(me.s == 'flt') { me.s = 'active'; return false; }
-		me.s = 'flt';
+	var fltStartPosition;
+	var fltStartTime;
+	me.flt = function(on = true) {
+		if(!on) { // turning off
+			me.ctr(fltStartPosition);
+		} else {
+			if(me.s == 'flt') { me.s = 'active'; return false; }
+			me.s = 'flt';
 
-		fltStart = performance.now();
+			fltStartPosition = { x: me.x, y: me.y };
+			fltStartTime = performance.now();
 
-		function l(ms) {
-			var msSinceStart = performance.now() - fltStart;
+			tickFrame();
 
-			/// optimization:
-			if(msSinceStart < 1000) {
-				var v = msSinceStart / 1000;
-				fltVelocity.x = fltDirection * v;
-				fltVelocity.y = fltDirection * v;
-			} else {
-				fltVelocity.x = fltDirection;
-				fltVelocity.y = fltDirection;
+			function tickFrame(ms) {
+				var msSinceStart = performance.now() - fltStartTime;
 
-				if(msSinceStart > 19000) {
-					if(msSinceStart < 20000) {
-						var v = (1000 - (msSinceStart % 19000)) / 1000;
-						fltVelocity.x = fltDirection * v;
-						fltVelocity.y = fltDirection * v;
-					} else {
-						fltDirection *= -1;
-						fltStart = new Date();
+				/// optimization:
+				if(msSinceStart < 1000) {
+					var v = msSinceStart / 1000;
+					fltVelocity.x = fltDirection * v;
+					fltVelocity.y = fltDirection * v;
+				} else {
+					fltVelocity.x = fltDirection;
+					fltVelocity.y = fltDirection;
+
+					if(msSinceStart > 19000) {
+						if(msSinceStart < 20000) {
+							var v = (1000 - (msSinceStart % 19000)) / 1000;
+							fltVelocity.x = fltDirection * v;
+							fltVelocity.y = fltDirection * v;
+						} else {
+							fltDirection *= -1;
+							fltStartTime = new Date();
+						}
+
 					}
-
 				}
+
+				var x = me.x += fltVelocity.x;
+				var y = me.y += fltVelocity.y;
+				me.x = x;
+				me.y = y;
+
+				me.set(x, y);
+
+				if(me.s == 'flt') {
+					window.requestAnimationFrame(tickFrame);
+				}
+
+				// if(me.s == 'flt') setTimeout(l, 50);
 			}
-
-			var x = me.x += fltVelocity.x;
-			var y = me.y += fltVelocity.y;
-			me.x = x;
-			me.y = y;
-
-			me.set(x, y);
-
-			if(me.s == 'flt') window.requestAnimationFrame(l);
-			// if(me.s == 'flt') setTimeout(l, 50);
 		}
-
-		l();
 	}
 
 	/// wip

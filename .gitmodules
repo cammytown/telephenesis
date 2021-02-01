@@ -1,0 +1,3 @@
+[submodule ".\\client\\js\\history-time"]
+	path = .\\client\\js\\history-time
+	url = git@github.com:cameronsteele/history-time.git

@@ -6,7 +6,6 @@ node_modules/
 *.css.map
 *.log
 
-.cammyflow
 telepServer.config.js
 uploads/*
 public/music/*
