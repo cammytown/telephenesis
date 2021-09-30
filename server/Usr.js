@@ -56,14 +56,16 @@ module.exports = function(db, vl, bcrypt) {
 	}
 
 	this.check = function(em, pw, ip, cb) { /// rename
-		v(em, pw, ip, function(errors, doc) {
-			collection.findOne({em: em}, function(err, doc) {
-				if(err) {
-					// console.log(err);
+		validate(em, pw, ip, function(errors, doc) {
+			collection.findOne({em: em}, function(findErrors, doc) {
+				if(findErrors) {
+					// console.log(findErrors);
+					cb(findErrors, doc);
 					return false;
 				}
 
 				if(!doc) { /// safe check?
+					cb("No user with email " + em); ////
 					return false;
 				}
 
@@ -107,7 +109,7 @@ module.exports = function(db, vl, bcrypt) {
 	}
 
 	this.rg = function(em, pw, ip, cb) { /// pass ip here?
-		v(em, pw, ip, function(errors) {
+		validate(em, pw, ip, function(errors) {
 			if(errors.length) {
 				cb(errors);
 				return false;
@@ -149,7 +151,7 @@ module.exports = function(db, vl, bcrypt) {
 		});
 	}
 
-	function v(em, pw, ip, cb) {
+	function validate(em, pw, ip, cb) {
 		var errors = [];
 
 		if(!em.length) { /// safe check?

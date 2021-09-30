@@ -1,3 +1,6 @@
 [submodule ".\\client\\js\\history-time"]
 	path = .\\client\\js\\history-time
 	url = git@github.com:cameronsteele/history-time.git
+[submodule "client/js/pijin-js"]
+	path = client/js/pijin-js
+	url = https://github.com/cameronsteele/pijin-js.git

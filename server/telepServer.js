@@ -8,7 +8,7 @@ var cookieParser = require('cookie-parser');
 var MongoClient = require('mongodb').MongoClient;
 var MongoStore = require('connect-mongo')(session);
 var multer = require('multer');
-var upload = multer({ dest: '../uploads/' });
+var upload = multer({ dest: __dirname + '/../uploads/' });
 var fs = require('fs');
 const Lame = require('node-lame').Lame;
 // var connect = require('connect');
@@ -29,7 +29,6 @@ app.use(express.static(__dirname + '/../public'));
 
 app.use(bodyParser.json({ limit: "2400mb" }));
 app.use(bodyParser.urlencoded({ limit: "2400mb", extended: true }));
-
 app.use(cookieParser(config.sessionSecret));
 
 // app.use(function(i, o, n) {
@@ -97,8 +96,12 @@ function init() {
 			i.user = user;
 
 			if(user) {
-				api.getUsrMeta(i.user.id, function(doc) {
-					i.user.usrMeta = doc;
+				api.getUsrMeta(i.user.id, function(err, usrMeta) {
+					if(err) {
+						o.status(404).send("There was a problem retrieving your account in our system. Please email us at contact@telephenesis.com"); ///
+					}
+
+					i.user.usrMeta = usrMeta;
 					n();
 				});
 			} else {
@@ -112,18 +115,27 @@ function init() {
 	app.post('/ajax/upload/:starid', telepAuth('creator'), upload.single('submission'), function(i, o) { /// could maybe just use .post('/create/:starid')
 		/// consider putting objects in memory if we care about deep optimization later https://github.com/expressjs/multer#memorystorage
 
+		return false; ///REVISIT uploading not currently allowed
+
 		var starId = parseInt(i.params.starid);
 
 		///:
-		if(starId > 0) { ///
+		if(starId != -1) { ///
 			api.getStar(starId, function(err, sourceStar) {
-				api.createStar(i.user.id, sourceStar, i.file, function(star) {
-					o.json({ error: 0, sid: star.id });
+				api.createStar(i.user.id, {
+					sourceStar,
+					multerFile: i.file,
+					callback: function(star) {
+						o.json({ error: 0, sid: star.id });
+					}
 				});
 			});
 		} else {
-			api.createStar(i.user.id, false, i.file, function(star) {
-				o.json({ error: 0, sid: star.id });
+			api.createStar(i.user.id, {
+				multerFile: i.file,
+				callback: function(star) {
+					o.json({ error: 0, sid: star.id });
+				}
 			});
 		}
 
@@ -138,8 +150,53 @@ function init() {
 
 	// app.post('/create', function(i, o)) {}
 
-	app.post('/ajax/:operation', function(i, o) {
+	app.post('/ajax/:operation', upload.none(), function(i, o) {
 		switch(i.params.operation) {
+			// case 'create': {
+			// 	// if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
+			// 	if(!i.user) {
+			// 		o.json({ error: "not logged in" });
+			// 		return false;
+			// 	}
+
+			// 	// var gameProperties = {
+			// 	// 	access: i.body['access-setting'],
+			// 	// 	timeLimit: i.body['time-limit'],
+			// 	// 	artType: i.body['art-type'],
+			// 	// };
+
+			// 	var genesisStar = {
+			// 		artURL: i.body['file-url'],
+			// 		artType: i.body['art-type'],
+			// 		artTitle: i.body['art-title']
+			// 	};
+
+			// 	api.createStar(i.user.id, genesisStar);
+			// } break;
+
+			// case 'recreate': {
+			// 	// if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
+			// 	if(!i.user) {
+			// 		o.json({ error: "not logged in" });
+			// 		return false;
+			// 	}
+
+			// 	// var gameProperties = {
+			// 	// 	access: i.body['access-setting'],
+			// 	// 	timeLimit: i.body['time-limit'],
+			// 	// 	artType: i.body['art-type'],
+			// 	// };
+
+			// 	var recreationStar = {
+			// 		sourceStarId: i.body['source-star-id'],
+			// 		artURL: i.body['file-url'],
+			// 		artType: i.body['art-type'],
+			// 		artTitle: i.body['art-title']
+			// 	};
+
+			// 	api.createStar(i.user.id, recreationStar);
+			// } break;
+
 			case 'renameStar': {
 				/// consolidate:
 				var sid = parseInt(i.body.sid);
@@ -163,7 +220,37 @@ function init() {
 
 						o.json({ error: 0 });
 					});
-				});			
+				});
+			} break;
+
+			case 'deleteStar': {
+				/// consolidate:
+				var starID = parseInt(i.body.starID);
+				console.log(starID);
+
+				api.getStar(starID, function(err, star) {
+					if(err) {
+						///
+						o.json({ error: "couldn't get star" });
+						return false;
+					}
+
+					// if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
+					if(!i.user || i.user.lv != 7) {
+						o.json({ error: "not logged in" });
+						return false;
+					}
+
+					api.deleteStar(starID, function(err, result) {
+						if(err) {
+							o.json({ error: "couldn't delete" }); ///
+							return false;
+						}
+
+						console.log('no error');
+						o.json({ error: 0 });
+					});
+				});
 			} break;
 
 			case 'bookmark': {
@@ -192,8 +279,22 @@ function init() {
 						o.json({ error: 0 });
 					});
 				});
+			} break;
 
+			case 'settings': { /// naming (need to rename element id of form in current architecture)
+				if(!i.user) {
+					o.json({ error: "not logged in" });
+					return false;
+				}
 
+				api.updateProfile(i.user.id, i.body, function(err, result) {
+					if(err) {
+						o.json({ error: err }); ///
+						return false;
+					}
+
+					o.json({ error: 0 });
+				});
 			} break;
 
 			case 'recolor': {
@@ -251,47 +352,111 @@ function init() {
 				});
 			} break;
 
-			case 'place': {
-				var sid = parseInt(i.body.sid);
-				api.getStar(sid, function(err, star) {
-					if(err) {
-						///
-						return false;
+			case 'actualize': {
+				if(!i.user || i.user.lv != 7) {
+					o.json({ error: "not logged in" });
+					return false;
+				}
+
+				console.log(i.body);
+
+				var starID = parseInt(i.body.starID);
+
+				switch(i.body.hostType) {
+					case 'external': {
+						var starData = {
+							starID: i.body.starID,
+							x: i.body.x,
+							y: i.body.y,
+							color: i.body.color,
+							sourceStarID: i.body.sourceStarID,
+							hostType: i.body.hostType,
+							fileURL: i.body.fileURL,
+						};
+
+						api.createStar(i.user.id, starData, function(err, result) {
+							if(err) {
+								o.json({ error: "could not create star" });
+								return false;
+							}
+
+							o.json({ error: 0 });
+						});
+
+						// api.actualize(starData, function(err, result) {
+						// 	if(err) {
+						// 		o.json({ error: "did not place" });
+						// 		return false;
+						// 	}
+
+						// 	if(star.lsid) {
+						// 		// $lstar = api.sid($star['lsid']);
+						// 		// $luser = $usr->gt($lstar['uid']);
+						// 		// $lmeta = api.meta($lstar['uid']);
+
+						// 		// $content = "Hello, ".$lmeta['name'].".\n\n";
+						// 		// $content .= "Someone has recreated your star on Telephenesis! Check it out here:\n\n";
+						// 		// $content .= URL.'/'.$sid."\n\n";
+						// 		// $content .= "Exciting!\n\n";
+						// 		// $content .= "Don't want these messages? Just reply to this email letting us know."; ///
+
+						// 		// api.email($luser['em'], 'Someone recreated your star', $content);
+						// 	}
+
+						// 	// o.json({ creator: umeta.name });
+						// 	o.json({ error: 0 });
+						// });
+					} break;
+
+					case 'upload': {
+						// star should already have been created ///REVISIT architecture; maybe it would be better to just have some token associated to the upload that we use when creating the star
+					} break;
+
+					default: {
+						console.log('unhandled hostType: ' + i.body.hostType);
 					}
+				}
 
-					if(!i.user || i.user.id != star.creatorId) {
-						o.json({ error: "not logged in" });
-						return false;
-					}
+				// api.getStar(sid, function(err, star) {
+				// 	if(err) {
+				// 		///
+				// 		o.json({ error: "could not get source star" });
+				// 		return false;
+				// 	}
 
-					var x = parseInt(i.body.x);
-					var y = -1 * parseInt(i.body.y);
-					var rgb = i.body.rgb;
+				// 	if(!i.user || i.user.id != star.creator.uid) {
+				// 		o.json({ error: "not logged in" });
+				// 		return false;
+				// 	}
 
-					api.place(sid, x, y, rgb, function(err, result) {
-						if(err) {
-							o.json({ error: "did not place" });
-							return false;
-						}
+				// 	var x = parseInt(i.body.x);
+				// 	var y = -1 * parseInt(i.body.y);
+				// 	var rgb = i.body.rgb;
 
-						if(star.lsid) {
-							// $lstar = api.sid($star['lsid']);
-							// $luser = $usr->gt($lstar['uid']);
-							// $lmeta = api.meta($lstar['uid']);
+				// 	api.actualize(sid, x, y, rgb, function(err, result) {
+				// 		if(err) {
+				// 			o.json({ error: "did not place" });
+				// 			return false;
+				// 		}
 
-							// $content = "Hello, ".$lmeta['name'].".\n\n";
-							// $content .= "Someone has recreated your star on Telephenesis! Check it out here:\n\n";
-							// $content .= URL.'/'.$sid."\n\n";
-							// $content .= "Exciting!\n\n";
-							// $content .= "Don't want these messages? Just reply to this email letting us know."; ///
+				// 		if(star.lsid) {
+				// 			// $lstar = api.sid($star['lsid']);
+				// 			// $luser = $usr->gt($lstar['uid']);
+				// 			// $lmeta = api.meta($lstar['uid']);
 
-							// api.email($luser['em'], 'Someone recreated your star', $content);
-						}
+				// 			// $content = "Hello, ".$lmeta['name'].".\n\n";
+				// 			// $content .= "Someone has recreated your star on Telephenesis! Check it out here:\n\n";
+				// 			// $content .= URL.'/'.$sid."\n\n";
+				// 			// $content .= "Exciting!\n\n";
+				// 			// $content .= "Don't want these messages? Just reply to this email letting us know."; ///
 
-						// o.json({ creator: umeta.name });
-						o.json({ error: 0 });
-					});
-				});
+				// 			// api.email($luser['em'], 'Someone recreated your star', $content);
+				// 		}
+
+				// 		// o.json({ creator: umeta.name });
+				// 		o.json({ error: 0 });
+				// 	});
+				// });
 
 			} break;
 
@@ -327,16 +492,18 @@ function init() {
 							// o.render('register', { p: i.body, errors: err });
 							o.json({ error: err });
 						} else {
-							o.cookie('usr_ss', sessionCode, {
-								// secure: true /// https only
+							api.createProfile({
+								userID: usrDoc.id,
+								email: i.body.email,
+								creatorName: i.body.creatorName
+
+							}, function() {
+								o.cookie('usr_ss', sessionCode, {
+									// secure: true //// https only
+								});
+
+								o.json({ error: 0 });
 							});
-
-							// console.log(results._id);
-
-							// console.log(souls);
-							// console.log(result);
-							// console.log(err);
-							o.json({ error: 0 });
 						}
 					}
 				);
@@ -401,34 +568,59 @@ function init() {
 		);
 	});
 
-	app.get('/:page', function(i, o) {
-		var realPages = ['help', 'login', 'register', 'settings'];
+	app.get('/:page?', function(i, o) {
+		var realPages = ['help', 'login', 'register', 'settings', 'create'];
+
+		var className = "";
+		if(i.user) {
+			className = "in";
+
+			if(i.user.lv > 0) {
+				className += " creator";
+			} else if(i.user.lv == 7) {
+				className += " adminor";
+			}
+		}
 
 		if(
-			realPages.indexOf(i.params.page) == -1
+			i.params.page !== undefined ///REVISIT best check?
+			&& realPages.indexOf(i.params.page) == -1
 			&& isNaN(parseInt(i.params.page))
 		) { /// isNaN necessary?
 			o.status(404).send("Sorry, no page exists there."); ///
 		} else {
-			api.getPlanets(i.user, function(planets) { /// consolidate
+			api.getStars(i.user, function(stars) { /// consolidate
 				o.render('main', {
 					pageTitle: 'telephenesis : ' + i.params.page, /// not if it is a number
-					planets,
+					className,
+					stars,
 					user: i.user
 				});
 			});
 		}
 	});
 
-	app.get('/', (i, o) => {
-		api.getPlanets(i.user, function(planets) {
-			o.render('main', {
-				pageTitle: 'telephenesis : musical exploration',
-				planets,
-				user: i.user
-			});
-		});
-	});
+	// app.get('/', (i, o) => {
+	// 	api.getStars(i.user, function(stars) {
+	// 		var className = "";
+	// 		if(i.user) {
+	// 			className = "in";
+
+	// 			if(i.user.lv > 0) {
+	// 				className += " creator";
+	// 			} else if(i.user.lv == 7) {
+	// 				className += " adminor";
+	// 			}
+	// 		}
+
+	// 		o.render('main', {
+	// 			pageTitle: 'telephenesis : musical exploration',
+	// 			className,
+	// 			stars,
+	// 			user: i.user
+	// 		});
+	// 	});
+	// });
 }
 
 if(app.get('env') == 'production') {

@@ -2,9 +2,11 @@ const Lame = require('node-lame').Lame;
 const fs = require('fs');
 
 module.exports = function(db) {
-	var planets = db.collection('MLplanets'); /// safe name?
+	var stars = db.collection('MLstars');
 
 	var me = this;
+
+	var musicPath = __dirname + "/../public/music/";
 
 	me.grr = false;
 
@@ -37,18 +39,49 @@ module.exports = function(db) {
 			if(err) {
 				console.error(err);
 				///
-				return false;
+				callback(err);
+				// return false;
 			}
 
-			callback(doc);
+			callback(err, doc);
 		});
 	}
 
-	me.getPlanets = function(userId = false, cb) {
-		planets.find({ initialized: true }).toArray(function(err, results) {
+	me.createProfile = function(profileData, callback) { /// post naming?
+		usrMeta.insertOne(profileData, function(err, result) {
+			if(err) {
+				////
+				callback(err);
+			}
+
+			callback(err, result);
+		});
+	}
+
+	me.updateProfile = function(uid, post, callback) { /// post naming?
+		//// if post.email is in use, error
+
+		usrMeta.updateOne(
+			{ uid },
+			{
+				// "email": post.email, //// send confirmation if different
+				$set: { "creatorName": post.creatorName }
+			},
+			callback
+		);
+
+		stars.updateMany(
+			{ creatorId: uid },
+			{ $set: { "creator.creatorName": post.creatorName }}
+		); /// no callback
+	}
+
+	me.getStars = function(userId = false, cb) {
+		stars.find({ initialized: true }).toArray(function(err, results) {
 			if(err) {
 				// console.log(err);
 				////
+				// cb(err);
 				return false;
 			}
 
@@ -57,108 +90,24 @@ module.exports = function(db) {
 	}
 
 	me.getStar = function(starId, callback) {
-		planets.findOne({ id: starId }, function(err, doc) {
+		stars.findOne({ id: starId }, function(err, doc) {
 			if(err) {
 				// console.log(err);
 				////
+				callback(err);
 				return false;
 			}
+
+			// var usrMeta = me.getUsrMeta(doc.uid); /// probably cache in the star and update whenever profile changes
+			// doc.creatorName = usrMeta.creatorName;
 
 			callback(err, doc);
 		});
 	}
 
-	me.createStar = function(uid, sourceStar, multerFile, callback) {
-		var sourceId = false;
-		var sourceX = false;
-		var sourceY = false;
-		var tier = 0;
-
-		if(sourceStar) {
-			sourceId = sourceStar.id;
-			sourceX = sourceStar.x;
-			sourceY = sourceStar.y;
-			tier = sourceStar.tier + 1;
-		}
-
-		var newPlanetId = MLPcurrentPlanetIndex;
-		MLPcurrentPlanetIndex += 1;
-		MLMeta.updateOne({ id: "persistors" }, { $inc: {currentPlanetIndex: 1} });
-
-		var starFileName = newPlanetId;
-		switch(multerFile.mimetype) {
-			case 'audio/aiff':
-			case 'audio/wav':
-			{
-				starFileName += '.mp3';
-
-				const encoder = new Lame({
-					"output": "./public/music/" + starFileName,
-					"bitrate": 256
-				}).setFile('./' + multerFile.path);
-
-				encoder.encode().then(() => {
-					console.log('Encoding finished');
-				}).catch((error) => {
-					console.log(error);
-					console.log('Something went wrong');
-				});
-
-			} break;
-
-			case 'audio/mpeg':
-			case 'audio/mp3': {
-				starFileName += '.mp3';
-				var target_path = 'public/music/' + starFileName;
-				fs.copyFile(multerFile.path, target_path, function(err) {
-					if(err) {
-						console.log(err);
-						///
-					}
-				});
-			} break;
-
-			case 'audio/ogg': {
-				/// convert?
-				starFileName += '.ogg';
-				var target_path = 'public/music/' + starFileName;
-				fs.copyFile(multerFile.path, target_path, function(err) {
-					if(err) {
-						console.log(err);
-						///
-					}
-				});
-			} break;
-
-			default: {
-				console.warn("WARNING: Didn't know what to do with file of mimetype " + multerFile.mimetype);
-			}
-		}
-
-		planets.insertOne({
-			id: newPlanetId,
-			// uid,
-			sourceId,
-			sourceX, ///
-			sourceY, ///
-			// constellationId: targetConstellationId,
-			tier,
-			creatorId: uid,
-			creatorName: "testt",
-			x: 0,
-			y: 0,
-			placed: false,
-			initialized: false,
-			// expiration: expirationMS,
-			// rgb: 
-		}, function(err, result) {
-			callback(result.ops[0]); ///
-		});
-	}
-
-	me.bookmark = function(star, uid, callback) {
+	me.bookmark = function(star, userID, callback) {
 		usrMeta.updateOne(
-			{ uid },
+			{ userID },
 			{ $addToSet: { bookmarks: star.id } },
 			{ upsert: true },
 			callback
@@ -166,7 +115,7 @@ module.exports = function(db) {
 	}
 
 	me.recolor = function(starId, rgb, callback) {
-		planets.updateOne(
+		stars.updateOne(
 			{ id: starId },
 			{ $set: { rgb } },
 			callback
@@ -174,26 +123,154 @@ module.exports = function(db) {
 	}
 
 	me.move = function(starId, x, y, callback) {
-		planets.updateOne(
+		stars.updateOne(
 			{ id: starId },
 			{ $set: { x, y } },
 			callback
 		);
 	}
 
+	me.createStar = function(userID, starObject, callback) {
+		// var defaultObject = {
+		// 	sourceStar: false,
+		// 	fileURL: false,
+		// 	multerFile: false,
+		// };
+		// Object.assign();
+
+		var newStarID = MLPcurrentPlanetIndex;
+		MLPcurrentPlanetIndex += 1;
+		MLMeta.updateOne({ id: "persistors" }, { $inc: {currentPlanetIndex: 1} });
+
+		switch(starObject.hostType) {
+			case 'external': {
+
+			} break;
+
+			case 'upload': {
+				var starFileName = "star" + newStarID;
+				switch(multerFile.mimetype) {
+					case 'audio/aiff':
+					case 'audio/wav':
+					{
+						starFileName += '.mp3';
+
+						const encoder = new Lame({
+							"output": musicPath + starFileName,
+							"bitrate": 256 //// 320?
+						}).setFile('./' + multerFile.path);
+
+						encoder.encode().then(() => {
+							console.log('Encoding finished');
+						}).catch((error) => {
+							console.log(error);
+							console.log('Something went wrong');
+						});
+
+					} break;
+
+					case 'audio/mpeg':
+					case 'audio/mp3': {
+						starFileName += '.mp3';
+						var target_path = musicPath + starFileName;
+						fs.copyFile(multerFile.path, target_path, function(err) {
+							if(err) {
+								console.log(err);
+								///
+							}
+						});
+					} break;
+
+					case 'audio/ogg': {
+						/// convert?
+						starFileName += '.ogg';
+						var target_path = musicPath + starFileName;
+						fs.copyFile(multerFile.path, target_path, function(err) {
+							if(err) {
+								console.log(err);
+								///
+							}
+						});
+					} break;
+
+					default: {
+						console.warn("WARNING: Didn't know what to do with file of mimetype " + multerFile.mimetype);
+					}
+				}
+			} break;
+		}
+
+		me.getUsrMeta(userID, function(err, usrMeta) { /// not digging this architecture
+			var sourceId = false;
+			var sourceX = false;
+			var sourceY = false;
+			var tier = 0;
+
+			var newStar = {
+				id: newStarID,
+				sourceId: false,
+				sourceX: false, ///
+				sourceY: false, ///
+				tier: 0,
+				creator: usrMeta.creatorName,
+				x: 0,
+				y: 0,
+				// placed: false,
+				// initialized: false,
+				hostType: starObject.hostType,
+				fileURL: starObject.fileURL,
+				color: starObject.color,
+				// expiration: expirationMS,
+				// rgb: 
+			}
+
+			if(starObject.sourceStarID == -1) {
+				stars.insertOne(newStar, function(err, result) {
+					callback(err, result.ops[0]); ///
+				});
+			} else {
+				me.getStar(starObject.sourceStarID, function(err, sourceStar) {
+					starObject.sourceX = sourceStar.x;
+					starObject.sourceY = sourceStar.y;
+					starObject.tier = sourceStar.tier + 1;
+
+					stars.insertOne(newStar, function(err, result) {
+						callback(err, result.ops[0]); ///
+					});
+				});
+			}
+
+			return true;
+		});
+	}
+
 	me.renameStar = function(starId, creatorName, callback) {
-		planets.updateOne(
+		stars.updateOne(
 			{ id: starId },
 			{ $set: { creatorName } },
 			callback
 		);
 	}
 
-	me.place = function(starId, x, y, rgb, callback) {
-		planets.updateOne(
+	me.deleteStar = function(starId, callback) {
+		///// probably do some other stuff
+
+		stars.deleteOne(
 			{ id: starId },
-			{ $set: { x, y, rgb, initialized: true, placed: true } },
 			callback
 		);
 	}
+
+	// me.actualize = function(starData, callback) {
+	// 	///TODO maybe validate starData structure
+
+	// 	starData.initialized = true;
+	// 	// starData.placed = true;
+
+	// 	stars.updateOne(
+	// 		{ id: starId },
+	// 		{ $set: starData },
+	// 		callback
+	// 	);
+	// }
 }

@@ -14,179 +14,81 @@ html(lang="en")
 		link(href="https://fonts.googleapis.com/css?family=Strait|Monda" rel="stylesheet" type="text/css")
 		link(href="/constellations.css" rel="stylesheet" type="text/css")
 
-	- var className = ""
-	if(user)
-		- className = "in"
-
-		if user.lv > 0
-			- className += " creator"
-		if user.lv == 7
-			- className += " adminor"
-
-
 	body(class=className)
-		a#logo Telephenesis
-		a.menuToggle |||
+		nav
+			a#logo Telephenesis
+			a.menuToggle |||
 
-		#menu
-			.user
-				a.create(href="/settings") profile
-				a(href="/logout") logout
+			#menu
+				.user
+					a.create(href="/settings") profile
+					a(href="/logout") logout
 
-			.guest
-				a(href="/login") login
-				a(href="/register") register
+				.guest
+					a(href="/login") login
+					a(href="/register") register
 
-			a(href="/help") help
+				a(href="/help") help
+
+		header
+			h2 Song Title
+			h3 Artist Name
+			a artistwebsite.com
 
 		canvas#uiEffects
 
-		#spcE
+		#spc
 			div.lyr.a
 			div.lyr.b
 			div.lyr.c
 
 			#map
-				each planet, i in planets
-					planet.id
-					//- .planet(data-prev=planet.lsid data-next=planet.)
+				each star, i in stars
+					star.id
+					//- .star(data-prev=star.lsid data-next=star.)
+
 					.star(
-						id = "s" + planet.id
-						class = user.usrMeta && user.usrMeta.bookmarks.indexOf(planet.id) != -1 ? "bookmarked" : ""
-						data-prev = planet.sourceId
-						data-tier = planet.tier
-						style = "left: " + planet.x + "px; top: " + -planet.y + "px"
+						id = "s" + star.id
+						class = user.usrMeta && user.usrMeta.bookmarks.indexOf(star.id) != -1 ? "bookmarked" : ""
+						data-prev = star.sourceId
+						data-tier = star.tier
+						style = "left: " + star.x + "px; top: " + -star.y + "px"
 					)
-						a(href=planet.id style="background-color: rgb(" + planet.rgb + ')')
+						a(href=star.id style="background-color: rgb(" + star.rgb + ')')
+
 						div.meta
-							div.text.name= planet.creatorName
+							div.text.name= star.creatorName
 							div.text.time
 
 		#limbo
 			//- #ticket
-			#starMenu.menu
-				.user
-					a(href="/bookmark") Bookmark
-					a.create(href="/create") Recreate
-					a.admin(href="/moveStar") Move
-					a.admin(href="/recolorStar") Recolor
-					a.admin(href="/renameStar") Change Creator
-					a.admin.danger(href="#") Delete
+			include contextMenus.pug
+			include creation.pug
+			include auth.pug
+			include help.pug
 
-				.guest
-					a(href="/login") login
-					a(href="/register") register
+			form#settings.uibox.wide(method="POST")
+				label.floatBeside(for="email") Email
+				input(name="email" value=user.em type="text" placeholder="email" disabled)
 
-			#galaxyMenu.menu
-				.user
-					a.create(href="/create") Create Constellation
+				label.floatBeside(for="creatorName") Creator Name
+				input(
+					name="creatorName"
+					type="text"
+					placeholder="creator name"
+					value= user.usrMeta ? user.usrMeta.creatorName : ''
+				)
 
-				.guest
-					a(href="/login") login
-					a(href="/register") register
+				// label(for="password") Password
+				// input(name="password" placeholder="password")
+				// label(for="password-confirm") Confirm
+				// input(name="password-confirm" placeholder="password again")
 
-			form#create.uibox(method="POST")
-				h2 Create
-
-				p Create a new star. Something unique, honest, and without legal ties.
-				p.
-					Recreate this star. It can be a cover, a re-orchestration... 
-					the goal is to transform and the challenge is to maintain a 
-					perceivable thread.
-
-				a.btn.g.upload
-					input#submission(name="submission" type="file")
-					| Upload <small>(mp3)</small>
-
-				a.btn.r.close close
-
-			form#renameStar.uibox(action="/renameStar" method="POST")
-				h2 Rename Star
-				input.bad.init(name="creatorName" type="text" placeholder="Creator Name")
-				input.activeStarIdInput(name="sid" type="hidden")
-				button.btn(type="submit") submit
-				//- a.btn.r.close close
-
-			form#settings.uibox(method="POST")
-				input.bad.init(name="name" type="text")
-				input.bad.init(name="password" placeholder="password")
-				input.bad.init(name="password-confirm" placeholder="password again")
-				button.btn(type="submit") register
-
-			form#login.uibox(action="/login" method="POST")
-				input.bad.init(type="text" name="email" placeholder="email")
-				input.bad.init(type="password" name="password" placeholder="password")
-				button.btn(type="submit") login
-
-			form#register.uibox(action="/register" method="POST")
-				input.bad.init(type="text" name="email" placeholder="email")
-				input.bad.init(type="password" name="password" placeholder="password")
-				input.bad.init(type="password" name="password-confirm" placeholder="password again")
-				button.btn(type="submit") register
-
-			#help.uibox
-				p.
-					Telephenesis is a visualization of the metamorphosis of a musical 
-					idea as it is reinterpreted and recreated by different artists.
-
-				p It's like the game "Telephone", but with music.
-
-				.control
-					.mouse.left
-						span
-						span
-						span
-
-					div Play / Pause
-
-				.control
-					.mouse.right
-						span
-						span
-						span
-
-					div Menu
-					div(style="color: #aea;") Create
-
-				.control
-					span.key &larr;
-					span Previous
-
-				.control
-					span.key &rarr;
-					span Next
-
-				.control.space
-					span.key spacebar
-					span Pause / Play
-
-				p.
-					The ability to contribute to Telephenesis is by invite only. Feel 
-					free to send us a link to your music.
-
-				p
-					a(href="mailto:contact@telephenesis.com") contact@telephenesis.com
-
-				div.credits
-					h3 credits
-					a(href="https://steelecameron.com") Cameron Steele
-					a(href="http://nopiano.com") Chris Marianetti
-
-			.placement
-				#placeable.placement
-				#placer.star.placer
-					a
-					span.text.name
-					span.text.time
-				#colorer
-					.down
-					.up
-
-				#colorwheel
+				button.btn.main(type="submit") Submit
 
 			audio#aud
 
-			script
+			// script
 				//- | al(window, 'load', function() {
 
 				//- if c == 'auth' || c == 'admin'

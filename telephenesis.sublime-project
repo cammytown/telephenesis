@@ -3,6 +3,9 @@
 	[
 		{
 			"path": "."
+		},
+		{
+			"path": "J:\\c\\telephenesis\\telephenesis-ml"
 		}
 	]
 }

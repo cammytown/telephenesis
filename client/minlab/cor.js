@@ -1,8 +1,31 @@
-// v0.03
+// v0.045
+// CHANGELOG
+// 0.045
+// - added _()
 
 // var EXPORTED_SYMBOLS = ['al', 'rl', 'ac', 'rc', 'cc'];
 
-export default { al, rl, ac, rc, cc };
+export default { _, al, rl, ac, rc, cc };
+
+function _(selector) {
+	if(selector[0] == '#') {
+		selector = selector.slice(1); // remove '#'
+
+		//// more stuff
+
+		var selectedElement = document.getElementById(selector);
+		if(selectedElement) {
+			return selectedElement;
+		} else {
+			console.log("_() did not find #" + selector);
+			return false;
+		}
+	} else if(selector[0] == '.') {
+		
+	}
+
+	return false; ////
+}
 
 function al(ele, eve, fnc) {
 	if(!ele) return false;

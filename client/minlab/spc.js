@@ -1,6 +1,5 @@
 // v0.02
 /*
-	e : element
 	s : state
 
 	d : drift
@@ -8,26 +7,20 @@
 	m : map
 */
 
-export default Spc;
+export default new Spc();
+// export default Spc;
 
 import cor from './cor';
 import Anm from './anm';
 
-
-function Spc(e) {
+function Spc(elementID = "spc") {
 	/// a blurred animation for going to a point over space that isn't loaded
 	/// make mov() generic so you can get places without using the formula
 	/// background flt optionally independent of spc.map
 
 	var me = this;
-	me.e = document.getElementById(e);
-	me.s = 1;
 
-	me.map = document.getElementById('map'); ///
-	var lyr = document.getElementsByClassName('lyr'); /// ByClassName
-
-	me.x = me.map.offsetLeft;
-	me.y = me.map.offsetTop;
+	document.addEventListener("DOMContentLoaded", init); //// backwards-compatibility
 
 	var targetCenter = false;
 	var centering = false;
@@ -35,18 +28,34 @@ function Spc(e) {
 	var bfr = 3; ///
 	var seg = 500; ///
 
-	me.map.style.left = me.map.offsetLeft+'px';
-	me.map.style.top = me.map.offsetTop+'px';
-	for(var i = lyr.length - 1; i >= 0; i--) {
-		lyr[i].style.backgroundPosition = me.map.offsetLeft/(1+i*0.5)+'px '
-			+ me.map.offsetTop/(1+i*0.5)+'px';
-	}
-
-	var xl; var yl;
+	var lastX;
+	var lastY;
 	var xc = 0; var yc = 0;
 	var ld = {};
+	var lyr;
 
 	me.moveCallbacks = [];
+
+	function init() {
+		me.element = document.getElementById(elementID);
+		me.map = document.getElementById('map'); ///
+		lyr = document.getElementsByClassName('lyr'); /// ByClassName
+
+		cor.al(me.element, 'mousedown', grb);
+		cor.al(window, 'mouseup', rls);
+		//al(window, 'mouseout', rls);
+
+		me.s = 1;
+		me.x = me.map.offsetLeft;
+		me.y = me.map.offsetTop;
+
+		me.map.style.left = me.map.offsetLeft+'px';
+		me.map.style.top = me.map.offsetTop+'px';
+		for(var i = lyr.length - 1; i >= 0; i--) {
+			lyr[i].style.backgroundPosition = me.map.offsetLeft/(1+i*0.5)+'px '
+				+ me.map.offsetTop/(1+i*0.5)+'px';
+		}
+	}
 
 	me.Vec2 = class {
 		constructor(x, y) {
@@ -208,24 +217,29 @@ function Spc(e) {
 	}
 
 	function grb(e) {
-		if(!me.s || e.button == 2) return false;
-		xl = e.clientX; yl = e.clientY;
-		cor.al(me.e, 'mousemove', drg);
-		me.e.className = 'act';
+		if(!me.s || e.button == 2) {
+			return false;
+		}
+
+		lastX = e.clientX;
+		lastY = e.clientY;
+
+		cor.al(me.element, 'mousemove', drg);
+		me.element.className = 'act';
 	}
 
 	function rls(e) {
-		cor.rl(me.e, 'mousemove', drg);
-		me.e.removeAttribute('class');
+		cor.rl(me.element, 'mousemove', drg);
+		me.element.removeAttribute('class');
 	}
 
 	function drg(e) {
-		var x = e.clientX - xl + me.x;
-		var y = e.clientY - yl + me.y;
+		var x = e.clientX - lastX + me.x;
+		var y = e.clientY - lastY + me.y;
 		// me.x = x;
 		// me.y = y;
 
-		xl = e.clientX; yl = e.clientY;
+		lastX = e.clientX; lastY = e.clientY;
 
 		me.set(x, y);
 		// me.ctr(Math.floor(x), Math.floor(y));
@@ -278,8 +292,4 @@ function Spc(e) {
 	function lds(x, y) {
 
 	}
-
-	cor.al(me.e, 'mousedown', grb);
-	cor.al(window, 'mouseup', rls);
-	//al(window, 'mouseout', rls);
 }

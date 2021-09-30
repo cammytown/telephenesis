@@ -1,80 +1,99 @@
-export default Aud;
-
 import cor from './cor';
 
-function Aud(eid) {
-	//loa = (typeof loa === "function") ? false : loa;
-	//pla = (typeof pla === "undefined") ? "aud_pla" : pla;
-	//pau = (typeof pau === "undefined") ? "aud_pau" : pau;
+class Aud {
+	constructor(elementID = "aud") {
+		this.init = this.init.bind(this);
+		this.up = this.up.bind(this);
 
-	var aud = this;
-	aud.e = document.getElementById(eid);
-	aud.e.loop = false;
-	aud.t = null;
-	aud.dec = null;
-	aud.aut = true;
+		this.elementID = elementID;
+		this.element;
+		this.autoplaying = false;
+		document.addEventListener("DOMContentLoaded", this.init); //// backwards-compatibility
+	}
 
-	var autoplaying = false;
+	init() {
+		//loa = (typeof loa === "function") ? false : loa;
+		//pla = (typeof pla === "undefined") ? "aud_pla" : pla;
+		//pau = (typeof pau === "undefined") ? "aud_pau" : pau;
 
-	aud.d = null; aud.m = null; aud.s = null;
+		this.element = document.getElementById(this.elementID);
+		this.element.loop = false;
 
-	aud.pl = function() {
-		aud.d = aud.e.duration | 0;
-		aud.m = aud.d / 60 | 0;
-		aud.s = aud.d - aud.m*60 + '';
-		if(aud.s.length<2) aud.s = "0"+aud.s;
-		aud.e.play();
+		this.timeString = null;
+		this.dec = null;
+		this.aut = true;
+
+		this.autoplaying = false;
+
+		this.duration = null; this.m = null; this.s = null;
+
+		cor.al(this.element, 'canplay', function() {
+			console.log("huh?");
+
+			if(this.autoplaying) {
+				this.play();
+			}
+		});
+
+		cor.al(this.element, 'error', this.elementError);
+		// cor.rl(this.element, 'canplay', this.pl);
+
+		if(this.element.addEventListener) this.element.addEventListener('timeupdate', this.up);
+		else if(this.element.attachEvent) this.element.attachEvent('ontimeupdate', this.up);
+	}
+
+	play() {
+		this.duration = this.element.duration | 0;
+		this.m = this.duration / 60 | 0;
+		this.s = this.duration - this.m * 60 + '';
+		if(this.s.length<2) this.s = "0"+this.s;
+		this.element.play();
 		return true;
 	}
 
-	aud.pa = function() {
-		aud.e.pause();
+	pause() {
+		this.element.pause();
 		return true;
 	}
 
-	aud.st = function() {
-		aud.e.pause();
-		aud.e.currentTime = 0;
+	stop() {
+		this.element.pause();
+		this.element.currentTime = 0;
 
 		return true;
 	}
 
-	cor.al(aud.e, 'canplay', function() {
-		if(autoplaying) {
-			aud.pl();
-		}
-	});
-	cor.al(aud.e, 'error', aud.er);
-	// cor.rl(aud.e, 'canplay', aud.pl);
+	load(src, autoplay = true) {
+		// console.log(src);
 
-	aud.ld = function(src, autoplay = true) {
-		autoplaying = autoplay;
+		console.log(autoplay);
+		this.autoplaying = autoplay;
 
-		aud.e.setAttribute('src', src);
-		aud.e.load();
+		this.element.setAttribute('src', src);
+		this.element.load();
 	}
 
-	aud.er = function() {
+	elementError() { /// naming
 		////
 		console.log("Audio Error:");
-		console.log(aud.e.error);
+		console.log(this.element.error);
 	}
 
-	aud.up = function() {
-		var t = aud.e.currentTime | 0;
+	up() {
+		var t = this.element.currentTime | 0;
 		var m = t/60 | 0;
 		var s = (t-m*60)+'';
 		if(s.length<2) s = "0"+s;
 
-		if(aud.m == 'null') {
-			aud.t = 'loading...';
+		if(this.m == 'null') {
+			this.timeString = 'loading...';
 		} else {
-			aud.t = m+':'+s+' / '+aud.m+':'+aud.s;
+			this.timeString = m+':'+s+' / '+this.m+':'+this.s;
 		}
 
-		aud.dec = t/aud.d;
+		this.dec = t/this.duration;
 	}
-
-	if(aud.e.addEventListener) aud.e.addEventListener('timeupdate', aud.up);
-	else if(aud.e.attachEvent) aud.e.attachEvent('ontimeupdate', aud.up);
 }
+
+export default new Aud("aud");
+
