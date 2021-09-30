@@ -1,0 +1,40 @@
+#ui { ///rename /// in use?
+	position: absolute;
+	top: 5px;
+	right: 15px;
+	z-index: 1;
+	width: 140px;
+	overflow: hidden;
+}
+
+
+/*.loading { margin: 5% auto 0; text-align: center; }
+.loading .progress { height: 1px; background: #000; }*/
+
+// #spc hr {
+// 	position: absolute;
+// 	height: 1px;
+// 	border: 0;
+// 	background: #556;
+// }
+
+
+/* /// */
+#settings {
+	// top: 25%;
+	// margin-left: -265px;
+	// padding: 100px;	
+}
+
+/* temp \\ archive */
+#ticket {
+	position: absolute;
+	left: 25%;
+	top: 25%;
+	width: 350px;
+	padding: 185px 223px 124px 207px;
+	background: url('/images/ticket.png') no-repeat center center;
+	color: #7E0000;
+	font-size: 1.5em;
+	text-align: center;
+}

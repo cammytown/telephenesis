@@ -1,0 +1,31 @@
+#spc {
+	position: absolute;
+	z-index: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	// background-color: #000;
+	cursor: url('/images/release.png'), auto;
+	transition: background-color 0.4s;
+
+	&.act {
+		cursor: url('/images/grab.png'), auto;
+	}
+}
+
+#map {
+	position: relative;
+	width: 0;
+	height: 0;
+	overflow: visible;
+}
+
+.lyr {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+
+	&.a { background: url('/images/spc1.png') repeat; }
+	&.b { background: url('/images/spc2.png') repeat; }
+	&.c { background: url('/images/spc3.png') repeat; }
+}

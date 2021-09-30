@@ -1,0 +1,67 @@
+.tutorial {
+	position: absolute;
+	/*left: 30%;*/
+	/*top: 30%;*/
+	z-index: 3;
+	width: 450px;
+	margin: 0 auto;
+	padding: 10px;
+	background: rgba(0, 0, 0, 0.75);
+	color: #ddd;
+	font-family: 'Strait', sans-serif;
+	transition: color 0.3s, background-color 0.5s;
+}
+
+.tutorial.small {
+	width: 250px;
+	font-size: 2em;
+}
+
+.tutorial.large {
+	width: 500px;
+	font-size: 2.6em;
+}
+
+.tutorial small { font-size: 0.6em; }
+
+.tutorial .meta {
+	margin-top: 15px;
+}
+
+.tutorial .btn {
+	width: 205px;
+	margin: 0;
+	padding: 10px;
+	background: none;
+	font-size: 0.6em;
+	text-align: left;
+}
+.tutorial .next { float: right; text-align: left; }
+.tutorial .prev { float: left; text-align: right; }
+
+.tutorial .close {
+	margin: 0 auto;
+	clear: both;
+	text-align: center;
+}
+
+.inverse .tutorial {
+	background: rgba(255, 255, 255, 0.75);
+	color: #333;
+}
+
+.inverse .tutorial.invite {
+	background: none;
+}
+
+/* more of this?: */
+.tutorial.invite .btn {
+	width: 250px;
+	font-size: 0.85em;
+}
+.inverse .tutorial .btn { color: rgb(35, 35, 155); transition: color 0.15s; }
+.inverse .tutorial .btn:hover { color: rgb(145, 145, 255); background: rgb(10, 10, 75); }
+.inverse .tutorial .btn.g { color: rgb(35, 120, 35); }
+.inverse .tutorial .btn.g:hover { color: rgb(145, 210, 145); background: rgb(10, 75, 10); }
+.inverse .tutorial .btn.r { color: rgb(175, 25, 25); }
+.inverse .tutorial .btn.r:hover { color: rgb(210, 145, 145); background: rgb(75, 10, 10); }

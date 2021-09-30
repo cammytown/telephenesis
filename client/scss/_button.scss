@@ -1,0 +1,119 @@
+.double { /// revisit naming / placement / architecture
+	@extend .clearfix;
+
+	.btn {
+		float: left;
+		width: 50%;
+		box-sizing: border-box;
+	}
+}
+
+.btn, .btn:link {
+	display: block;
+	width: 205px;
+	margin: 2px 0;
+	padding: 10px;
+	background: none;
+	border: 0;
+	font-size: 1.2em;
+	font-family: 'Strait', sans-serif;
+	/*font-weight: 800;*/
+	text-transform: uppercase;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background-color 0.25s, color 0.5s;
+
+	&.text-left { ///
+		text-align: left;
+	}
+
+	&.main {
+		width: 98%;
+		margin: 2px auto;
+		background-color: #789;
+		color: #111;
+		font-size: 0.9em;
+		text-align: center;
+		border-radius: 0 0 2px 2px;
+
+		&:hover {
+			color: #789;
+			background-color: #111;
+		}
+
+		&:active {
+			color: #222;
+			background-color: #999;
+		}
+	}
+}
+
+
+/*.btn:visited { color: #113; }*/
+
+.btn.green {
+	color: $lightGreen; /*background-color: #050;*/
+
+	&:hover {
+		color: $darkGreen;
+		background-color: $lightGreen;
+	}
+
+	&.active {
+		background: $darkGreen;
+		color: $lightGreen;
+	}
+}
+
+.btn.red {
+	color: $lightRed; /*background-color: #500;*/
+
+	&:hover {
+		background-color: $lightRedFaded;
+		color: $redText;
+	}
+
+	&.active {
+		background-color: $darkRed;
+		color: $lightRed;
+	}
+}
+
+.btn.blue {
+	color: $lightBlueText; /*background-color: #022065;*/
+
+	&:hover { color: $darkBlueText; background-color: $lightBlue; }
+
+	&.active {
+		background: $darkBlue;
+		color: $lightBlueText;
+	}
+}
+
+.btn.orange {
+	color: $orange; /*background-color: #550505;*/
+
+	&:hover { background-color: $orange; color: $orangeText; }
+
+	&.active {
+		background: $darkOrange;
+		color: $orange;
+	}
+}
+
+.btn.purple {
+	color: $purple; /*background-color: #550505;*/
+
+	&:hover {
+		background-color: $purple;
+		color: $purpleText;
+	}
+
+	&.active {
+		background: $darkPurple;
+		color: $purple;
+	}
+}
+
+.btn.disabled { background: rgba(0, 0, 0, 0.7); }

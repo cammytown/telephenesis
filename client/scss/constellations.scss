@@ -1,0 +1,46 @@
+/**
+ * telephenesis
+ * we@telephenesis.com
+ * v0.06
+ ***/
+
+@import 'variables';
+
+@import 'base';
+@import 'input';
+@import 'button';
+@import 'navigation';
+
+@import 'uibox';
+@import 'star';
+@import 'spc';
+
+@import 'help';
+@import 'tutorial';
+@import 'creation';
+
+@import 'shame';
+
+header {
+	position: absolute;
+	top: 25px;
+	left: 25px;
+	z-index: 1;
+
+	h2, h3 {
+		margin: 5px 0;
+	}
+
+	a {
+		font-size: 0.8rem;
+	}
+}
+
+#limbo { display: none; }
+
+canvas#uiEffects {
+	position: absolute;
+	z-index: 0; ////
+	width: 100%;
+	height: 100%;
+}

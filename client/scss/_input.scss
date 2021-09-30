@@ -1,0 +1,98 @@
+/* forms */
+input[type="text"],
+input[type="password"],
+textarea {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	margin: 1px 0;
+	padding: $inputPaddingY $inputPaddingX;
+	background-color: #e7e7e7;
+	border: 0;
+	font-size: 1.35em;
+	font-family: 'Strait', sans-serif;
+	text-align: center;
+
+	&:hover, textarea:hover {
+		background-color: #ddd;
+	}
+
+	&:first-child {
+		margin-top: 0;
+	}
+
+	&.init { color: #777; }
+}
+
+label {
+	&.floatBeside {
+		$labelWidth: 200px;
+
+		position: absolute;
+		left: -$labelWidth;
+		display: block;
+		width: $labelWidth;
+		padding: $inputPaddingY 0;
+		background: $uiBackground;
+		text-align: right;
+	}
+}
+
+// form {
+// 	.btn[type=submit] {
+// 	}
+// }
+
+textarea#code {
+	display: block;
+	width: 100%;
+	margin: 0;
+	padding: 20px 0 5px;
+	background-color: rgba(150, 175, 200, 0.2);
+	color: #cce;
+	font-size: 0.85em;
+	text-align: center;
+
+	&:hover {
+		background-color: rgba(150, 175, 200, 0.3);
+	}
+}
+
+
+
+.upload { ///sloppy?
+	position: relative;
+	overflow: hidden;
+}
+.btn.upload input { ///sloppy?
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0 0 0 100%;
+	opacity: 0;
+	cursor: pointer;
+}
+
+// .multicolumn {
+// 	label, input, textarea {
+// 		display: block;
+// 		float: left;
+// 		text-align: left;
+// 	}
+
+// 	label {
+// 		width: 30%;
+// 		padding-top: $inputPaddingY;
+// 	}
+
+// 	input, textarea {
+// 		width: 70%;
+// 	}
+
+// 	textarea {
+// 		height: 150px;
+// 	}
+// }

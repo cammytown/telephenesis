@@ -1,0 +1,28 @@
+form#login.uibox.ajax(action="/login" method="POST")
+	label.floatBeside(for="email") Email
+	input(type="text" name="email" placeholder="email")
+
+	label.floatBeside(for="password") Password
+	input(type="password" name="password" placeholder="password")
+
+	button.btn.main(type="submit") Login
+
+form#register.uibox.ajax(action="/register" method="POST")
+	label.floatBeside(for="email") Email
+	input(name="email" value=user.em type="text" placeholder="email")
+
+	label.floatBeside(for="creatorName") Creator Name (optional)
+	input(
+		name="creatorName"
+		type="text"
+		placeholder="creator name (optional)"
+		value= user.usrMeta ? user.usrMeta.creatorName : ''
+	)
+
+	label.floatBeside(for="password") Password
+	input(type="password" name="password" placeholder="password")
+
+	label.floatBeside(for="password-confirm") Confirm Password
+	input(type="password" name="password-confirm" placeholder="password again")
+
+	button.btn.main(type="submit") Register

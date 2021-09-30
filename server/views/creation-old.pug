@@ -1,0 +1,112 @@
+form#create.uibox(method="POST" action="/create")
+	h2 Create
+
+	p Start a new constellation. Something unique, honest, and without legal ties.
+
+	div#accessSettings.double
+		#publicGameButton.btn.green.text-left.active Public
+		#privateGameButton.btn.blue.text-left Private
+		input#accessSetting(type="hidden" name="access-setting" value="public")
+
+	section#timeSettings.public
+		| Choose a time limit for each round. This is how long each player has to recreate and upload a piece.
+
+		//- div.control
+		label(for="timeLimit-24hours")
+			input(type="radio" name="time-limit" id="timeLimit-24hours" value="24 hours") 
+			| 24 hours (1 day)
+
+		label(for="timeLimit-48hours")
+			input(type="radio" name="time-limit" id="timeLimit-48hours" value="48 hours")
+			| 48 hours (2 days)
+
+		label(for="timeLimit-72hours")
+			input(type="radio" name="time-limit" id="timeLimit-72hours" value="72 hours")
+			| 72 hours (3 days)
+
+		label(for="timeLimit-1week")
+			input(type="radio" name="time-limit" id="timeLimit-1week" value="1 week")
+			| 1 week (7 days; 168 hours)
+
+	div#typeSettings.double
+		| What type of art should players create?
+
+		#musicTypeButton.btn.blue.text-left.active Music
+		#visualTypeButton.btn.red.text-left Visual Art
+		#videoTypeButton.btn.purple.text-left Video
+		#anythingTypeButton.btn.orange.text-left Anything
+
+		input#typeSetting(type="hidden" name="art-type" value="music")
+
+
+	//- div.double
+	//- 	.btn.green
+	//- 		| File URL
+
+	//- 	.btn.green.upload
+	//- 		input#submission(name="submission" type="file")
+	//- 		| Upload <small>(mp3)</small>
+
+	section.fileUpload
+		h3 MP3 File URL
+		em We recommend 
+			a(href="https://archive.org/" target="_blank") archive.org
+
+		input(type="text" name="file-url" class="file-url" placeholder="Enter the URL of an MP3 file.")
+
+	label.rightsAgreement
+		input(type="checkbox" name="rights-confirmation" class="rights-confirmation")
+		| I have the rights to upload this piece of music and I permit others to use it in their recreations.
+
+	div.double
+		button.btn.green(type="submit")
+			| Finish
+			//- | Finish and Place Star
+
+		a.btn.red.close cancel
+
+form#recreate.uibox(method="POST")
+	h2 Recreate
+
+	p.
+		Recreate this star. It can be a cover, a re-orchestration... 
+		the goal is to transform and the challenge is to maintain a 
+		perceivable thread.
+
+	//- This constellation is set to public. All recreations follow the same license.
+
+	//- .btn.green.upload
+	//- 	input#submission(name="submission" type="file")
+	//- 	| Upload <small>(mp3)</small>
+
+	//- .btn.green Public
+	//- .btn.blue Private
+
+	a.btn.red.close cancel
+
+
+form#renameStar.uibox(action="/renameStar" method="POST")
+	h2 Rename Star
+	input.bad.init(name="creatorName" type="text" placeholder="Creator Name")
+	input.activeStarIdInput(name="sid" type="hidden")
+	button.btn.main(type="submit") submit
+	//- a.btn.red.close close
+
+form#deleteStar.uibox(action="/deleteStar" method="POST")
+	h2 Delete Star Confirmation
+	input.activeStarIdInput(name="starID" type="hidden")
+	div Are you sure?
+		button.btn.main(type="submit") Yes.
+		a.btn.red.close No.
+
+.placement
+	#validPlacementZone.placement
+	#placementSymbol.star.placer
+		a
+		span.text.name
+		span.text.time
+	#colorShiftSelect
+		.down
+		.up
+
+	#colorwheelSelect

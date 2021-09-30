@@ -1,0 +1,37 @@
+html, body {
+	margin: 0;
+	height: 100%;
+}
+
+body {
+	background: #000;
+	color: $text;
+	font-size: 16px; ///
+	font-family: 'Monda', sans-serif;
+}
+
+a {
+	// display: block;
+	color: $link;
+	text-decoration: none;
+	cursor: pointer;
+	transition: color 0.3s;
+
+	&:hover {
+		color: $linkHover;
+	}
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Strait', sans-serif;
+	margin: 0;
+}
+
+.clearfix { /// placement
+	&:after { /// placement
+		display: block;
+		height: 0;
+		content: " ";
+		clear: both;
+	}
+}

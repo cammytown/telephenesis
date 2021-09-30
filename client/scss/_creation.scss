@@ -1,0 +1,153 @@
+/// all of this feels sloppy
+
+.create, .admin { display: none; }
+.creator .create { display: block; }
+.adminor .admin { display: block; }
+
+form#create {
+	#timeSettings {
+		// height: 0;
+		margin-bottom: 20px;
+		padding: 7px;
+		background: $black;
+		transition: height 0.2s, background 0.5s;
+		overflow: hidden;
+
+		$labelHeight: 30px;
+		$labelPaddingY: 7px;
+		$labelPaddingX: 0;
+
+		label {
+			display: block;
+			height: $labelHeight;
+			padding: $labelPaddingY $labelPaddingX;
+		}
+
+		// div.control {
+		// 	transition: background 0.5s
+		// }
+
+		// &.public, &.private {
+		// 	height: ($labelHeight + $labelPaddingY*2) * 4;
+		// }
+
+		&.public {
+			// div.control {
+			background: $darkGreen;
+			// }
+		}
+
+		&.private {
+			// div.control {
+			background: $darkBlue;
+			// }
+		}
+	}
+
+	input {
+		margin: 10px 0;
+		text-align: left;
+	}
+
+	section.fileUpload {
+		margin: 10px 0 12px;
+	}
+
+	label.rightsAgreement {
+		display: block;
+		cursor: pointer;
+		padding: 20px;
+		background: $darkPurple;
+
+		input.rights-confirmation {
+			margin-right: 10px;
+		}
+	}
+}
+
+.menu a:hover {
+	background-color: #334;
+}
+
+/* create /// naming / specificity */
+.placementSymbol.star {
+	z-index: 2;
+
+	a {
+		left: -7px;
+		top: -7px;
+		border-color: transparent;
+		border-radius: 12px;
+		cursor: none;
+	}
+}
+
+.placement {
+	position: absolute;
+	z-index: 3;
+	width: 150px;
+	height: 150px;
+	background: rgba(0, 100, 0, 0.5);
+	border-radius: 75px;
+	cursor: none;
+}
+
+.star .progress {
+	position: absolute;
+	left: 40px;
+	top: -15px;
+	font-size: 1.9em;
+	background: rgba(0, 0, 0, 0.5);
+}
+.inverse .star .progress {
+	background: none;
+}
+
+#colorShiftSelect {
+	position: absolute;
+	left: -64px;
+	top: -64px;
+	z-index: -1; /* /// */
+	width: 128px;
+	height: 128px;
+	/*border: 1px solid #222;*/
+	border-radius: 5px;
+	overflow: hidden;
+
+	div {
+		display: block;
+		float: left;
+		width: 50%;
+		height: 100%;
+		opacity: 0.5;
+		cursor: pointer;
+
+		&:hover {
+			opacity: 1;
+		}
+	}
+}
+
+.star #colorwheelSelect {
+	position: absolute;
+	left: -31px;
+	top: -31px;
+	width: 64px;
+	height: 64px;
+	background: url('/images/6colordesat.png') center center;
+	border-radius: 32px;
+	z-index: -1;
+	cursor: crosshair;
+}
+
+#colorwheelSelect {
+	position: absolute;
+	z-index: 5;
+	width: 100%;
+	height: 100%;
+	 div {
+		position: absolute;
+		border-left: 650px solid transparent;
+		border-right: 650px solid transparent;
+	}
+}
