@@ -21,11 +21,12 @@
 
 @import 'shame';
 
-header {
+header#playingStarInfo { ///placement
 	position: absolute;
 	top: 25px;
 	left: 25px;
 	z-index: 1;
+	display: none;
 
 	h2, h3 {
 		margin: 5px 0;
@@ -33,6 +34,24 @@ header {
 
 	a {
 		font-size: 0.8rem;
+	}
+}
+
+#playbackProgress { ///placement
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 20px;
+	background: $uiBackground;
+
+	#playbackProgressBar {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 1%;
+		height: 25px;
+		background: $darkRed;
 	}
 }
 

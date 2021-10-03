@@ -9,19 +9,23 @@ export default { _, al, rl, ac, rc, cc };
 
 function _(selector) {
 	if(selector[0] == '#') {
-		selector = selector.slice(1); // remove '#'
+		var elementID = selector.slice(1); // remove '#'
 
 		//// more stuff
 
-		var selectedElement = document.getElementById(selector);
+		var selectedElement = document.getElementById(elementID);
 		if(selectedElement) {
 			return selectedElement;
 		} else {
-			console.log("_() did not find #" + selector);
+			console.log("_() did not find #" + elementID);
 			return false;
 		}
 	} else if(selector[0] == '.') {
-		
+		var className = selector.slice(1); // remove '#'
+
+		var selectedElements = document.getElementsByClassName(className);
+
+		return selectedElements;
 	}
 
 	return false; ////

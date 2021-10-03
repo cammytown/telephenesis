@@ -40,7 +40,7 @@ module.exports = function(db) {
 				console.error(err);
 				///
 				callback(err);
-				// return false;
+				return false;
 			}
 
 			callback(err, doc);
@@ -77,7 +77,8 @@ module.exports = function(db) {
 	}
 
 	me.getStars = function(userId = false, cb) {
-		stars.find({ initialized: true }).toArray(function(err, results) {
+		// stars.find({ initialized: true }).toArray(function(err, results) {
+		stars.find({ active: true }).toArray(function(err, results) {
 			if(err) {
 				// console.log(err);
 				////
@@ -130,9 +131,9 @@ module.exports = function(db) {
 		);
 	}
 
-	me.createStar = function(userID, starObject, callback) {
+	me.createStar = function(userID, starData, callback) {
 		// var defaultObject = {
-		// 	sourceStar: false,
+		// 	originStar: false,
 		// 	fileURL: false,
 		// 	multerFile: false,
 		// };
@@ -142,7 +143,7 @@ module.exports = function(db) {
 		MLPcurrentPlanetIndex += 1;
 		MLMeta.updateOne({ id: "persistors" }, { $inc: {currentPlanetIndex: 1} });
 
-		switch(starObject.hostType) {
+		switch(starData.hostType) {
 			case 'external': {
 
 			} break;
@@ -201,38 +202,46 @@ module.exports = function(db) {
 		}
 
 		me.getUsrMeta(userID, function(err, usrMeta) { /// not digging this architecture
-			var sourceId = false;
-			var sourceX = false;
-			var sourceY = false;
-			var tier = 0;
-
 			var newStar = {
 				id: newStarID,
-				sourceId: false,
+				originStarID: starData.originStarID,
 				sourceX: false, ///
 				sourceY: false, ///
 				tier: 0,
-				creator: usrMeta.creatorName,
-				x: 0,
-				y: 0,
+				creator: {
+					id: usrMeta._id,
+					creatorName: usrMeta.creatorName,
+					creatorLink: usrMeta.creatorLink
+				},
+				// creator: usrMeta.creatorName,
+				// creatorLink: usrMeta.creatorLink,
+				x: starData.x,
+				y: starData.y,
+				title: starData.title,
 				// placed: false,
 				// initialized: false,
-				hostType: starObject.hostType,
-				fileURL: starObject.fileURL,
-				color: starObject.color,
+				hostType: starData.hostType,
+				fileURL: starData.fileURL,
+				color: starData.color,
+				active: true,
 				// expiration: expirationMS,
 				// rgb: 
 			}
 
-			if(starObject.sourceStarID == -1) {
+			if(starData.originStarID == -1) {
 				stars.insertOne(newStar, function(err, result) {
 					callback(err, result.ops[0]); ///
 				});
 			} else {
-				me.getStar(starObject.sourceStarID, function(err, sourceStar) {
-					starObject.sourceX = sourceStar.x;
-					starObject.sourceY = sourceStar.y;
-					starObject.tier = sourceStar.tier + 1;
+				me.getStar(starData.originStarID, function(err, originStar) {
+					if(err) {
+						callback(err);
+						return false;
+					}
+
+					newStar.sourceX = originStar.x;
+					newStar.sourceY = originStar.y;
+					newStar.tier = originStar.tier + 1;
 
 					stars.insertOne(newStar, function(err, result) {
 						callback(err, result.ops[0]); ///

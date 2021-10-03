@@ -959,17 +959,35 @@ form#create label.rightsAgreement input.rights-confirmation {
   text-align: center;
 }
 
-header {
+header#playingStarInfo {
   position: absolute;
   top: 25px;
   left: 25px;
   z-index: 1;
+  display: none;
 }
-header h2, header h3 {
+header#playingStarInfo h2, header#playingStarInfo h3 {
   margin: 5px 0;
 }
-header a {
+header#playingStarInfo a {
   font-size: 0.8rem;
+}
+
+#playbackProgress {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.9);
+}
+#playbackProgress #playbackProgressBar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1%;
+  height: 25px;
+  background: rgba(85, 0, 0, 0.51);
 }
 
 #limbo {

@@ -8,6 +8,7 @@ import ui from "./ui";
 import creation from "./creation";
 import admin from "./admin";
 
+
 // import "./constellations.scss";
 
 export { Telep };
@@ -25,6 +26,7 @@ function Telep() {
 	var spc;
 
 	me.actingStar;
+	me.playingStar;
 
 	me.init = function() { /// doesn't need to be property
 		// spc = new Spc('spcE');
@@ -35,23 +37,24 @@ function Telep() {
 		function initializeAudio() {
 			// aud = new Aud('aud');
 
-			cor.al(aud.e, 'timeupdate', playerUpdate);
-			cor.al(aud.e, 'ended', playerFinish);
+			cor.al(aud.element, 'timeupdate', playerUpdate);
+			cor.al(aud.element, 'ended', playerFinish);
 
 			function playerUpdate() {
 				// if(time) {
-					playing_star.getElementsByClassName('time')[0].innerHTML = aud.t;
+					me.playingStar.getElementsByClassName('time')[0].innerHTML = aud.timeString;
+					cor._('#playbackProgressBar').style.width = (aud.playbackProgress * 100.0) + "%";
 				// }
 			}
 
 			function playerFinish() {
-				cor.rc(playing_star, 'active');
+				cor.rc(me.playingStar, 'active');
 
-				if(playing_star.getAttribute('data-next')) {
-					var star = document.getElementById('s' + playing_star.getAttribute('data-next'));
+				if(me.playingStar.getAttribute('data-next')) {
+					var star = document.getElementById('s' + me.playingStar.getAttribute('data-next'));
 					load(star);
 				} else {
-					playing_star = false;
+					me.playingStar = false;
 				}
 			}
 		}

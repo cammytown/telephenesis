@@ -1,7 +1,3 @@
-// export { pidgeon };
-
-
-
 
 	// 	var placer = document.createElement('div');
 	// 	placer.className = 'star placer';

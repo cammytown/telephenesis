@@ -121,9 +121,9 @@ function init() {
 
 		///:
 		if(starId != -1) { ///
-			api.getStar(starId, function(err, sourceStar) {
+			api.getStar(starId, function(err, originStar) {
 				api.createStar(i.user.id, {
-					sourceStar,
+					originStar,
 					multerFile: i.file,
 					callback: function(star) {
 						o.json({ error: 0, sid: star.id });
@@ -188,7 +188,7 @@ function init() {
 			// 	// };
 
 			// 	var recreationStar = {
-			// 		sourceStarId: i.body['source-star-id'],
+			// 		originStarId: i.body['source-star-id'],
 			// 		artURL: i.body['file-url'],
 			// 		artType: i.body['art-type'],
 			// 		artTitle: i.body['art-title']
@@ -358,24 +358,24 @@ function init() {
 					return false;
 				}
 
-				console.log(i.body);
-
 				var starID = parseInt(i.body.starID);
 
 				switch(i.body.hostType) {
 					case 'external': {
 						var starData = {
 							starID: i.body.starID,
-							x: i.body.x,
-							y: i.body.y,
+							x: parseInt(i.body.x),
+							y: parseInt(i.body.y),
 							color: i.body.color,
-							sourceStarID: i.body.sourceStarID,
+							originStarID: parseInt(i.body.originStarID),
 							hostType: i.body.hostType,
 							fileURL: i.body.fileURL,
+							title: i.body.starTitle
 						};
 
 						api.createStar(i.user.id, starData, function(err, result) {
 							if(err) {
+								console.log(err); ///
 								o.json({ error: "could not create star" });
 								return false;
 							}

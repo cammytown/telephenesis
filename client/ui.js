@@ -1,4 +1,4 @@
-// import pidgeon from './shame'; ////
+///TODO convert to ES6 class
 
 import cor from './minlab/cor';
 import spc from './minlab/spc'; /// relying on implied singleton
@@ -7,8 +7,6 @@ import aud from './minlab/aud'; /// relying on implied singleton
 import ajx from './minlab/ajx';
 
 import HistoryTime from './js/history-time'
-
-export default { init }
 
 var client;
 var canvasContext;
@@ -22,7 +20,7 @@ var galaxyMenu;
 var uiCanvas;
 var queuedConstellationLines = [];
 
-var playingStar = false;
+// var playingStar = false;
 // var actingStar;
 var activeContextBox = false;
 
@@ -55,6 +53,12 @@ function init(Telep) {
 	// 	});
 	// }
 
+	var starElements = document.getElementsByClassName('star');
+	for (var starIndex = 0; starIndex < starElements.length; starIndex++) {
+		var starElement = starElements[starIndex];
+		starElement.addEventListener('click', onStarClick);
+	}
+
 	var navLinks = document.getElementsByClassName('nav');
 	for (var navLinkIndex = 0; navLinkIndex < navLinks.length; navLinkIndex++) {
 		navLinks[navLinkIndex].addEventListener('click', onNavLinkClick);
@@ -84,8 +88,8 @@ function init(Telep) {
 		switch(e.keyCode) {
 			case 39: // right arrow
 				e.preventDefault();
-				if(playingStar) {
-					var nsid = playingStar.getAttribute('data-next');
+				if(client.playingStar) {
+					var nsid = client.playingStar.getAttribute('data-next');
 					/// if next star isn't loaded? if there is no next star?
 					var nstar = document.getElementById('s'+nsid);
 					playStar(nstar);
@@ -94,8 +98,8 @@ function init(Telep) {
 
 			case 37: // left arrow
 				e.preventDefault();
-				if(playingStar) {
-					var previousStarID = playingStar.getAttribute('data-prev');
+				if(client.playingStar) {
+					var previousStarID = client.playingStar.getAttribute('data-prev');
 					/// if prev star isn't loaded?
 					var previousStar = document.getElementById('s'+previousStarID);
 					playStar(previousStar);
@@ -134,8 +138,8 @@ function init(Telep) {
 	/// TODO: put toggle and menu in same element for active?
 	function toggleMenu(e) {
 		var menu = document.getElementById('menu');
-		var check = cor.cc(menu, 'active');
-		if(check) {
+		var isActive = cor.cc(menu, 'active');
+		if(isActive) {
 			e.target.innerHTML = '|||';
 			cor.rc(e.target, 'active');
 			cor.rc(menu, 'active');
@@ -153,13 +157,14 @@ function contextMenu(e) {
 
 	clear(); /// ?
 
-	var check = cor.cc(e.target.parentNode, 'star');
-	if(check) {
+	var isStarClick = cor.cc(e.target.parentNode, 'star'); ///REVISIT weird architecture?
+	if(isStarClick) {
 		var star = e.target.parentNode;
 		var sid = star.id.split('s')[1];
 
 		//document.getElementById('download').href = '/f/'+sid+'.mp3';
 		client.actingStar = star;
+
 
 		var menu = starMenu;
 		menu.style.left = parseInt(star.style.left) + 12 + 'px';
@@ -185,9 +190,9 @@ function generateConstellationLines() {
 	for (var starIndex = 0; starIndex < starElements.length; starIndex++) {
 		var starElement = starElements[starIndex];
 		if(starElement.getAttribute('data-prev')) {
-			var sourceId = starElement.getAttribute('data-prev');
-			if(parseInt(sourceId) > 0) {
-				var rootStar = document.getElementById('s' + sourceId);
+			var originStarID = starElement.getAttribute('data-prev');
+			if(parseInt(originStarID) > 0) {
+				var rootStar = document.getElementById('s' + originStarID);
 				rootStar.setAttribute('data-next', starElement.id.split('s')[1]);
 				queuedConstellationLines.push({
 					startX: parseInt(rootStar.style.left),
@@ -283,15 +288,23 @@ function onNavLinkClick(event) {
 	// }
 }
 
+function onStarClick(event) {
+	event.preventDefault();
+	playStar(event.currentTarget);
+	// if(state.path == path) return true;
+}
+
 function navigate(path) {
 	var parts = path.split('/');
 	var operation = parts[1];
 
-	if(operation.length && !isNaN(operation)) {
-		var star = document.getElementById('s'+operation)
-		playStar(star);
-		// if(state.path == path) return true;
-	} else switch(operation) {
+	// if(operation.length && !isNaN(operation)) {
+	// 	var star = document.getElementById('s'+operation)
+	// 	playStar(star);
+	// 	// if(state.path == path) return true;
+
+	// } else switch(operation) {
+	switch(operation) {
 		/// TODO: refactor:
 		case 'login':
 		case 'register':
@@ -403,21 +416,43 @@ function bookmarkStar(star) {
 }
 
 function playStar(star) {
-	var sid = star.id.split('s')[1];
+	// var sid = star.id.split('s')[1];
 	// var sid = star.getAttribute('data-id').split('s')[1];
 
-	if(star == playingStar) {
+	// var infoBox = cor._('#starInfoBox');
+	// infoBox.get
+
+	var starTitle = star.getAttribute('data-title');
+	cor._('#playingStarTitle').innerHTML = starTitle;
+
+	var creatorName = star.getAttribute('data-creatorName');
+	cor._('#playingCreatorName').innerHTML = creatorName;
+
+	var creatorLink = star.getAttribute('data-creatorLink');
+	cor._('#playingCreatorLink').innerHTML = creatorLink;
+
+	cor._('#playingStarInfo').style.display = 'block';
+
+	if(star == client.playingStar) {
 		aud.element.paused ? aud.play() : aud.pause();
 	} else {
-		cor.rc(playingStar, "active");
+		if(client.playingStar) {
+			cor.rc(client.playingStar, "active");
+		}
 
-		playingStar = star;
+		client.playingStar = star;
 		cor.ac(star, "active");
 
-		var time = star.getElementsByTagName('span')[1];
+		// var time = star.getElementsByTagName('span')[1];
 
-		aud.load('/music/'+sid+'.mp3');
-		aud.play();
+		aud.load(star.getElementsByTagName('a')[0].href);
+		// aud.load('/music/'+sid+'.mp3');
+
+		aud.element.addEventListener('loadedmetadata', function() {
+			aud.play();
+		}, {
+			once: true /// browser support?
+		});
 	}
 }
 
@@ -501,3 +536,6 @@ function logout() { /// placement
 		}
 	});
 }
+
+export default { init }
+

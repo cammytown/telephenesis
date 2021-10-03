@@ -12,10 +12,9 @@ Listeners and browse through a growing constellation of the progression of music
 - `npm run sasswatch`
 - `webpack --watch`
 
-## TODO
-- organize/filter the universe by newness, popularity, etc.
-- get webpack config to handle SASS?
-- rename instances of "sid" to "starID", probably
+## Planned Features
+- Reorder the layout of the universe and filter stars to quickly see bookmarked or most popular stars.
+- Community features like discussion.
 
 ## Built using
 * [Node.js](https://nodejs.org/en/)
@@ -23,14 +22,6 @@ Listeners and browse through a growing constellation of the progression of music
 * [LAME](https://lame.buanzo.org/)
 * [MongoDB](https://www.mongodb.com/)
 
-## Planned Features
-- Reorder the layout of the universe and filter stars to quickly see bookmarked or most popular stars.
-- Community features like discussion.
-- Dead stars.
-- private games
-- licensing options
-	| possible pay distribution
-
 ## Credits
-* **Cameron Steele** - [steelecameron.com](https://steelecameron.com)
-* **Chris Marianetti** - [nopiano.com](http://nopiano.com)
+* **Chris Marianetti** - [nopiano.com](http://nopiano.com) - game design, web design
+* **Cameron Steele** - [steelecameron.com](https://steelecameron.com) - programming, web design, game design

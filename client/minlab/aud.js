@@ -3,7 +3,7 @@ import cor from './cor';
 class Aud {
 	constructor(elementID = "aud") {
 		this.init = this.init.bind(this);
-		this.up = this.up.bind(this);
+		this.update = this.update.bind(this);
 
 		this.elementID = elementID;
 		this.element;
@@ -20,7 +20,7 @@ class Aud {
 		this.element.loop = false;
 
 		this.timeString = null;
-		this.dec = null;
+		this.playbackProgress = null;
 		this.aut = true;
 
 		this.autoplaying = false;
@@ -28,8 +28,6 @@ class Aud {
 		this.duration = null; this.m = null; this.s = null;
 
 		cor.al(this.element, 'canplay', function() {
-			console.log("huh?");
-
 			if(this.autoplaying) {
 				this.play();
 			}
@@ -38,8 +36,8 @@ class Aud {
 		cor.al(this.element, 'error', this.elementError);
 		// cor.rl(this.element, 'canplay', this.pl);
 
-		if(this.element.addEventListener) this.element.addEventListener('timeupdate', this.up);
-		else if(this.element.attachEvent) this.element.attachEvent('ontimeupdate', this.up);
+		if(this.element.addEventListener) this.element.addEventListener('timeupdate', this.update);
+		else if(this.element.attachEvent) this.element.attachEvent('ontimeupdate', this.update);
 	}
 
 	play() {
@@ -79,7 +77,7 @@ class Aud {
 		console.log(this.element.error);
 	}
 
-	up() {
+	update() {
 		var t = this.element.currentTime | 0;
 		var m = t/60 | 0;
 		var s = (t-m*60)+'';
@@ -91,7 +89,7 @@ class Aud {
 			this.timeString = m+':'+s+' / '+this.m+':'+this.s;
 		}
 
-		this.dec = t/this.duration;
+		this.playbackProgress = t/this.duration;
 	}
 }
 
