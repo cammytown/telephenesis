@@ -3,7 +3,7 @@
 import cor from './minlab/cor';
 import spc from './minlab/spc'; /// relying on implied singleton
 import Anm from './minlab/anm';
-import aud from './minlab/aud'; /// relying on implied singleton
+// import aud from './minlab/aud'; /// relying on implied singleton
 import ajx from './minlab/ajx';
 
 import HistoryTime from './js/history-time'
@@ -24,10 +24,13 @@ var queuedConstellationLines = [];
 // var actingStar;
 var activeContextBox = false;
 
+var aud; ///naming
+
 HistoryTime.bindPathToCallback('*', navigate);
 
 function init(Telep) {
 	client = Telep;
+	aud = client.aud
 	starMenu = document.getElementById('starMenu');
 	galaxyMenu = document.getElementById('galaxyMenu');
 

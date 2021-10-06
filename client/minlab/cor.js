@@ -5,7 +5,16 @@
 
 // var EXPORTED_SYMBOLS = ['al', 'rl', 'ac', 'rc', 'cc'];
 
-export default { _, al, rl, ac, rc, cc };
+export default {
+	_,
+	relativeToElement,
+	relativeToEventTarget,
+	al,
+	rl,
+	ac,
+	rc,
+	cc
+};
 
 function _(selector) {
 	if(selector[0] == '#') {
@@ -29,6 +38,24 @@ function _(selector) {
 	}
 
 	return false; ////
+}
+
+function relativeToElement(element, vec2) {
+	var rect = element.getBoundingClientRect();
+
+	var x = vec2.x - rect.left;
+	var y = vec2.y - rect.top;
+	return { x, y };
+}
+
+function relativeToEventTarget(event) {
+	return relativeToElement(
+		event.target,
+		{
+			x: event.clientX,
+			y: event.clientY 
+		}
+	);
 }
 
 function al(ele, eve, fnc) {

@@ -972,19 +972,13 @@ header#playingStarInfo h2, header#playingStarInfo h3 {
 header#playingStarInfo a {
   font-size: 0.8rem;
 }
-
-#playbackProgress {
-  position: fixed;
-  left: 0;
-  bottom: 0;
+header#playingStarInfo #playbackProgress {
   width: 100%;
   height: 20px;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(250, 250, 250, 0.2);
+  display: block;
 }
-#playbackProgress #playbackProgressBar {
-  position: absolute;
-  left: 0;
-  top: 0;
+header#playingStarInfo #playbackProgress #playbackProgressBar {
   width: 1%;
   height: 25px;
   background: rgba(85, 0, 0, 0.51);
