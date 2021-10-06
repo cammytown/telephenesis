@@ -1,0 +1,64 @@
+body {
+	header#playingStarInfo { ///placement
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 1;
+		width: 100%;
+		// display: none;
+		opacity: 0;
+		height: 0;
+		transition: height 500ms, opacity 500ms;
+
+		h2, h3 {
+			margin: 5px 0 5px 20px;
+		}
+
+		a {
+			font-size: 0.8rem;
+		}
+
+		#playbackProgress { ///placement
+			// position: fixed;
+			// left: 0;
+			// bottom: 0;
+			width: 100%;
+			height: 20px;
+			margin-bottom: 10px;
+			// background: rgba(123, 74, 147, 0.4);
+			background: rgba(123, 74, 147, 0.4);
+			display: block;
+
+			#playbackProgressBar {
+				// position: absolute;
+				// left: 0;
+				// top: 0;
+				width: 1%;
+				height: 100%;
+				background: rgb(227, 63, 84);
+			}
+		}
+
+		&::after {
+			// player shadow
+
+			display: block;
+			position: absolute;
+			top: 20px;
+			left: 5px;
+			z-index: 0;
+			width: 100%;
+			height: 7px;
+			background: $darkPurple;
+			content: "";
+		}
+	}
+
+	&.playing {
+		header#playingStarInfo {
+			// display: block;
+			opacity: 1;
+			height: 120px;
+		}
+	}
+}

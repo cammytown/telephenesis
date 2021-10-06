@@ -132,10 +132,12 @@ $inactiveBorderWidth: 1px;
 		}
 
 		49% {
+			// make sure star style properties are at default
 			@include starProps($starSize);
 		}
 
 		50% {
+			// reduce the border size for this moment
 			@include starProps($starSize, $activeBorderWidth - 3);
 		}
 

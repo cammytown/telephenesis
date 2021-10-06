@@ -228,8 +228,8 @@ body {
   /* menu */
   /* /// refactor: */
 }
-body.active nav {
-  top: 25px;
+body.playing nav {
+  top: 28px;
 }
 body nav {
   display: block;
@@ -238,6 +238,7 @@ body nav {
   right: 60px;
   width: 300px;
   text-align: right;
+  transition: top 250ms;
 }
 body nav a#logo {
   display: block;
@@ -598,6 +599,50 @@ body .in .guest {
 }
 .star.active .meta:hover .text {
   color: #4e5767;
+}
+
+body header#playingStarInfo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  opacity: 0;
+  height: 0;
+  transition: height 500ms, opacity 500ms;
+}
+body header#playingStarInfo h2, body header#playingStarInfo h3 {
+  margin: 5px 0 5px 20px;
+}
+body header#playingStarInfo a {
+  font-size: 0.8rem;
+}
+body header#playingStarInfo #playbackProgress {
+  width: 100%;
+  height: 20px;
+  margin-bottom: 10px;
+  background: rgba(123, 74, 147, 0.4);
+  display: block;
+}
+body header#playingStarInfo #playbackProgress #playbackProgressBar {
+  width: 1%;
+  height: 100%;
+  background: #e33f54;
+}
+body header#playingStarInfo::after {
+  display: block;
+  position: absolute;
+  top: 20px;
+  left: 5px;
+  z-index: 0;
+  width: 100%;
+  height: 7px;
+  background: rgba(76, 20, 200, 0.19);
+  content: "";
+}
+body.playing header#playingStarInfo {
+  opacity: 1;
+  height: 120px;
 }
 
 #spc {
@@ -961,44 +1006,15 @@ form#create label.rightsAgreement input.rights-confirmation {
   text-align: center;
 }
 
-body header#playingStarInfo {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  width: 100%;
-  display: none;
-}
-body header#playingStarInfo h2, body header#playingStarInfo h3 {
-  margin: 5px 0;
-}
-body header#playingStarInfo a {
-  font-size: 0.8rem;
-}
-body header#playingStarInfo #playbackProgress {
-  width: 100%;
-  height: 20px;
-  background: rgba(250, 250, 250, 0.2);
-  display: block;
-}
-body header#playingStarInfo #playbackProgress #playbackProgressBar {
-  width: 1%;
-  height: 25px;
-  background: rgba(85, 0, 0, 0.51);
-}
-body.playing header#playingStarInfo {
-  display: block;
-}
-
-#limbo {
-  display: none;
-}
-
 canvas#uiEffects {
   position: absolute;
   z-index: 0;
   width: 100%;
   height: 100%;
+}
+
+#limbo {
+  display: none;
 }
 
 /*# sourceMappingURL=constellations.css.map */

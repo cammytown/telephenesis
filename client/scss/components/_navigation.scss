@@ -1,8 +1,8 @@
 /// clean up architecture
 body {
-	&.active {
+	&.playing {
 		nav {
-			top: $audioPlayerHeight;
+			top: $playerHeight;
 		}
 	}
 
@@ -13,6 +13,7 @@ body {
 		right: 60px;
 		width: 300px;
 		text-align: right;
+		transition: top 250ms;
 
 		a#logo {
 			display: block;

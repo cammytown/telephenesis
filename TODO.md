@@ -1,5 +1,24 @@
 ## TODO
 ### 3
+- improve appearance of audio player
+	| are images part of the player or do you view them separately?
+
+- create a shifting color theme which effects all elements
+	| allow for user to select consistent color(s)
+
+- make aud submodule
+- move js files and libs into js/libs folder
+
+- fix help and profile links
+- hitting escape or clicking in space should close the menu
+
+- reimplement admin features
+- visual stars are squares, music are circles?
+- sort stars
+
+- add numbers/tier level to stars
+- make first stars appear slightly different
+
 - progress bar along bottom
 	| also in header probably
 
