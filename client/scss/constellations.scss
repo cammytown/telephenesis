@@ -4,54 +4,65 @@
  * v0.06
  ***/
 
-@import 'variables';
+@import 'abstracts/variables';
 
 @import 'base';
-@import 'input';
-@import 'button';
-@import 'navigation';
 
-@import 'uibox';
-@import 'star';
+@import 'components/input';
+
+@import 'components/button';
+@import 'components/navigation';
+
+@import 'components/uibox';
+@import 'components/star';
 @import 'spc';
 
-@import 'help';
-@import 'tutorial';
-@import 'creation';
+@import 'pages/help';
+@import 'pages/tutorial';
+@import 'pages/creation';
 
 @import 'shame';
 
-header#playingStarInfo { ///placement
-	position: absolute;
-	top: 25px;
-	left: 25px;
-	z-index: 1;
-	display: none;
-
-	h2, h3 {
-		margin: 5px 0;
-	}
-
-	a {
-		font-size: 0.8rem;
-	}
-
-	#playbackProgress { ///placement
-		// position: fixed;
-		// left: 0;
-		// bottom: 0;
+body {
+	header#playingStarInfo { ///placement
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 1;
 		width: 100%;
-		height: 20px;
-		background: $uiBackgroundLight;
-		display: block;
+		display: none;
 
-		#playbackProgressBar {
-			// position: absolute;
+		h2, h3 {
+			margin: 5px 0;
+		}
+
+		a {
+			font-size: 0.8rem;
+		}
+
+		#playbackProgress { ///placement
+			// position: fixed;
 			// left: 0;
-			// top: 0;
-			width: 1%;
-			height: 25px;
-			background: $darkRed;
+			// bottom: 0;
+			width: 100%;
+			height: 20px;
+			background: $uiBackgroundLight;
+			display: block;
+
+			#playbackProgressBar {
+				// position: absolute;
+				// left: 0;
+				// top: 0;
+				width: 1%;
+				height: 25px;
+				background: $darkRed;
+			}
+		}
+	}
+
+	&.playing {
+		header#playingStarInfo {
+			display: block;
 		}
 	}
 }

@@ -434,7 +434,8 @@ function playStar(star) {
 	var creatorLink = star.getAttribute('data-creatorLink');
 	cor._('#playingCreatorLink').innerHTML = creatorLink;
 
-	cor._('#playingStarInfo').style.display = 'block';
+	// cor._('#playingStarInfo').style.display = 'block';
+	cor.ac(document.body, 'playing')
 
 	if(star == client.playingStar) {
 		aud.element.paused ? aud.play() : aud.pause();
