@@ -45,11 +45,13 @@ class HistoryTime { //v0.1
 			this.deactivatePathBind(activePathBind);
 		}
 
+		// Run wildcard callbacks
 		for (var constantBindIndex = 0; constantBindIndex < this.pathBinds['*'].length; constantBindIndex++) {
 			var constantPathBind = this.pathBinds['*'][constantBindIndex];
 			this.activatePathBind(constantPathBind, path);
 		}
 
+		// Run callbacks for target path
 		if(this.pathBinds.hasOwnProperty(path)) {
 			for(var bindIndex = 0; bindIndex < this.pathBinds[path].length; bindIndex++) {
 				var pathBind = this.pathBinds[path][bindIndex];
