@@ -2,7 +2,7 @@ const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = [{
-	entry: './client/telepClient.js',
+	entry: './client/js/telepClient.js',
 	mode: 'development',
 	devtool: 'eval-source-map',
 	output: {

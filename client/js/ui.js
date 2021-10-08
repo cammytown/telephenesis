@@ -1,14 +1,12 @@
 ///TODO convert to ES6 class
 
-import cor from './minlab/cor';
-import spc from './minlab/spc'; /// relying on implied singleton
-import Anm from './minlab/anm';
-// import aud from './minlab/aud'; /// relying on implied singleton
-import ajx from './minlab/ajx';
+import cor from './libs/minlab/cor';
+import spc from './libs/minlab/spc'; /// relying on implied singleton
+import Anm from './libs/minlab/anm';
+import ajx from './libs/minlab/ajx';
+import HistoryTime from './libs/history-time'
+import clientState from './ClientState';
 
-import HistoryTime from './js/history-time'
-
-var client;
 var canvasContext;
 var menuToggleElement;
 
@@ -24,13 +22,9 @@ var queuedConstellationLines = [];
 // var actingStar;
 var activeContextBox = false;
 
-var aud; ///naming
-
 HistoryTime.bindPathToCallback('*', navigate);
 
 function init(Telep) {
-	client = Telep;
-	aud = client.aud
 	starMenu = document.getElementById('starMenu');
 	galaxyMenu = document.getElementById('galaxyMenu');
 
@@ -91,8 +85,8 @@ function init(Telep) {
 		switch(e.keyCode) {
 			case 39: // right arrow
 				e.preventDefault();
-				if(client.playingStar) {
-					var nsid = client.playingStar.getAttribute('data-next');
+				if(clientState.playingStar) {
+					var nsid = clientState.playingStar.getAttribute('data-next');
 					/// if next star isn't loaded? if there is no next star?
 					var nstar = document.getElementById('s'+nsid);
 					playStar(nstar);
@@ -101,8 +95,8 @@ function init(Telep) {
 
 			case 37: // left arrow
 				e.preventDefault();
-				if(client.playingStar) {
-					var previousStarID = client.playingStar.getAttribute('data-prev');
+				if(clientState.playingStar) {
+					var previousStarID = clientState.playingStar.getAttribute('data-prev');
 					/// if prev star isn't loaded?
 					var previousStar = document.getElementById('s'+previousStarID);
 					playStar(previousStar);
@@ -113,7 +107,7 @@ function init(Telep) {
 				if(!activeContextBox) {
 					e.preventDefault();
 
-					aud.element.paused ? aud.play() : aud.pause();
+					clientState.audio.element.paused ? clientState.audio.play() : clientState.audio.pause();
 				}
 			} break;
 
@@ -166,7 +160,7 @@ function contextMenu(e) {
 		var sid = star.id.split('s')[1];
 
 		//document.getElementById('download').href = '/f/'+sid+'.mp3';
-		client.actingStar = star;
+		clientState.actingStar = star;
 
 
 		var menu = starMenu;
@@ -178,7 +172,7 @@ function contextMenu(e) {
 		spc.map.appendChild(menu);
 	} else {
 		closeContextMenu();
-		client.actingStar = false;
+		clientState.actingStar = false;
 
 		var menu = galaxyMenu;
 		menu.style.left = e.clientX + 'px';
@@ -329,7 +323,7 @@ function navigate(path) {
 		// } break;
 
 		case 'bookmark': {
-			bookmarkStar(client.actingStar);
+			bookmarkStar(clientState.actingStar);
 			return true;
 		} break;
 
@@ -392,12 +386,12 @@ function navigate(path) {
 }
 
 function deleteStar(star) { /// revisit architecture
-	var sid = client.actingStar.id.split('s')[1];
+	var sid = clientState.actingStar.id.split('s')[1];
 	var p = "sid="+sid;
 	ajx('/ajax/deleteStar', p, function(d) {
 		var r = JSON.parse(d);
 		if(!r.error) {
-			client.actingStar.fadeOut();
+			clientState.actingStar.fadeOut();
 		}
 	});
 
@@ -437,23 +431,23 @@ function playStar(star) {
 	// cor._('#playingStarInfo').style.display = 'block';
 	cor.ac(document.body, 'playing')
 
-	if(star == client.playingStar) {
-		aud.element.paused ? aud.play() : aud.pause();
+	if(star == clientState.playingStar) {
+		clientState.audio.element.paused ? clientState.audio.play() : clientState.audio.pause();
 	} else {
-		if(client.playingStar) {
-			cor.rc(client.playingStar, "active");
+		if(clientState.playingStar) {
+			cor.rc(clientState.playingStar, "active");
 		}
 
-		client.playingStar = star;
+		clientState.playingStar = star;
 		cor.ac(star, "active");
 
 		// var time = star.getElementsByTagName('span')[1];
 
-		aud.load(star.getElementsByTagName('a')[0].href);
-		// aud.load('/music/'+sid+'.mp3');
+		clientState.audio.load(star.getElementsByTagName('a')[0].href);
+		// clientState.audio.load('/music/'+sid+'.mp3');
 
-		aud.element.addEventListener('loadedmetadata', function() {
-			aud.play();
+		clientState.audio.element.addEventListener('loadedmetadata', function() {
+			clientState.audio.play();
 		}, {
 			once: true /// browser support?
 		});
@@ -464,7 +458,7 @@ function playStar(star) {
 // 	/// can't load if not logged in
 // 	/// create separate aud for sound-effects like this
 
-// 	aud.load('/audio/ticket.mp3');
+// 	clientState.audio.load('/audio/ticket.mp3');
 
 // 	var ticket = document.getElementById('ticket');
 // 	document.body.appendChild(ticket, limbo);
@@ -479,11 +473,11 @@ function onFormSubmit(event) { //// temporary; should find more robust solution 
 	event.preventDefault();
 
 	/// quick-fix; if working on a star, update the field values appropriately; this should obviously happen somewhere else
-	if(client.actingStar) {
+	if(clientState.actingStar) {
 		var activeStarIdInputs = document.getElementsByClassName('activeStarIdInput');
 		for (var inputIndex = 0; inputIndex < activeStarIdInputs.length; inputIndex++) {
 			var input = activeStarIdInputs[inputIndex];
-			input.value = client.actingStar.id.split('s')[1];
+			input.value = clientState.actingStar.id.split('s')[1];
 		}
 	}
 

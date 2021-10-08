@@ -82,9 +82,6 @@ export default class Aud {
 	}
 
 	load(src, autoplay = true) {
-		// console.log(src);
-
-		console.log(autoplay);
 		this.autoplaying = autoplay;
 
 		this.element.setAttribute('src', src);

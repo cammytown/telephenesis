@@ -1,10 +1,10 @@
-import cor from './minlab/cor';
-import spc from './minlab/spc'; //// ultimately whatever spc becomes probably won't output a singleton
-import Anm from './minlab/anm';
-import Upl from './minlab/upl';
-import ColorTool from './minlab/colorTool.js';
-import ajx from './minlab/ajx'; ///TODO get rid of in favor or Pijin
-import HistoryTime from './js/history-time';
+import cor from './libs/minlab/cor';
+import spc from './libs/minlab/spc'; //// ultimately whatever spc becomes probably won't output a singleton
+import Anm from './libs/minlab/anm';
+import Upl from './libs/minlab/upl';
+import ColorTool from './libs/minlab/colorTool.js';
+import ajx from './libs/minlab/ajx'; ///TODO get rid of in favor or Pijin
+import HistoryTime from './libs/history-time';
 
 // import Pijin from './js/pijin-js';
 
@@ -69,7 +69,7 @@ function init(Telep) {
 function onRecreateClick(event) {
 	event.preventDefault();
 
-	workingStar.originStarID = parseInt(client.actingStar.id.split('s')[1]);
+	workingStar.originStarID = parseInt(clientState.actingStar.id.split('s')[1]);
 }
 
 function onCreateSubmit(event) {
@@ -140,8 +140,8 @@ function initializeStarPlacement() {
 	} else {
 		// create valid placement zone around the area of the origin star
 
-		var current_x = parseInt(client.actingStar.style.left);
-		var current_y = parseInt(client.actingStar.style.top);
+		var current_x = parseInt(clientState.actingStar.style.left);
+		var current_y = parseInt(clientState.actingStar.style.top);
 
 		// center camera around origin star
 		spc.ctr(current_x, current_y);
@@ -235,10 +235,10 @@ function initializeStarColoring(genesis) {
 		Anm.fadeOut(validPlacementZone);
 
 		var colorShiftSelect = document.getElementById('colorShiftSelect');
-		var rgb = client.actingStar.getElementsByTagName('a')[0].style.backgroundColor.substr(4).split(',');
+		var rgb = clientState.actingStar.getElementsByTagName('a')[0].style.backgroundColor.substr(4).split(',');
 		var hsl = ColorTool.rgb(rgb[0], rgb[1], parseInt(rgb[2]));
-		console.log(client.actingStar.getElementsByTagName('a')[0].style.backgroundColor)
-		console.log(client.actingStar.getElementsByTagName('a')[0])
+		console.log(clientState.actingStar.getElementsByTagName('a')[0].style.backgroundColor)
+		console.log(clientState.actingStar.getElementsByTagName('a')[0])
 		console.log(rgb);
 		console.log(hsl);
 		colorShiftSelect.children[0].style.background = 'hsl('+(hsl[0]-17)+', 45%, 80%)';
@@ -290,7 +290,7 @@ function uploadCreation() {
 	// document.body.className = null;
 	//spc.ctr(0, 0);
 
-	var originStarID = client.actingStar ? parseInt(client.actingStar.id.split('s')[1]) : -1;
+	var originStarID = clientState.actingStar ? parseInt(clientState.actingStar.id.split('s')[1]) : -1;
 	var file = document.getElementById('submission');
 	var upl = new Upl('/ajax/upload/'+originStarID, file, onUploadProgress, onUploadComplete);
 
