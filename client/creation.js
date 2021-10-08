@@ -346,7 +346,7 @@ function actualizeCreation() {
 	formData.append('x', workingStar.x);
 	formData.append('y', workingStar.y);
 	formData.append('color', workingStar.color);
-	formData.append('color', workingStar.color);
+	// formData.append('color', workingStar.color);
 	formData.append('originStarID', workingStar.originStarID);
 	formData.append('hostType', workingStar.hostType);
 	formData.append('fileURL', workingStar.fileURL);

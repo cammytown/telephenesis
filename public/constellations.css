@@ -226,10 +226,24 @@ textarea#code:hover {
 
 body {
   /* menu */
-  /* /// refactor: */
 }
 body.playing nav {
   top: 28px;
+}
+body .user, body .create {
+  display: none;
+}
+body .user {
+  display: block;
+}
+body.in #navigation {
+  left: -140px;
+}
+body.in.creator .create {
+  display: block;
+}
+body.in .guest {
+  display: none;
 }
 body nav {
   display: block;
@@ -316,9 +330,6 @@ body #navigation a {
 body #navigation a:first-child {
   margin-left: 0;
 }
-body .in #navigation {
-  left: -140px;
-}
 body .menu {
   /* /// name? */
   position: absolute;
@@ -354,18 +365,6 @@ body .menu a.admin:hover {
 }
 body #menu .user a, body #menu .guest a {
   display: block;
-}
-body .user, body .create {
-  display: none;
-}
-body .in .user {
-  display: block;
-}
-body .in.creator .create {
-  display: block;
-}
-body .in .guest {
-  display: none;
 }
 
 .uibox {
@@ -621,13 +620,13 @@ body header#playingStarInfo #playbackProgress {
   width: 100%;
   height: 20px;
   margin-bottom: 10px;
-  background: rgba(123, 74, 147, 0.4);
+  background: rgba(121, 61, 155, 0.33);
   display: block;
 }
 body header#playingStarInfo #playbackProgress #playbackProgressBar {
   width: 1%;
   height: 100%;
-  background: #e33f54;
+  background: rgba(227, 63, 84, 0.7);
 }
 body header#playingStarInfo::after {
   display: block;

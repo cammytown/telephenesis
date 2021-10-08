@@ -11,13 +11,13 @@ import admin from "./admin";
 
 // import "./constellations.scss";
 
-export { Telep };
+export { TelepClient };
 
 window.addEventListener('load', function() { ///DOMonload?
-	new Telep().init(); /// change architecture after pondering on it some more
+	new TelepClient().init(); /// change architecture after pondering on it some more
 });
 
-function Telep() {
+function TelepClient() {
 	var me = this;
 
 	// var state = { page: 'index' };

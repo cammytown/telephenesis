@@ -21,14 +21,14 @@ html(lang="en")
 
 			#menu
 				.user
-					a.create(href="/settings") profile
-					a(href="/logout") logout
+					a.create.nav(href="/settings") profile
+					a.nav(href="/logout") logout
 
 				.guest
-					a(href="/login") login
-					a(href="/register") register
+					a.nav(href="/login") login
+					a.nav(href="/register") register
 
-				a(href="/help") help
+				a.nav(href="/help") help
 
 		header#playingStarInfo.inactive
 			div#playbackProgress
@@ -69,7 +69,10 @@ html(lang="en")
 						)
 
 						div.meta
-							div.text.name= star.creator.creatorName
+							span.text.title= star.title
+							| by
+							span.text.creator= star.creator.creatorName
+
 							div.text.time
 
 		#limbo
@@ -79,7 +82,7 @@ html(lang="en")
 			include auth.pug
 			include help.pug
 
-			form#settings.uibox.wide(method="POST")
+			form#settings.ajax.uibox.wide(method="POST")
 				label.floatBeside(for="email") Email
 				input(name="email" value=user.em type="text" placeholder="email" disabled)
 

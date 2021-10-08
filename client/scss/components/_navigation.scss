@@ -6,6 +6,23 @@ body {
 		}
 	}
 
+	.user, .create { display: none; } ///architecture
+	.user, { display: block; } ///architecture
+
+	&.in {
+		///TODO make naming of "in" and "guest" and such clearer
+
+		#navigation {
+			left: -140px;
+		}
+
+		&.creator {
+			.create { display: block; }
+		}
+
+		.guest { display: none; }
+	}
+
 	nav {
 		display: block;
 		position: absolute;
@@ -101,10 +118,6 @@ body {
 		}
 	}
 
-	.in #navigation {
-		left: -140px;
-	}
-
 	/* menu */
 	.menu { /* /// name? */
 		position: absolute;
@@ -150,10 +163,4 @@ body {
 			display: block;
 		}
 	}
-
-	/* /// refactor: */
-	.user, .create { display: none; }
-	.in .user, { display: block; }
-	.in.creator .create { display: block; }
-	.in .guest { display: none; }
 }

@@ -41,7 +41,7 @@ function init(Telep) {
 	uiCanvas.height = document.body.offsetHeight;
 	canvasContext = uiCanvas.getContext('2d');
 
-	cor.al(window, 'resize', function() {
+	window.addEventListener('resize', function() {
 		uiCanvas.width = document.body.offsetWidth;
 		uiCanvas.height = document.body.offsetHeight;
 	});
@@ -62,7 +62,7 @@ function init(Telep) {
 		starElement.addEventListener('click', onStarClick);
 	}
 
-	var navLinks = document.getElementsByClassName('nav');
+	var navLinks = document.getElementsByClassName('nav'); ///REVISIT not really into this class name; something more descriptive?
 	for (var navLinkIndex = 0; navLinkIndex < navLinks.length; navLinkIndex++) {
 		navLinks[navLinkIndex].addEventListener('click', onNavLinkClick);
 	}
@@ -126,7 +126,7 @@ function init(Telep) {
 
 	/* navigation */
 	cor.al(spc.element, 'click', function(event) {
-		clear();
+		closeContextMenu();
 
 		if(event.target.parentNode.id == 'spc' && HistoryTime.state.path != '/') { ///
 			// state.updating = true;
@@ -158,7 +158,7 @@ function contextMenu(e) {
 	e.preventDefault();
 	e.stopPropagation();
 
-	clear(); /// ?
+	closeContextMenu();
 
 	var isStarClick = cor.cc(e.target.parentNode, 'star'); ///REVISIT weird architecture?
 	if(isStarClick) {
@@ -177,7 +177,7 @@ function contextMenu(e) {
 
 		spc.map.appendChild(menu);
 	} else {
-		clear();
+		closeContextMenu();
 		client.actingStar = false;
 
 		var menu = galaxyMenu;
@@ -187,6 +187,7 @@ function contextMenu(e) {
 	}
 }
 
+var lineDrawStartMS = performance.now();
 function generateConstellationLines() {
 	/* stars */
 	var starElements = document.getElementsByClassName('star');
@@ -211,64 +212,63 @@ function generateConstellationLines() {
 	}
 
 	window.requestAnimationFrame(drawLineStep);
-}
 
-var lineDrawStartMS = performance.now();
-function drawLineStep(currentMS) {
-	canvasContext.clearRect(0, 0, uiCanvas.width, uiCanvas.height);
+	function drawLineStep(currentMS) {
+		canvasContext.clearRect(0, 0, uiCanvas.width, uiCanvas.height);
 
-	var elapsedMS = currentMS - lineDrawStartMS;
-	for (var lineIndex = 0; lineIndex < queuedConstellationLines.length; lineIndex++) {
-		var line = queuedConstellationLines[lineIndex];
+		var elapsedMS = currentMS - lineDrawStartMS;
+		for (var lineIndex = 0; lineIndex < queuedConstellationLines.length; lineIndex++) {
+			var line = queuedConstellationLines[lineIndex];
 
-		////
-		// var delay = (line.tier * 1000) - (line.tier * 350);
-		var delay = ((line.tier) * 1000) - (line.tier * 800);
-		// var delay = (line.tier * 1000) / (line.tier / 2);
-		// var delay = ((line.tier * line.tier / 2) * 1000) - (line.tier * line.tier * 475);
+			////
+			// var delay = (line.tier * 1000) - (line.tier * 350);
+			var delay = ((line.tier) * 1000) - (line.tier * 800);
+			// var delay = (line.tier * 1000) / (line.tier / 2);
+			// var delay = ((line.tier * line.tier / 2) * 1000) - (line.tier * line.tier * 475);
 
-		var progress = (elapsedMS - delay) / 1000;
-		if(progress < 0) {
-			continue;
+			var progress = (elapsedMS - delay) / 1000;
+			if(progress < 0) {
+				continue;
+			}
+
+			if(progress >= 1) {
+				progress = 1;
+				// queuedConstellationLines.splice(queuedConstellationLines.indexOf(line), 1);
+			}
+
+			var lineVector = new spc.Vec2(line.endX - line.startX, line.endY - line.startY)
+				// .normalize()
+				.scale(progress);
+
+			// console.log(lineVector);
+
+
+			var drawVec = new spc.Vec2(line.startX + lineVector.x, line.startY + lineVector.y);
+
+			// var lineGradient = canvasContext.createLinearGradient(0,0,170,0);
+			// var lineGradient = canvasContext.createLinearGradient(line.startX,line.startY,line.endX,line.endY);
+			// var lineGradient = canvasContext.createLinearGradient(0, 0, line.endX + line.startX, line.endY + line.startY);
+			var lineGradient = canvasContext.createLinearGradient(line.startX + spc.x, line.startY + spc.y, drawVec.x + spc.x, drawVec.y + spc.y);
+			lineGradient.addColorStop("0", line.startColor);
+			lineGradient.addColorStop("1.0", line.endColor);
+
+			// canvasContext.strokeStyle = 'rgb(200, 200, 200)';
+			canvasContext.strokeStyle = lineGradient;
+			canvasContext.beginPath();
+			canvasContext.moveTo(line.startX + spc.x, line.startY + spc.y);
+			canvasContext.lineTo(drawVec.x + spc.x, drawVec.y + spc.y);
+			canvasContext.stroke();
 		}
 
-		if(progress >= 1) {
-			progress = 1;
-			// queuedConstellationLines.splice(queuedConstellationLines.indexOf(line), 1);
-		}
-
-		var lineVector = new spc.Vec2(line.endX - line.startX, line.endY - line.startY)
-			// .normalize()
-			.scale(progress);
-
-		// console.log(lineVector);
-
-
-		var drawVec = new spc.Vec2(line.startX + lineVector.x, line.startY + lineVector.y);
-
-		// var lineGradient = canvasContext.createLinearGradient(0,0,170,0);
-		// var lineGradient = canvasContext.createLinearGradient(line.startX,line.startY,line.endX,line.endY);
-		// var lineGradient = canvasContext.createLinearGradient(0, 0, line.endX + line.startX, line.endY + line.startY);
-		var lineGradient = canvasContext.createLinearGradient(line.startX + spc.x, line.startY + spc.y, drawVec.x + spc.x, drawVec.y + spc.y);
-		lineGradient.addColorStop("0", line.startColor);
-		lineGradient.addColorStop("1.0", line.endColor);
-
-		// canvasContext.strokeStyle = 'rgb(200, 200, 200)';
-		canvasContext.strokeStyle = lineGradient;
-		canvasContext.beginPath();
-		canvasContext.moveTo(line.startX + spc.x, line.startY + spc.y);
-		canvasContext.lineTo(drawVec.x + spc.x, drawVec.y + spc.y);
-		canvasContext.stroke();
+		/// optimize
+		// if(queuedConstellationLines.length) {
+			window.requestAnimationFrame(drawLineStep); ////
+		// }
 	}
-
-	/// optimize
-	// if(queuedConstellationLines.length) {
-		window.requestAnimationFrame(drawLineStep); ////
-	// }
 }
 
-// visual functions
-function clear() {
+// VISUAL FUNCTIONS
+function closeContextMenu() {
 	// var menus = document.getElementsByClassName('star menu');
 	// if(menus.length) menus[0].className = 'star';
 	limbo.appendChild(starMenu);
@@ -319,7 +319,7 @@ function navigate(path) {
 		case 'deleteStar':
 		case 'help':
 		{
-			clear(); ///
+			closeContextMenu(); ///
 			close();
 			open(operation);
 		} break;

@@ -34,8 +34,8 @@ module.exports = function(db) {
 		}
 	});
 
-	me.getUsrMeta = function(uid, callback) {
-		usrMeta.findOne({ uid }, function(err, doc) {
+	me.getUsrMeta = function(userID, callback) {
+		usrMeta.findOne({ userID }, function(err, doc) {
 			if(err) {
 				console.error(err);
 				///
@@ -58,11 +58,11 @@ module.exports = function(db) {
 		});
 	}
 
-	me.updateProfile = function(uid, post, callback) { /// post naming?
+	me.updateProfile = function(userID, post, callback) { /// post naming?
 		//// if post.email is in use, error
 
 		usrMeta.updateOne(
-			{ uid },
+			{ userID },
 			{
 				// "email": post.email, //// send confirmation if different
 				$set: { "creatorName": post.creatorName }
@@ -71,12 +71,12 @@ module.exports = function(db) {
 		);
 
 		stars.updateMany(
-			{ creatorId: uid },
+			{ creatorId: userID },
 			{ $set: { "creator.creatorName": post.creatorName }}
 		); /// no callback
 	}
 
-	me.getStars = function(userId = false, cb) {
+	me.getStars = function(userID = false, cb) {
 		// stars.find({ initialized: true }).toArray(function(err, results) {
 		stars.find({ active: true }).toArray(function(err, results) {
 			if(err) {
@@ -99,7 +99,7 @@ module.exports = function(db) {
 				return false;
 			}
 
-			// var usrMeta = me.getUsrMeta(doc.uid); /// probably cache in the star and update whenever profile changes
+			// var usrMeta = me.getUsrMeta(doc.userID); /// probably cache in the star and update whenever profile changes
 			// doc.creatorName = usrMeta.creatorName;
 
 			callback(err, doc);

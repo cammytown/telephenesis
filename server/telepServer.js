@@ -93,6 +93,7 @@ function init() {
 		console.log(i.originalUrl);
 
 		usr.in(i.cookies.usr_ss, function(user) {
+			// console.log(user);
 			i.user = user;
 
 			if(user) {
@@ -101,6 +102,8 @@ function init() {
 						o.status(404).send("There was a problem retrieving your account in our system. Please email us at contact@telephenesis.com"); ///
 					}
 
+					console.log(usrMeta);
+
 					i.user.usrMeta = usrMeta;
 					n();
 				});
@@ -108,7 +111,6 @@ function init() {
 				i.user.usrMeta = {}; ///
 				n();
 			}
-
 		});
 	});
 
