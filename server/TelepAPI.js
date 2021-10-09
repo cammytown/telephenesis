@@ -86,6 +86,11 @@ module.exports = function(db) {
 				return false;
 			}
 
+			results.forEach(document => {
+				var creationDate = new Date(document._id.getTimestamp());
+				document.timestamp = creationDate.getTime(); // Convert Date to unix timestamp
+			} );
+
 			cb(results);
 		});
 	}
@@ -101,6 +106,9 @@ module.exports = function(db) {
 
 			// var usrMeta = me.getUsrMeta(doc.userID); /// probably cache in the star and update whenever profile changes
 			// doc.creatorName = usrMeta.creatorName;
+
+			var creationDate = new Date(doc._id.getTimestamp());
+			doc.timestamp = creationDate.getTime(); // Convert Date to unix timestamp
 
 			callback(err, doc);
 		});

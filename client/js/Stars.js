@@ -1,13 +1,26 @@
 import cor from './libs/minlab/cor';
+import spc from './libs/minlab/spc';
+import anime from 'animejs/lib/anime.es.js';
+// import Anm from './libs/minlab/anm';
 
 import clientState from './ClientState';
+import mediaPlayer from './MediaPlayer';
 import effects from './ClientEffects';
 
 export default new ClientStarsAPI();
 
 function ClientStarsAPI() {
+	var me = this;
+
+	var starElements;
+
+	me.cachedSorts = {
+		'newest': null
+	}
+
 	this.init = function() {
-		var starElements = document.getElementsByClassName('star');
+		starElements = Array.from(document.getElementsByClassName('star')); ////TODO not supported in IE, make sure there's something to fill the gap
+
 		for (var starIndex = 0; starIndex < starElements.length; starIndex++) {
 			var starElement = starElements[starIndex];
 			starElement.addEventListener('click', onClick);
@@ -19,6 +32,53 @@ function ClientStarsAPI() {
 
 		play(event.currentTarget);
 		// if(state.path == path) return true;
+	}
+
+	this.sort = function(mode = "newest") { ///REVISIT probably rename when we better understand how we will architect things
+		// spc.s = false;
+
+		// if(me.cachedSorts[mode] != null) {
+		// 	////CHECK if there have been changes to the loaded stars, we cannot use cache
+
+		// 	return true;
+		// }
+
+		// Rank stars according to mode
+		switch(mode) {
+			case 'newest': {
+				// me.cachedSorts['newest'] = [];
+				me.cachedSorts['newest'] = starElements.sort((a, b) => {
+					return parseInt(b.getAttribute('data-timestamp'))
+						- parseInt(a.getAttribute('data-timestamp'));
+				});
+
+				// for (var eleIndex = 0; eleIndex < starElements.length; eleIndex++) {
+				// 	var starEle = starElements[eleIndex];
+				// 	me.cachedSorts['newest']
+				// }
+			} break;
+		}
+
+		var xPadding = 200;
+		var columnWidth = 50; ///TODO to be moved probably; maybe into clientState or maybe it's a property of Spc()
+		for (var starEleIndex = 0; starEleIndex < me.cachedSorts[mode].length; starEleIndex++) {
+			var starEle = me.cachedSorts[mode][starEleIndex];
+
+			// Calculate target position of the star
+			var newX = xPadding + columnWidth * starEleIndex;
+			var newY = 0;
+
+			// Animate the star to its target position
+			anime({
+				targets: starEle,
+				left: newX + 'px',
+				top: newY + 'px',
+				duration: 2000,
+			})
+
+			// Anm.animate(starEle, 'left', newX + 'px', 80);
+			// Anm.animate(starEle, 'top', newY + 'px', 80);
+		}
 	}
 
 	function play(starElement) {
@@ -41,7 +101,7 @@ function ClientStarsAPI() {
 		cor.ac(document.body, 'playing')
 
 		if(starElement == clientState.playingStar) {
-			clientState.audio.element.paused ? clientState.audio.play() : clientState.audio.pause();
+			mediaPlayer.audio.element.paused ? mediaPlayer.audio.play() : mediaPlayer.audio.pause();
 		} else {
 			if(clientState.playingStar) {
 				cor.rc(clientState.playingStar, "active");
@@ -52,11 +112,11 @@ function ClientStarsAPI() {
 
 			// var time = starElement.getElementsByTagName('span')[1];
 
-			clientState.audio.load(starElement.getElementsByTagName('a')[0].href);
-			// clientState.audio.load('/music/'+sid+'.mp3');
+			mediaPlayer.audio.load(starElement.getElementsByTagName('a')[0].href);
+			// mediaPlayer.audio.load('/music/'+sid+'.mp3');
 
-			clientState.audio.element.addEventListener('loadedmetadata', function() {
-				clientState.audio.play();
+			mediaPlayer.audio.element.addEventListener('loadedmetadata', function() {
+				mediaPlayer.audio.play();
 			}, {
 				once: true /// browser support?
 			});
@@ -118,7 +178,6 @@ function ClientStarsAPI() {
 		window.requestAnimationFrame(drawLineStep);
 
 		function drawLineStep(currentMS) {
-			console.log(effects)
 			effects.context.clearRect(0, 0, effects.canvas.width, effects.canvas.height);
 
 			var elapsedMS = currentMS - lineDrawStartMS;
@@ -150,19 +209,25 @@ function ClientStarsAPI() {
 
 				var drawVec = new spc.Vec2(line.startX + lineVector.x, line.startY + lineVector.y);
 
-				// var lineGradient = canvasContext.createLinearGradient(0,0,170,0);
-				// var lineGradient = canvasContext.createLinearGradient(line.startX,line.startY,line.endX,line.endY);
-				// var lineGradient = canvasContext.createLinearGradient(0, 0, line.endX + line.startX, line.endY + line.startY);
-				var lineGradient = canvasContext.createLinearGradient(line.startX + spc.x, line.startY + spc.y, drawVec.x + spc.x, drawVec.y + spc.y);
+				// var lineGradient = effects.context.createLinearGradient(0,0,170,0);
+				// var lineGradient = effects.context.createLinearGradient(line.startX,line.startY,line.endX,line.endY);
+				// var lineGradient = effects.context.createLinearGradient(0, 0, line.endX + line.startX, line.endY + line.startY);
+				var lineGradient = effects.context.createLinearGradient(
+					line.startX + spc.x,
+					line.startY + spc.y,
+					drawVec.x + spc.x,
+					drawVec.y + spc.y
+				);
+
 				lineGradient.addColorStop("0", line.startColor);
 				lineGradient.addColorStop("1.0", line.endColor);
 
-				// canvasContext.strokeStyle = 'rgb(200, 200, 200)';
-				canvasContext.strokeStyle = lineGradient;
-				canvasContext.beginPath();
-				canvasContext.moveTo(line.startX + spc.x, line.startY + spc.y);
-				canvasContext.lineTo(drawVec.x + spc.x, drawVec.y + spc.y);
-				canvasContext.stroke();
+				// effects.context.strokeStyle = 'rgb(200, 200, 200)';
+				effects.context.strokeStyle = lineGradient;
+				effects.context.beginPath();
+				effects.context.moveTo(line.startX + spc.x, line.startY + spc.y);
+				effects.context.lineTo(drawVec.x + spc.x, drawVec.y + spc.y);
+				effects.context.stroke();
 			}
 
 			/// optimize

@@ -2,15 +2,20 @@
 ## PHASE 1
 ### 3
 
-- reimplement admin features
 - sort stars
+
+- clicking stars should open a menu near them
+	| maybe it's a radial menu
+
+- reimplement admin features
 
 - make first stars appear slightly different
 
-- progress bar along bottom
-	| also in header probably
-
 - refactor code
+	- should we be using transform css prop instead of left and top? (probably?)
+	- rewrite Spc
+	- rewrite Anm if keeping
+	- probably just get rid of ui.js; move addComponent()s into telepClient.js
 	- make aud submodule
 	- move js files and libs into js/libs folder
 	- clean up how we pass star data around; very sloppy atm
@@ -20,8 +25,12 @@
 	- maybe only subscribers can upload and if you cancel then at some point your track may be moved to archive.org hosting
 		- alternatively, we just monthly make a big archive.org post with the tracks if they don't mind
 
+- future-proof and tamper-proof star placement
+
 ### 2
 - update usrMeta (creator name) of stars when original doc is updated
+
+- star radial progress bar that wraps around star and fills in
 
 - create a shifting color theme which effects all elements
 	| allow for user to select consistent color(s)

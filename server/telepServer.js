@@ -102,8 +102,6 @@ function init() {
 						o.status(404).send("There was a problem retrieving your account in our system. Please email us at contact@telephenesis.com"); ///
 					}
 
-					console.log(usrMeta);
-
 					i.user.usrMeta = usrMeta;
 					n();
 				});

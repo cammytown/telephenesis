@@ -19,10 +19,13 @@ $inactiveBorderWidth: 1px;
 
 /* stars */
 .star {
+	display: block;
 	position: absolute;
 	z-index: 1;
-	display: block;
+	width: 1px; //// make sure this works on all browers; this is to prevent star title from staying up as you hover to the right
+	height: 1px; //// see above
 	padding: 1px 0 0;
+
 	color: #eee;
 	font-size: 1.25em;
 	white-space: nowrap;
@@ -159,18 +162,19 @@ $inactiveBorderWidth: 1px;
 	}
 
 	.meta {
+		display: none;
 		position: relative;
 		left: 14px;
 		top: -14px;
-		display: none;
 		margin: 0 4px;
 		transition: left 450ms, top 450ms;
+
+		background-color: rgba(0, 0, 0, 0.6);
+		transition: background-color 250ms;
 
 		.text {
 			// display: none;
 			padding: 2px 5px 2px 3px;
-			background-color: rgba(0, 0, 0, 0.6);
-			transition: background-color 250ms;
 
 			&.time {
 				display: none;
@@ -184,31 +188,28 @@ $inactiveBorderWidth: 1px;
 		// &:hover .name, &.active .time {
 	}
 
-	&.active {
+	&.active, &:hover {
 		.meta {
-			display: block;
-			left: 22px;
-			top: -22px;
-
-			.time {
-				display: block;
-			}
+			display: inline-block;
 		}
 	}
 
-	&:hover .meta {
-		display: block;
-	}
+	&.active {
+		.meta {
+			left: 22px;
+			top: -22px;
 
-	&.active .meta {
-		display: block;
+			&:hover {
+				// opacity: 0;
+				z-index: -1;
 
-		&:hover {
-			// opacity: 0;
-			z-index: -1;
+				.text {
+					color: $dimmedText;
+				}
+			}
 
-			.text {
-				color: $dimmedText;
+			.time {
+				display: block;
 			}
 		}
 	}

@@ -1,17 +1,13 @@
-import Aud from './libs/minlab/aud';
-
 function ClientState() {
-	this.actingStar;
-	this.playingStar;
+	var me = this;
 
-	// Audio player
-	this.audio = new Aud({
-		elementID: 'aud',
-		seekbar: document.getElementById('playbackProgress'),
-	});
+	me.actingStar;
+	me.playingStar;
+
+	me.activeWindow = false;
 
 	// Component functionality
-	var uninitializedComponents = [];
+	var uninitializedComponents = []; ///REVISIT perhaps unnecessary
 	var readyCallbacks = [];
 
 	document.addEventListener("DOMContentLoaded", initializeComponents);
@@ -28,7 +24,7 @@ function ClientState() {
 		}
 	}
 
-	this.addComponent = function(component) {
+	me.addComponent = function(component) {
 		if(document.readyState != 'complete') {
 			uninitializedComponents.push(component);
 		} else {
@@ -36,9 +32,9 @@ function ClientState() {
 		}
 	};
 
-	this.whenReady = function(callback) { ///REVISIT naming/architecture
-		readyCallbacks.push(callback);
-	}
+	// me.whenReady = function(callback) { ///REVISIT naming/architecture
+	// 	readyCallbacks.push(callback);
+	// }
 }
 
 export default new ClientState();

@@ -5,6 +5,7 @@
   "main": "server.js",
   "private": true,
   "dependencies": {
+    "animejs": "^3.2.1",
     "bcrypt-nodejs": "0.0.3",
     "connect-mongo": "^3.2.0",
     "cookie-parser": "^1.4.5",

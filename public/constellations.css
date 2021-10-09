@@ -429,9 +429,11 @@ body #menu .user a, body #menu .guest a {
 
 /* stars */
 .star {
+  display: block;
   position: absolute;
   z-index: 1;
-  display: block;
+  width: 1px;
+  height: 1px;
   padding: 1px 0 0;
   color: #eee;
   font-size: 1.25em;
@@ -563,41 +565,37 @@ body #menu .user a, body #menu .guest a {
   }
 }
 .star .meta {
+  display: none;
   position: relative;
   left: 14px;
   top: -14px;
-  display: none;
   margin: 0 4px;
   transition: left 450ms, top 450ms;
+  background-color: rgba(0, 0, 0, 0.6);
+  transition: background-color 250ms;
   /*.inverse & .text { background-color: #fcfcfc; }*/
 }
 .star .meta .text {
   padding: 2px 5px 2px 3px;
-  background-color: rgba(0, 0, 0, 0.6);
-  transition: background-color 250ms;
 }
 .star .meta .text.time {
   display: none;
 }
+.star.active .meta, .star:hover .meta {
+  display: inline-block;
+}
 .star.active .meta {
-  display: block;
   left: 22px;
   top: -22px;
-}
-.star.active .meta .time {
-  display: block;
-}
-.star:hover .meta {
-  display: block;
-}
-.star.active .meta {
-  display: block;
 }
 .star.active .meta:hover {
   z-index: -1;
 }
 .star.active .meta:hover .text {
   color: #4e5767;
+}
+.star.active .meta .time {
+  display: block;
 }
 
 body header#playingStarInfo {

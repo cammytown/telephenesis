@@ -10,10 +10,9 @@ import Stars from './Stars';
 import Navigation from './Navigation';
 import Forms from './Forms';
 import ClientEffects from './ClientEffects';
+import mediaPlayer from './MediaPlayer';
 
 var menuToggleElement;
-
-var activeContextBox = false;
 
 function init(Telep) {
 	menuToggleElement = document.getElementsByClassName('menuToggle')[0]; ////
@@ -22,9 +21,10 @@ function init(Telep) {
 	clientState.addComponent(Stars);
 	clientState.addComponent(Navigation);
 	clientState.addComponent(Forms);
+	clientState.addComponent(mediaPlayer);
 
 	// clientState.whenReady(Stars.generateConstellationLines);
-	Stars.generateConstellationLines;
+	Stars.generateConstellationLines();
 
 	// var closes = document.getElementsByClassName('close');
 	// if(closes.length) for(var i=0, j=closes.length; i<j; i++) {
@@ -58,16 +58,18 @@ function init(Telep) {
 				break;
 
 			case 32: { // spacebar
-				if(!activeContextBox) {
+				if(!clientState.activeWindow) {
 					e.preventDefault();
 
-					clientState.audio.element.paused ? clientState.audio.play() : clientState.audio.pause();
+					mediaPlayer.audio.element.paused ? mediaPlayer.audio.play() : mediaPlayer.audio.pause();
 				}
 			} break;
 
 			case 27: { // escape key
 				// state.updating = true;
 				HistoryTime.navigateTo('/', "Telephenesis"); //// page title
+
+				Stars.sort(); ////
 			} break;
 		}
 	});
@@ -94,7 +96,7 @@ function init(Telep) {
 // 	/// can't load if not logged in
 // 	/// create separate aud for sound-effects like this
 
-// 	clientState.audio.load('/audio/ticket.mp3');
+// 	mediaPlayer.load('/audio/ticket.mp3');
 
 // 	var ticket = document.getElementById('ticket');
 // 	document.body.appendChild(ticket, limbo);

@@ -162,7 +162,7 @@ function ClientNavigation() {
 
 		function open(box) {
 			var box = document.getElementById(box);
-			activeContextBox = box;
+			clientState.activeWindow = box;
 			document.body.appendChild(box);
 			Anm.fadeIn(box);
 			// spc.flt(true);
@@ -170,8 +170,8 @@ function ClientNavigation() {
 
 		///:
 		function close(box) {
-			box = (typeof box === "undefined") ? activeContextBox : box;
-			activeContextBox = false;
+			box = (typeof box === "undefined") ? clientState.activeWindow : box;
+			clientState.activeWindow = false;
 
 			///:
 			// menuToggleElement.innerHTML = '|||';
