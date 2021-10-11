@@ -2,6 +2,7 @@ const Lame = require('node-lame').Lame;
 const fs = require('fs');
 
 module.exports = function(db) {
+	var constellations = db.collection('MLconstellations');
 	var stars = db.collection('MLstars');
 
 	var me = this;
@@ -13,24 +14,29 @@ module.exports = function(db) {
 	///:
 	var MLMeta = db.collection('MLMeta'); /// do we need to filter MLMeta?
 	var usrMeta = db.collection('usrMeta'); /// do we need to filter MLMeta?
-	var MLPcurrentPlanetIndex;
+	var constellationCount;
+	var planetCount;
 	MLMeta.find({ id: 'persistors' }).limit(1).next(function(err, persistorDoc) {
 		if(!persistorDoc) {
 			// persistorDoc = {}; /// quick-fix
+
+			////TODO refactor; move this into some kind of database initialization file/method
 			MLMeta.insertOne({
 				id: 'persistors',
 				userIndex: 1,
-				currentConstellationIndex: 1,
-				currentPlanetIndex: 1
+				constellationCount: 0,
+				planetCount: 0
 			}, function() {
-				
+				planetCount = 0;
+				constellationCount = 0;
 			});
 		} else {
-			if(persistorDoc.hasOwnProperty("currentPlanetIndex")) {
-				MLPcurrentPlanetIndex = persistorDoc.currentPlanetIndex;
-			} else {
-				MLMeta.updateOne({ id: "persistors" }, { $set: { currentPlanetIndex: 0 } });
-			}
+			// if(persistorDoc.hasOwnProperty("planetCount")) {
+				planetCount = persistorDoc.planetCount;
+				constellationCount = persistorDoc.constellationCount;
+			// } else {
+			// 	MLMeta.updateOne({ id: "persistors" }, { $set: { planetCount: 0 } });
+			// }
 		}
 	});
 
@@ -147,9 +153,9 @@ module.exports = function(db) {
 		// };
 		// Object.assign();
 
-		var newStarID = MLPcurrentPlanetIndex;
-		MLPcurrentPlanetIndex += 1;
-		MLMeta.updateOne({ id: "persistors" }, { $inc: {currentPlanetIndex: 1} });
+		var newStarID = planetCount + 1;
+		planetCount += 1;
+		MLMeta.updateOne({ id: "persistors" }, { $inc: {planetCount: 1} });
 
 		switch(starData.hostType) {
 			case 'external': {
@@ -212,8 +218,9 @@ module.exports = function(db) {
 		me.getUsrMeta(userID, function(err, usrMeta) { /// not digging this architecture
 			var newStar = {
 				id: newStarID,
-				originStarID: starData.originStarID,
-				sourceX: false, ///
+				constellationID: null,
+				originStarID: null,
+				sourceX: false, /// null?
 				sourceY: false, ///
 				tier: 0,
 				creator: {
@@ -237,6 +244,22 @@ module.exports = function(db) {
 			}
 
 			if(starData.originStarID == -1) {
+				// Creating a new constellation.
+				var newConstellationID = constellationCount + 1;
+				constellationCount += 1;
+				MLMeta.updateOne({ id: "persistors" }, { $inc: { constellationCount: 1 } });
+
+				newStar.constellationID = newConstellationID;
+
+				var newConstellation = {
+					id: newConstellationID,
+					starIDs: [newStarID]
+				}
+
+				constellations.insertOne(newConstellation, function(err, result) {
+					////TODO refactoring; what if there's an err?
+				});
+
 				stars.insertOne(newStar, function(err, result) {
 					callback(err, result.ops[0]); ///
 				});
@@ -247,6 +270,8 @@ module.exports = function(db) {
 						return false;
 					}
 
+					newStar.originStarID = originStar.id;
+					newStar.constellationID = originStar.constellationID;
 					newStar.sourceX = originStar.x;
 					newStar.sourceY = originStar.y;
 					newStar.tier = originStar.tier + 1;

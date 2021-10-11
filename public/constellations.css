@@ -3,13 +3,20 @@
  * we@telephenesis.com
  * v0.06
  ***/
+:export {
+  starGridWidth: 500px;
+  starGridSize: 50px;
+  starGridPaddingX: 200px;
+  starGridPaddingY: 200px;
+}
+
 html, body {
   margin: 0;
   height: 100%;
 }
 
 body {
-  background: #000;
+  background: linear-gradient(to bottom, #111 0%, #000 30%);
   color: #e7e7e7;
   font-size: 16px;
   font-family: "Monda", sans-serif;
@@ -429,22 +436,25 @@ body #menu .user a, body #menu .guest a {
 
 /* stars */
 .star {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: absolute;
   z-index: 1;
-  width: 1px;
-  height: 1px;
+  translate: -50% -50%;
+  width: 20px;
+  height: 20px;
   padding: 1px 0 0;
   color: #eee;
   font-size: 1.25em;
   white-space: nowrap;
+  transition: background 350ms;
   /*.inverse & { color: #222; }*/
 }
 .star.moving {
   z-index: -1;
 }
 .star > a {
-  position: absolute;
   display: block;
   left: -8px;
   top: -8px;
@@ -564,13 +574,28 @@ body #menu .user a, body #menu .guest a {
     border-color: #c77929;
   }
 }
+body.sorting .star {
+  width: 50px;
+  height: 50px;
+  background: rgba(40, 40, 40, 0.55);
+}
+body.sorting .star.even {
+  background: rgba(60, 60, 60, 0.55);
+}
+body.sorting .star:hover {
+  background: #444;
+}
+body.sorting .star .meta {
+  left: 100%;
+}
 .star .meta {
   display: none;
-  position: relative;
-  left: 14px;
-  top: -14px;
+  position: absolute;
+  left: 24px;
+  top: -6px;
   margin: 0 4px;
   transition: left 450ms, top 450ms;
+  pointer-events: none;
   background-color: rgba(0, 0, 0, 0.6);
   transition: background-color 250ms;
   /*.inverse & .text { background-color: #fcfcfc; }*/
@@ -578,7 +603,7 @@ body #menu .user a, body #menu .guest a {
 .star .meta .text {
   padding: 2px 5px 2px 3px;
 }
-.star .meta .text.time {
+.star .meta .text.playbackTime {
   display: none;
 }
 .star.active .meta, .star:hover .meta {
@@ -594,7 +619,7 @@ body #menu .user a, body #menu .guest a {
 .star.active .meta:hover .text {
   color: #4e5767;
 }
-.star.active .meta .time {
+.star.active .meta .playbackTime {
   display: block;
 }
 
@@ -604,9 +629,9 @@ body header#playingStarInfo {
   left: 0;
   z-index: 1;
   width: 100%;
-  opacity: 0;
+  display: none;
   height: 0;
-  transition: height 500ms, opacity 500ms;
+  overflow: hidden;
 }
 body header#playingStarInfo h2, body header#playingStarInfo h3 {
   margin: 5px 0 5px 20px;
@@ -638,7 +663,7 @@ body header#playingStarInfo::after {
   content: "";
 }
 body.playing header#playingStarInfo {
-  opacity: 1;
+  display: block;
   height: 120px;
 }
 
@@ -976,6 +1001,24 @@ form#create label.rightsAgreement input.rights-confirmation {
   position: absolute;
   border-left: 650px solid transparent;
   border-right: 650px solid transparent;
+}
+
+#sortingUI {
+  position: absolute;
+  left: 175px;
+  top: 135px;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 1s;
+}
+#sortingUI h2 {
+  display: none;
+}
+body.sorting #sortingUI {
+  opacity: 1;
+}
+body.sorting #sortingUI h2 {
+  display: block;
 }
 
 #ui {

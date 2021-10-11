@@ -24,7 +24,7 @@ function MediaPlayer() {
 	function onMediaPlayerUpdate() {
 		///REVISIT bit ugly:
 
-		clientState.playingStar.getElementsByClassName('time')[0].innerHTML = me.audio.timeString;
+		clientState.playingStar.getElementsByClassName('playbackTime')[0].innerHTML = me.audio.timeString;
 		// cor._('#playbackProgressBar').style.width = (me.audio.playbackProgress * 100.0) + "%";
 		cor._('#playbackProgressBar').style.width = (me.audio.playbackProgress * 100.0) + "%";
 	}

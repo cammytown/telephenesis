@@ -1,0 +1,23 @@
+nav
+	a#logo Telephenesis
+	a.menuToggle |||
+
+	#menu
+		.user
+			a.create.nav(href="/settings") profile
+			a.nav(href="/logout") logout
+
+		.guest
+			a.nav(href="/login") login
+			a.nav(href="/register") register
+
+		a.nav(href="/help") help
+
+header#playingStarInfo.inactive
+	div#playbackProgress
+		div#playbackProgressBar
+		// div#playbackProgressAccent
+
+	h2#playingStarTitle Song Title
+	h3#playingCreatorName Artist Name
+	a#playingCreatorLink artistwebsite.com

@@ -4,7 +4,8 @@ html, body {
 }
 
 body {
-	background: #000;
+	// background: #000;
+	background: linear-gradient(to bottom, #111 0%, #000 30%);
 	color: $text;
 	font-size: 16px; ///
 	font-family: 'Monda', sans-serif;

@@ -19,23 +19,23 @@ module.exports = function(db, vl, bcrypt) {
 
 	var MLMeta = db.collection('MLMeta'); /// do we need to filter MLMeta?
 	MLMeta.find({ id: 'persistors' }).limit(1).next(function(err, persistorDoc) {
-		if(!persistorDoc) {
-			// persistorDoc = {}; /// quick-fix
-			MLMeta.insertOne({
-				id: 'persistors',
-				userIndex: 0,
-				currentConstellationIndex: 0,
-				currentPlanetIndex: 0
-			}, function() {
+		// if(!persistorDoc) {
+		// 	// persistorDoc = {}; /// quick-fix
+		// 	MLMeta.insertOne({
+		// 		id: 'persistors',
+		// 		userIndex: 0,
+		// 		currentConstellationIndex: 0,
+		// 		currentPlanetIndex: 0
+		// 	}, function() {
 				
-			});
-		} else {
+		// 	});
+		// } else {
 			if(persistorDoc.hasOwnProperty("userIndex")) {
 				MLPuserIndex = persistorDoc.userIndex;
 			} else {
 				MLMeta.updateOne({ id: "persistors" }, { $set: { userIndex: 0 } });
 			}
-		}
+		// }
 	});
 
 	this.in = function(sessionString, cb) {

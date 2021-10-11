@@ -3,6 +3,8 @@ import spc from './libs/minlab/spc';
 import anime from 'animejs/lib/anime.es.js';
 // import Anm from './libs/minlab/anm';
 
+import styleVars from '../scss/abstracts/_variables.scss';
+
 import clientState from './ClientState';
 import mediaPlayer from './MediaPlayer';
 import effects from './ClientEffects';
@@ -25,6 +27,11 @@ function ClientStarsAPI() {
 			var starElement = starElements[starIndex];
 			starElement.addEventListener('click', onClick);
 		}
+
+		styleVars.starGridWidth = parseInt(styleVars.starGridWidth); ///REVISIT architecture
+		styleVars.starGridSize = parseInt(styleVars.starGridSize); ///REVISIT architecture
+		styleVars.starGridPaddingX = parseInt(styleVars.starGridPaddingX); ///REVISIT architecture
+		styleVars.starGridPaddingY = parseInt(styleVars.starGridPaddingY); ///REVISIT architecture
 	}
 
 	function onClick(event) {
@@ -34,8 +41,11 @@ function ClientStarsAPI() {
 		// if(state.path == path) return true;
 	}
 
-	this.sort = function(mode = "newest") { ///REVISIT probably rename when we better understand how we will architect things
-		// spc.s = false;
+	this.sort = function(mode = "newest") { ///REVISIT maybe separate into its own component? probably rename when we better understand how we will architect things
+		spc.s = false;
+
+		var xOffset = -spc.x;
+		var yOffset = -spc.y;
 
 		// if(me.cachedSorts[mode] != null) {
 		// 	////CHECK if there have been changes to the loaded stars, we cannot use cache
@@ -59,25 +69,70 @@ function ClientStarsAPI() {
 			} break;
 		}
 
-		var xPadding = 200;
-		var columnWidth = 50; ///TODO to be moved probably; maybe into clientState or maybe it's a property of Spc()
-		for (var starEleIndex = 0; starEleIndex < me.cachedSorts[mode].length; starEleIndex++) {
-			var starEle = me.cachedSorts[mode][starEleIndex];
+		// Reposition each star
+		var displayMode = 'grid';
 
-			// Calculate target position of the star
-			var newX = xPadding + columnWidth * starEleIndex;
-			var newY = 0;
+		switch(displayMode) {
+			// case 'constellationRows': {
+			// 	var constellationOrder = [];
 
-			// Animate the star to its target position
-			anime({
-				targets: starEle,
-				left: newX + 'px',
-				top: newY + 'px',
-				duration: 2000,
-			})
+			// 	for (var starEleIndex = 0; starEleIndex < me.cachedSorts[mode].length; starEleIndex++) {
+			// 		var starEle = me.cachedSorts[mode][starEleIndex];
 
-			// Anm.animate(starEle, 'left', newX + 'px', 80);
-			// Anm.animate(starEle, 'top', newY + 'px', 80);
+			// 		// Calculate target position of the star
+			// 		var newX = styleVars.starGridSize * starEleIndex;
+
+			// 		var constellationID = starEle.getAttribute('data-constellation');
+			// 		var constellationOrderIndex = constellationOrder.indexOf(constellationID);
+			// 		if(constellationOrderIndex == -1) {
+			// 			constellationOrderIndex = constellationOrder.length;
+			// 			constellationOrder.push(constellationID);
+			// 		}
+
+			// 		var newY = constellationOrderIndex * styleVars.starGridSize;
+
+			// 		// Animate the star to its target position
+			// 		anime({
+			// 			targets: starEle,
+			// 			left: xPadding + newX + 'px',
+			// 			top: newY + 'px',
+			// 			duration: 2000,
+			// 			complete: this.generateConstellationLines
+			// 		});
+			// 	}
+			// } break;
+
+			case 'grid': {
+				var currentRow = 0;
+				var rowCount = Math.floor(styleVars.starGridWidth / styleVars.starGridSize);
+
+				for (var starEleIndex = 0; starEleIndex < me.cachedSorts[mode].length; starEleIndex++) {
+					var starEle = me.cachedSorts[mode][starEleIndex];
+
+					starEle.className = 'star ' + (starEleIndex % 2 ? 'odd' : 'even'); ///TODO don't just overwrite className
+
+					// Calculate target position of the star
+					var newX = styleVars.starGridSize * (starEleIndex % rowCount);
+					var newY = styleVars.starGridSize * currentRow;
+
+					// Animate the star to its target position
+					anime({
+						targets: starEle,
+						left: newX + styleVars.starGridPaddingX + xOffset + 'px',
+						top: newY + styleVars.starGridPaddingY + yOffset + 'px',
+						duration: 500,
+						complete: function() {
+							me.generateConstellationLines();
+							cor.ac(document.body, 'sorting'); ////
+						}
+					});
+
+					// Wrap grid if row filled
+					if(newX >= styleVars.starGridWidth - styleVars.starGridSize) {
+						currentRow += 1;
+					}
+				}
+			} break;
 		}
 	}
 
@@ -150,24 +205,30 @@ function ClientStarsAPI() {
 		return false;
 	}
 
-	var lineDrawStartMS = performance.now();
-	var queuedConstellationLines = [];
+	/**
+	 * Draws constellation lines between stars.
+	 */
 	this.generateConstellationLines = function() {
-		/* stars */
+		var lineDrawStartMS = performance.now();
+		var queuedConstellationLines = [];
+
+		// Loop through stars and queue an animated line draw.
 		var starElements = document.getElementsByClassName('star');
 		for (var starIndex = 0; starIndex < starElements.length; starIndex++) {
 			var starElement = starElements[starIndex];
 			if(starElement.getAttribute('data-prev')) {
 				var originStarID = starElement.getAttribute('data-prev');
-				if(parseInt(originStarID) > 0) {
+
+				if(parseInt(originStarID) != -1) { // If this is not an origin star
 					var rootStar = document.getElementById('s' + originStarID);
-					rootStar.setAttribute('data-next', starElement.id.split('s')[1]);
+					rootStar.setAttribute('data-next', starElement.id.split('s')[1]); ///TODO figure out what "next" means when there are multiple child stars; also this shouldn't be here if it were being used
+
 					queuedConstellationLines.push({
 						startX: parseInt(rootStar.style.left),
 						startY: parseInt(rootStar.style.top),
-						startColor: rootStar.getElementsByTagName('a')[0].style.backgroundColor, ///
 						endX: parseInt(starElement.style.left),
 						endY: parseInt(starElement.style.top),
+						startColor: rootStar.getElementsByTagName('a')[0].style.backgroundColor, ///
 						endColor: starElement.getElementsByTagName('a')[0].style.backgroundColor, ///
 						tier: parseInt(starElement.getAttribute('data-tier'))
 					});

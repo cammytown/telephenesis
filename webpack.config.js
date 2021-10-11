@@ -16,18 +16,24 @@ module.exports = [{
 				exclude: /node_modules/,
 				loader: "babel-loader"
 			},
-			// {
-			// 	test: /\.s[ac]ss$/i,
-			// 	exclude: /node_modules/,
-			// 	use: [
-			// 		// process.env.NODE_ENV !== "production"
-			// 		// 	? "style-loader" // fallback to style-loader in development
-			// 		// 	: MiniCssExtractPlugin.loader,
-			// 		MiniCssExtractPlugin.loader,
-			// 		{ loader: "css-loader", options: { url: false }},
-			// 		"sass-loader"
-			// 	]
-			// }
+			{
+				test: /\.scss$/i,
+				exclude: /node_modules/,
+				use: [
+					// process.env.NODE_ENV !== "production"
+					// 	? "style-loader" // fallback to style-loader in development
+					// 	: MiniCssExtractPlugin.loader,
+					// MiniCssExtractPlugin.loader,
+					"style-loader",
+					{ loader: "css-loader", options: {
+						// url: false,
+						modules: {
+							compileType: 'icss'
+						}
+					}},
+					"sass-loader"
+				]
+			}
 		]
 	},
 	// plugins: [

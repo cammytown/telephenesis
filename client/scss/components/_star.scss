@@ -19,16 +19,25 @@ $inactiveBorderWidth: 1px;
 
 /* stars */
 .star {
-	display: block;
+	// $star: &;
+
+	display: flex; ///TODO support older browsers?
+	align-items: center;
+	justify-content: center;
+
 	position: absolute;
 	z-index: 1;
-	width: 1px; //// make sure this works on all browers; this is to prevent star title from staying up as you hover to the right
-	height: 1px; //// see above
+	translate: -50% -50%; ///COMPAT ensure browser support and consistency
+
+	width: 20px;
+	height: 20px;
 	padding: 1px 0 0;
 
 	color: #eee;
 	font-size: 1.25em;
 	white-space: nowrap;
+
+	transition: background 350ms;
 
 	&.moving {
 		z-index: -1; ///
@@ -37,7 +46,7 @@ $inactiveBorderWidth: 1px;
 	/*.inverse & { color: #222; }*/
 
 	> a {
-		position: absolute;
+		// position: absolute;
 
 		display: block;
 		@include starProps($starSize, $inactiveBorderWidth);
@@ -46,6 +55,7 @@ $inactiveBorderWidth: 1px;
 		// border-width: $inactiveBorderWidth;
 		border-style: solid;
 		border-color: #000;
+
 		transition:
 			left 0.3s, top 0.3s,
 			width 0.3s, height 0.3s,
@@ -161,13 +171,66 @@ $inactiveBorderWidth: 1px;
 		}
 	}
 
+	body.sorting & {
+		// opacity: 0;
+		// transition: opacity 500ms;
+		// position: absolute;
+		// left: -$starGridSize * 0.5;
+		// top: -$starGridSize * 0.5;
+		width: $starGridSize;
+		height: $starGridSize;
+		background: rgba(40, 40, 40, 0.55);
+
+		&.even {
+			background: rgba(60, 60, 60, 0.55);
+		}
+
+		&:hover {
+			background: #444;
+		}
+
+		.meta {
+			left: 100%;
+		}
+	}
+
+	// .gridBackground { ///REVISIT naming
+	// 	// display: none;
+	// 	opacity: 0;
+	// 	transition: opacity 500ms;
+	// 	position: absolute;
+	// 	left: -$starGridSize * 0.5;
+	// 	top: -$starGridSize * 0.5;
+	// 	width: $starGridSize;
+	// 	height: $starGridSize;
+	// 	z-index: -1; ///REVISIT is this a legit way of getting it to show up behind the star even though it's a child of it?
+	// 	background: rgba(40, 40, 40, 0.55);
+
+	// 	@at-root {
+	// 		body.sorting & {
+	// 			opacity: 1;
+	// 		}
+
+	// 		#{$star}.even .gridBackground {
+	// 			background: rgba(60, 60, 60, 0.55);
+	// 		}
+	// 	}
+	// }
+
+	// &.even {
+	// 	.gridBackground {
+	// 		background: rgba(60, 60, 60, 0.55);
+	// 	}
+	// }
+
 	.meta {
 		display: none;
-		position: relative;
-		left: 14px;
-		top: -14px;
+		position: absolute;
+		left: 24px;
+		top: -6px;
 		margin: 0 4px;
 		transition: left 450ms, top 450ms;
+		pointer-events: none;
 
 		background-color: rgba(0, 0, 0, 0.6);
 		transition: background-color 250ms;
@@ -176,7 +239,7 @@ $inactiveBorderWidth: 1px;
 			// display: none;
 			padding: 2px 5px 2px 3px;
 
-			&.time {
+			&.playbackTime {
 				display: none;
 			}
 
@@ -185,7 +248,7 @@ $inactiveBorderWidth: 1px;
 		}
 		/*.inverse & .text { background-color: #fcfcfc; }*/
 
-		// &:hover .name, &.active .time {
+		// &:hover .name, &.active .playbackTime {
 	}
 
 	&.active, &:hover {
@@ -208,7 +271,7 @@ $inactiveBorderWidth: 1px;
 				}
 			}
 
-			.time {
+			.playbackTime {
 				display: block;
 			}
 		}

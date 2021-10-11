@@ -1,5 +1,6 @@
 import cor from './libs/minlab/cor';
 import spc from './libs/minlab/spc'; /// relying on implied singleton
+import Anm from './libs/minlab/anm';
 import HistoryTime from './libs/history-time';
 
 import clientState from './ClientState';

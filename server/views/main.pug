@@ -15,67 +15,11 @@ html(lang="en")
 		link(href="/constellations.css" rel="stylesheet" type="text/css")
 
 	body(class=className)
-		nav
-			a#logo Telephenesis
-			a.menuToggle |||
-
-			#menu
-				.user
-					a.create.nav(href="/settings") profile
-					a.nav(href="/logout") logout
-
-				.guest
-					a.nav(href="/login") login
-					a.nav(href="/register") register
-
-				a.nav(href="/help") help
-
-		header#playingStarInfo.inactive
-			div#playbackProgress
-				div#playbackProgressBar
-				// div#playbackProgressAccent
-
-			h2#playingStarTitle Song Title
-			h3#playingCreatorName Artist Name
-			a#playingCreatorLink artistwebsite.com
-
-
+		include header.pug
 
 		canvas#uiEffects
 
-		#spc
-			div.lyr.a
-			div.lyr.b
-			div.lyr.c
-
-			#map
-				each star, i in stars
-					// star.id
-					//- .star(data-prev=star.lsid data-next=star.)
-
-					.star(
-						id = "s" + star.id
-						class = user.usrMeta && user.usrMeta.bookmarks.indexOf(star.id) != -1 ? "bookmarked" : ""
-						data-prev = star.originStarID
-						data-tier = star.tier
-						data-title = star.title
-						data-creatorName = star.creator.creatorName
-						data-creatorLink = star.creator.creatorLink
-						// data-constellation = star.
-						data-timestamp = star.timestamp
-						style = "left: " + star.x + "px; top: " + star.y + "px"
-					)
-						a(
-							href=star.fileURL
-							style="background-color: rgb(" + star.color + ')'
-						)
-
-						div.meta
-							span.text.title= star.title
-							| by
-							span.text.creator= star.creator.creatorName
-
-							div.text.time
+		include spc.pug
 
 		#limbo
 			//- #ticket
