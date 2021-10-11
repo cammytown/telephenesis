@@ -2,13 +2,6 @@
 ## PHASE 1
 ### 3
 
-- sort stars
-	i think a grid appears
-	grid or list view
-
-- clicking stars should open a menu near them
-	| maybe it's a radial menu
-
 - refactor code
 	- should we be using transform css prop instead of left and top? (probably?)
 	- back-end really needs a lot of rewriting/refactoring
@@ -19,10 +12,12 @@
 	- move js files and libs into js/libs folder
 	- clean up how we pass star data around; very sloppy atm
 
+- sort stars
+	list view
+	popularity sort
+
 - basic method for tracking popularity
 	| probably just ping the server if track is listened to for longer than [~5] seconds
-
-- organize/filter the universe by newness, popularity, etc.
 
 - figure out how to sustain hosting costs
 	- maybe only subscribers can upload and if you cancel then at some point your track may be moved to archive.org hosting
@@ -33,6 +28,12 @@
 - draw constellation line after placing
 
 ### 2
+
+- should we allow people to tag stars? maybe not the artists, but the public can add tags and others can vote those tags up if they feel it's relevant?
+
+- clicking stars should open a menu near them
+	| maybe it's a radial menu
+
 - do we maybe not want to reveal exact time of star creation (for user privacy?)
 
 - make first stars appear slightly different

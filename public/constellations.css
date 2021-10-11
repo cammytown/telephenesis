@@ -434,7 +434,6 @@ body #menu .user a, body #menu .guest a {
   font-size: 0.6em;
 }
 
-/* stars */
 .star {
   display: flex;
   align-items: center;
@@ -574,24 +573,10 @@ body #menu .user a, body #menu .guest a {
     border-color: #c77929;
   }
 }
-body.sorting .star {
-  width: 50px;
-  height: 50px;
-  background: rgba(40, 40, 40, 0.55);
-}
-body.sorting .star.even {
-  background: rgba(60, 60, 60, 0.55);
-}
-body.sorting .star:hover {
-  background: #444;
-}
-body.sorting .star .meta {
-  left: 100%;
-}
 .star .meta {
   display: none;
   position: absolute;
-  left: 24px;
+  left: 32px;
   top: -6px;
   margin: 0 4px;
   transition: left 450ms, top 450ms;
@@ -606,11 +591,18 @@ body.sorting .star .meta {
 .star .meta .text.playbackTime {
   display: none;
 }
+.star .meta .creationTime {
+  display: none;
+}
 .star.active .meta, .star:hover .meta {
   display: inline-block;
 }
+.star.active {
+  width: 45px;
+  height: 45px;
+}
 .star.active .meta {
-  left: 22px;
+  left: 46px;
   top: -22px;
 }
 .star.active .meta:hover {
@@ -619,7 +611,24 @@ body.sorting .star .meta {
 .star.active .meta:hover .text {
   color: #4e5767;
 }
-.star.active .meta .playbackTime {
+.star.active .meta .creationTime, .star.active .meta .playbackTime {
+  display: block;
+}
+body.sorting .star {
+  width: 50px;
+  height: 50px;
+  background: rgba(40, 40, 40, 0.55);
+}
+body.sorting .star.even {
+  background: rgba(60, 60, 60, 0.55);
+}
+body.sorting .star:hover {
+  background: rgba(232, 177, 150, 0.37);
+}
+body.sorting .star .meta {
+  left: 100%;
+}
+body.sorting .star .meta .creationTime {
   display: block;
 }
 

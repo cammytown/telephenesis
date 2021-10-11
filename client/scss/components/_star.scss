@@ -17,10 +17,7 @@ $inactiveBorderWidth: 1px;
 	// border-radius: 14px;
 }
 
-/* stars */
 .star {
-	// $star: &;
-
 	display: flex; ///TODO support older browsers?
 	align-items: center;
 	justify-content: center;
@@ -171,6 +168,69 @@ $inactiveBorderWidth: 1px;
 		}
 	}
 
+	.meta {
+		display: none;
+		position: absolute;
+		left: 32px;
+		top: -6px;
+		margin: 0 4px;
+		transition: left 450ms, top 450ms;
+		pointer-events: none;
+
+		background-color: rgba(0, 0, 0, 0.6);
+		transition: background-color 250ms;
+
+		.text { ///REVISIT is this class necessary?
+			// display: none;
+			padding: 2px 5px 2px 3px;
+
+			&.playbackTime {
+				display: none;
+			}
+
+			&.name {
+			}
+		}
+
+		.creationTime {
+			display: none;
+
+		}
+
+		/*.inverse & .text { background-color: #fcfcfc; }*/
+
+		// &:hover .name, &.active .playbackTime {
+	}
+
+	&.active, &:hover {
+		.meta {
+			display: inline-block;
+		}
+	}
+
+	&.active {
+		width: 45px;
+		height: 45px;
+
+		.meta {
+			left: 32px + $activeBorderWidth;
+			top: -22px;
+
+			&:hover {
+				// opacity: 0;
+				z-index: -1;
+
+				.text {
+					color: $dimmedText;
+				}
+			}
+
+			.creationTime, .playbackTime {
+				display: block;
+			}
+		}
+	}
+
 	body.sorting & {
 		// opacity: 0;
 		// transition: opacity 500ms;
@@ -186,100 +246,19 @@ $inactiveBorderWidth: 1px;
 		}
 
 		&:hover {
-			background: #444;
+			background: rgba(232, 177, 150, 0.37);
 		}
 
 		.meta {
 			left: 100%;
-		}
-	}
 
-	// .gridBackground { ///REVISIT naming
-	// 	// display: none;
-	// 	opacity: 0;
-	// 	transition: opacity 500ms;
-	// 	position: absolute;
-	// 	left: -$starGridSize * 0.5;
-	// 	top: -$starGridSize * 0.5;
-	// 	width: $starGridSize;
-	// 	height: $starGridSize;
-	// 	z-index: -1; ///REVISIT is this a legit way of getting it to show up behind the star even though it's a child of it?
-	// 	background: rgba(40, 40, 40, 0.55);
-
-	// 	@at-root {
-	// 		body.sorting & {
-	// 			opacity: 1;
-	// 		}
-
-	// 		#{$star}.even .gridBackground {
-	// 			background: rgba(60, 60, 60, 0.55);
-	// 		}
-	// 	}
-	// }
-
-	// &.even {
-	// 	.gridBackground {
-	// 		background: rgba(60, 60, 60, 0.55);
-	// 	}
-	// }
-
-	.meta {
-		display: none;
-		position: absolute;
-		left: 24px;
-		top: -6px;
-		margin: 0 4px;
-		transition: left 450ms, top 450ms;
-		pointer-events: none;
-
-		background-color: rgba(0, 0, 0, 0.6);
-		transition: background-color 250ms;
-
-		.text {
-			// display: none;
-			padding: 2px 5px 2px 3px;
-
-			&.playbackTime {
-				display: none;
-			}
-
-			&.name {
-			}
-		}
-		/*.inverse & .text { background-color: #fcfcfc; }*/
-
-		// &:hover .name, &.active .playbackTime {
-	}
-
-	&.active, &:hover {
-		.meta {
-			display: inline-block;
-		}
-	}
-
-	&.active {
-		.meta {
-			left: 22px;
-			top: -22px;
-
-			&:hover {
-				// opacity: 0;
-				z-index: -1;
-
-				.text {
-					color: $dimmedText;
-				}
-			}
-
-			.playbackTime {
+			.creationTime {
 				display: block;
 			}
 		}
 	}
 
-
 	// &.active .name, &.menu .name, &.menu .time {
 	// 	display: none;
 	// }
-
 }
