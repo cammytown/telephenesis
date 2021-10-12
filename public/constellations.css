@@ -5,7 +5,7 @@
  ***/
 :export {
   starGridWidth: 500px;
-  starGridSize: 50px;
+  sortGridSquareSize: 50px;
   starGridPaddingX: 200px;
   starGridPaddingY: 200px;
 }
@@ -444,9 +444,6 @@ body #menu .user a, body #menu .guest a {
   width: 20px;
   height: 20px;
   padding: 1px 0 0;
-  color: #eee;
-  font-size: 1.25em;
-  white-space: nowrap;
   transition: background 350ms;
   /*.inverse & { color: #222; }*/
 }
@@ -587,6 +584,11 @@ body #menu .user a, body #menu .guest a {
 }
 .star .meta .text {
   padding: 2px 5px 2px 3px;
+  color: #eee;
+  font-size: 1.25em;
+  white-space: nowrap;
+  font-size: 1.15em;
+  line-height: 120%;
 }
 .star .meta .text.playbackTime {
   display: none;
@@ -630,6 +632,11 @@ body.sorting .star .meta {
 }
 body.sorting .star .meta .creationTime {
   display: block;
+}
+body.sorting.list .star .meta {
+  display: inline-block;
+  cursor: auto;
+  pointer-events: all;
 }
 
 body header#playingStarInfo {

@@ -1,9 +1,9 @@
-import cor from './libs/minlab/cor';
-import spc from './libs/minlab/spc';
+import cor from '../libs/minlab/cor';
+import spc from '../libs/minlab/spc';
 import anime from 'animejs/lib/anime.es.js';
 // import Anm from './libs/minlab/anm';
 
-import styleVars from '../scss/abstracts/_variables.scss';
+import styleVars from '../../scss/abstracts/_variables.scss';
 
 import clientState from './ClientState';
 import mediaPlayer from './MediaPlayer';
@@ -29,7 +29,7 @@ function ClientStarsAPI() {
 		}
 
 		styleVars.starGridWidth = parseInt(styleVars.starGridWidth); ///REVISIT architecture
-		styleVars.starGridSize = parseInt(styleVars.starGridSize); ///REVISIT architecture
+		styleVars.sortGridSquareSize = parseInt(styleVars.sortGridSquareSize); ///REVISIT architecture
 		styleVars.starGridPaddingX = parseInt(styleVars.starGridPaddingX); ///REVISIT architecture
 		styleVars.starGridPaddingY = parseInt(styleVars.starGridPaddingY); ///REVISIT architecture
 	}
@@ -70,7 +70,7 @@ function ClientStarsAPI() {
 		}
 
 		// Reposition each star
-		var displayMode = 'grid';
+		var displayMode = 'list';
 
 		switch(displayMode) {
 			// case 'constellationRows': {
@@ -80,7 +80,7 @@ function ClientStarsAPI() {
 			// 		var starEle = me.cachedSorts[mode][starEleIndex];
 
 			// 		// Calculate target position of the star
-			// 		var newX = styleVars.starGridSize * starEleIndex;
+			// 		var newX = styleVars.sortGridSquareSize * starEleIndex;
 
 			// 		var constellationID = starEle.getAttribute('data-constellation');
 			// 		var constellationOrderIndex = constellationOrder.indexOf(constellationID);
@@ -89,7 +89,7 @@ function ClientStarsAPI() {
 			// 			constellationOrder.push(constellationID);
 			// 		}
 
-			// 		var newY = constellationOrderIndex * styleVars.starGridSize;
+			// 		var newY = constellationOrderIndex * styleVars.sortGridSquareSize;
 
 			// 		// Animate the star to its target position
 			// 		anime({
@@ -104,7 +104,7 @@ function ClientStarsAPI() {
 
 			case 'grid': {
 				var currentRow = 0;
-				var rowCount = Math.floor(styleVars.starGridWidth / styleVars.starGridSize);
+				var rowCount = Math.floor(styleVars.starGridWidth / styleVars.sortGridSquareSize);
 
 				for (var starEleIndex = 0; starEleIndex < me.cachedSorts[mode].length; starEleIndex++) {
 					var starEle = me.cachedSorts[mode][starEleIndex];
@@ -112,8 +112,8 @@ function ClientStarsAPI() {
 					starEle.className = 'star ' + (starEleIndex % 2 ? 'odd' : 'even'); ///TODO don't just overwrite className
 
 					// Calculate target position of the star
-					var newX = styleVars.starGridSize * (starEleIndex % rowCount);
-					var newY = styleVars.starGridSize * currentRow;
+					var newX = styleVars.sortGridSquareSize * (starEleIndex % rowCount);
+					var newY = styleVars.sortGridSquareSize * currentRow;
 
 					// Animate the star to its target position
 					anime({
@@ -128,9 +128,42 @@ function ClientStarsAPI() {
 					});
 
 					// Wrap grid if row filled
-					if(newX >= styleVars.starGridWidth - styleVars.starGridSize) {
+					if(newX >= styleVars.starGridWidth - styleVars.sortGridSquareSize) {
 						currentRow += 1;
 					}
+				}
+			} break;
+
+			case 'list': {
+				// var currentRow = 0;
+				var rowMargin = 20;
+				var rowCount = Math.floor(styleVars.starGridWidth / styleVars.sortGridSquareSize);
+
+				for (var starEleIndex = 0; starEleIndex < me.cachedSorts[mode].length; starEleIndex++) {
+					var starEle = me.cachedSorts[mode][starEleIndex];
+
+					starEle.className = 'star ' + (starEleIndex % 2 ? 'odd' : 'even'); ///TODO don't just overwrite className
+
+					// Calculate target position of the star
+					var newX = 0;
+					var newY = (styleVars.sortGridSquareSize + rowMargin) * starEleIndex;
+
+					// Animate the star to its target position
+					anime({
+						targets: starEle,
+						left: newX + styleVars.starGridPaddingX + xOffset + 'px',
+						top: newY + styleVars.starGridPaddingY + yOffset + 'px',
+						duration: 500,
+						complete: function() {
+							me.generateConstellationLines();
+							cor.ac(document.body, 'sorting list'); ////
+						}
+					});
+
+					// Wrap grid if row filled
+					// if(newX >= styleVars.starGridWidth - styleVars.sortGridSquareSize) {
+					// 	currentRow += 1;
+					// }
 				}
 			} break;
 		}

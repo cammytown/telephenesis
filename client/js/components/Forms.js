@@ -1,4 +1,4 @@
-import cor from './libs/minlab/cor';
+import cor from '../libs/minlab/cor';
 
 export default new ClientForms();
 

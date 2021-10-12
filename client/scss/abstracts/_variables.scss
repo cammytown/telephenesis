@@ -42,13 +42,13 @@ $inputPaddingY: 17px;
 $inputPaddingX: 10px;
 
 $starGridWidth: 500px;
-$starGridSize: 50px;
+$sortGridSquareSize: 50px;
 $gridPaddingX: 200px;
 $gridPaddingY: 200px;
 
 :export {
 	starGridWidth: $starGridWidth;
-	starGridSize: $starGridSize;
+	sortGridSquareSize: $sortGridSquareSize;
 	starGridPaddingX: $gridPaddingX;
 	starGridPaddingY: $gridPaddingY;
 }

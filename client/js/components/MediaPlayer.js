@@ -1,6 +1,5 @@
-import cor from './libs/minlab/cor';
-
-import Aud from './libs/minlab/aud';
+import cor from '../libs/minlab/cor';
+import Aud from '../libs/minlab/aud';
 
 import clientState from './ClientState';
 

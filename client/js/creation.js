@@ -6,7 +6,7 @@ import ColorTool from './libs/minlab/colorTool.js';
 import ajx from './libs/minlab/ajx'; ///TODO get rid of in favor or Pijin
 import HistoryTime from './libs/history-time';
 
-import clientState from './ClientState';
+import clientState from './components/ClientState';
 
 // import Pijin from './js/pijin-js';
 

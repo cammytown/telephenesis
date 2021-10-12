@@ -3,11 +3,16 @@ import cor from './libs/minlab/cor';
 // import navigate from "./navigate";
 // import starSystem from "./starSystem";
 
-import ui from "./ui";
 import creation from "./creation";
 import admin from "./admin";
 
-import clientState from "./ClientState";
+import clientState from './components/ClientState';
+import Interface from './components/Interface';
+import Stars from './components/Stars';
+import Navigation from './components/Navigation';
+import Forms from './components/Forms';
+import ClientEffects from './components/ClientEffects';
+import mediaPlayer from './components/MediaPlayer';
 
 // import "./constellations.scss";
 
@@ -21,7 +26,15 @@ function TelepClient() {
 	var me = this;
 
 	me.init = function() { /// doesn't need to be property
-		ui.init(me);
+		clientState.addComponent(Interface);
+		clientState.addComponent(ClientEffects);
+		clientState.addComponent(Stars);
+		clientState.addComponent(Navigation);
+		clientState.addComponent(Forms);
+		clientState.addComponent(mediaPlayer);
+
+		Stars.generateConstellationLines();
+
 		creation.init(me);
 	}
 }

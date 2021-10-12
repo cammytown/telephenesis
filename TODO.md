@@ -2,19 +2,19 @@
 ## PHASE 1
 ### 3
 
+- sort stars
+	list view
+	popularity sort
+
 - refactor code
-	- should we be using transform css prop instead of left and top? (probably?)
-	- back-end really needs a lot of rewriting/refactoring
 	- rewrite Spc
-	- replace Anm with animejs
 	- probably just get rid of ui.js; move addComponent()s into telepClient.js
 	- make aud submodule
 	- move js files and libs into js/libs folder
 	- clean up how we pass star data around; very sloppy atm
-
-- sort stars
-	list view
-	popularity sort
+	- back-end really needs a lot of rewriting/refactoring
+	- should we be using transform css prop instead of left and top? (probably?)
+	- replace Anm with animejs; i suppose make a wrapper around animejs with some convenience functions like fadeIn fadeOut
 
 - basic method for tracking popularity
 	| probably just ping the server if track is listened to for longer than [~5] seconds

@@ -18,6 +18,8 @@ $inactiveBorderWidth: 1px;
 }
 
 .star {
+	$star: &;
+
 	display: flex; ///TODO support older browsers?
 	align-items: center;
 	justify-content: center;
@@ -29,10 +31,6 @@ $inactiveBorderWidth: 1px;
 	width: 20px;
 	height: 20px;
 	padding: 1px 0 0;
-
-	color: #eee;
-	font-size: 1.25em;
-	white-space: nowrap;
 
 	transition: background 350ms;
 
@@ -184,6 +182,12 @@ $inactiveBorderWidth: 1px;
 			// display: none;
 			padding: 2px 5px 2px 3px;
 
+			color: #eee;
+			font-size: 1.25em;
+			white-space: nowrap;
+			font-size: 1.15em;
+			line-height: 120%;
+
 			&.playbackTime {
 				display: none;
 			}
@@ -231,29 +235,43 @@ $inactiveBorderWidth: 1px;
 		}
 	}
 
-	body.sorting & {
-		// opacity: 0;
-		// transition: opacity 500ms;
-		// position: absolute;
-		// left: -$starGridSize * 0.5;
-		// top: -$starGridSize * 0.5;
-		width: $starGridSize;
-		height: $starGridSize;
-		background: rgba(40, 40, 40, 0.55);
+	@at-root {
+		body.sorting {
+			#{$star} {
+				// opacity: 0;
+				// transition: opacity 500ms;
+				// position: absolute;
+				// left: -$sortGridSquareSize * 0.5;
+				// top: -$sortGridSquareSize * 0.5;
+				width: $sortGridSquareSize;
+				height: $sortGridSquareSize;
+				background: rgba(40, 40, 40, 0.55);
 
-		&.even {
-			background: rgba(60, 60, 60, 0.55);
-		}
+				&.even {
+					background: rgba(60, 60, 60, 0.55);
+				}
 
-		&:hover {
-			background: rgba(232, 177, 150, 0.37);
-		}
+				&:hover {
+					background: rgba(232, 177, 150, 0.37);
+				}
 
-		.meta {
-			left: 100%;
+				.meta {
+					left: 100%;
 
-			.creationTime {
-				display: block;
+					.creationTime {
+						display: block;
+					}
+				}
+			}
+
+			&.list {
+				#{$star} {
+					.meta {
+						display: inline-block;
+						cursor: auto;
+						pointer-events: all;
+					}
+				}
 			}
 		}
 	}
