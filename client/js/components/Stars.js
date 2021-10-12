@@ -16,6 +16,8 @@ function ClientStarsAPI() {
 
 	var starElements;
 
+	me.view = 'galaxy'; ///REVISIT architecture
+
 	me.cachedSorts = {
 		'newest': null
 	}
@@ -41,20 +43,9 @@ function ClientStarsAPI() {
 		// if(state.path == path) return true;
 	}
 
-	this.sort = function(mode = "newest") { ///REVISIT maybe separate into its own component? probably rename when we better understand how we will architect things
-		spc.s = false;
-
-		var xOffset = -spc.x;
-		var yOffset = -spc.y;
-
-		// if(me.cachedSorts[mode] != null) {
-		// 	////CHECK if there have been changes to the loaded stars, we cannot use cache
-
-		// 	return true;
-		// }
-
-		// Rank stars according to mode
-		switch(mode) {
+	this.getSortedStars = function(order = "newest") {
+		// Rank stars according to order
+		switch(order) {
 			case 'newest': {
 				// me.cachedSorts['newest'] = [];
 				me.cachedSorts['newest'] = starElements.sort((a, b) => {
@@ -67,17 +58,36 @@ function ClientStarsAPI() {
 				// 	me.cachedSorts['newest']
 				// }
 			} break;
+
+			default: {
+				console.error("Unhandled order mode: " + order);
+			}
 		}
 
-		// Reposition each star
-		var displayMode = 'list';
+		return me.cachedSorts[order];
+	}
 
-		switch(displayMode) {
+	this.sort = function(order = "newest", view = "list") { ///REVISIT maybe separate into its own component? probably rename when we better understand how we will architect things
+
+		var xOffset = -spc.x;
+		var yOffset = -spc.y;
+
+		// if(me.cachedSorts[order] != null) {
+		// 	////CHECK if there have been changes to the loaded stars, we cannot use cache
+
+		// 	return true;
+		// }
+
+		cor.rc(document.body, me.view); ////
+		cor.ac(document.body, view); ////
+
+		// Reposition each star
+		switch(view) {
 			// case 'constellationRows': {
 			// 	var constellationOrder = [];
 
-			// 	for (var starEleIndex = 0; starEleIndex < me.cachedSorts[mode].length; starEleIndex++) {
-			// 		var starEle = me.cachedSorts[mode][starEleIndex];
+			// 	for (var starEleIndex = 0; starEleIndex < me.cachedSorts[order].length; starEleIndex++) {
+			// 		var starEle = me.cachedSorts[order][starEleIndex];
 
 			// 		// Calculate target position of the star
 			// 		var newX = styleVars.sortGridSquareSize * starEleIndex;
@@ -102,12 +112,35 @@ function ClientStarsAPI() {
 			// 	}
 			// } break;
 
+			case 'galaxy': {
+				spc.s = true;
+
+				for (var starIndex = 0; starIndex < starElements.length; starIndex++) {
+					var starEle = starElements[starIndex];
+
+					cor.rc(document.body, 'sorting'); ////
+
+					anime({
+						targets: starEle,
+						left: starEle.getAttribute('data-x') + 'px',
+						top: starEle.getAttribute('data-y') + 'px',
+						duration: 1000,
+						complete: function() {
+							me.generateConstellationLines();
+						}
+					});
+				}
+			} break;
+
 			case 'grid': {
+				spc.s = false;
+
 				var currentRow = 0;
 				var rowCount = Math.floor(styleVars.starGridWidth / styleVars.sortGridSquareSize);
 
-				for (var starEleIndex = 0; starEleIndex < me.cachedSorts[mode].length; starEleIndex++) {
-					var starEle = me.cachedSorts[mode][starEleIndex];
+				var sortedElements = this.getSortedStars(order);
+				for (var starEleIndex = 0; starEleIndex < sortedElements.length; starEleIndex++) {
+					var starEle = sortedElements[starEleIndex];
 
 					starEle.className = 'star ' + (starEleIndex % 2 ? 'odd' : 'even'); ///TODO don't just overwrite className
 
@@ -135,12 +168,17 @@ function ClientStarsAPI() {
 			} break;
 
 			case 'list': {
+				spc.s = false;
+
+				var sortedElements = this.getSortedStars(order);
+
 				// var currentRow = 0;
 				var rowMargin = 20;
 				var rowCount = Math.floor(styleVars.starGridWidth / styleVars.sortGridSquareSize);
 
-				for (var starEleIndex = 0; starEleIndex < me.cachedSorts[mode].length; starEleIndex++) {
-					var starEle = me.cachedSorts[mode][starEleIndex];
+				var sortedElements = this.getSortedStars(order);
+				for (var starEleIndex = 0; starEleIndex < sortedElements.length; starEleIndex++) {
+					var starEle = sortedElements[starEleIndex];
 
 					starEle.className = 'star ' + (starEleIndex % 2 ? 'odd' : 'even'); ///TODO don't just overwrite className
 
@@ -156,7 +194,7 @@ function ClientStarsAPI() {
 						duration: 500,
 						complete: function() {
 							me.generateConstellationLines();
-							cor.ac(document.body, 'sorting list'); ////
+							cor.ac(document.body, 'sorting'); ////
 						}
 					});
 
@@ -167,6 +205,8 @@ function ClientStarsAPI() {
 				}
 			} break;
 		}
+
+		me.view = view;
 	}
 
 	function play(starElement) {

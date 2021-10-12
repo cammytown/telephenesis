@@ -54,7 +54,12 @@ function Interface(Telep) {
 					// state.updating = true;
 					HistoryTime.navigateTo('/', "Telephenesis"); //// page title
 
-					Stars.sort(); ////
+					////:
+					if(Stars.view == 'galaxy') {
+						Stars.sort('newest', 'list');
+					} else {
+						Stars.sort(null, 'galaxy');
+					}
 				} break;
 			}
 		});
