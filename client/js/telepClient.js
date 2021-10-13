@@ -32,6 +32,7 @@ function TelepClient() {
 		clientState.addComponent(Navigation);
 		clientState.addComponent(Forms);
 		clientState.addComponent(mediaPlayer);
+		clientState.init();
 
 		Stars.generateConstellationLines();
 

@@ -3,21 +3,19 @@
 ### 3
 
 - sort stars
-	list view
 	popularity sort
+		i think we distinguish between partial plays and full plays; full plays count more towards popularity score
+			also distinguish between total/guest plays and confirmed user plays
+			store play history of users; allow them to go back through it
 
 - refactor code
-	- rewrite Spc
-	- probably just get rid of ui.js; move addComponent()s into telepClient.js
-	- make aud submodule
-	- move js files and libs into js/libs folder
+	- back-end really needs a lot of rewriting/refactoring; move things into modules/components
 	- clean up how we pass star data around; very sloppy atm
-	- back-end really needs a lot of rewriting/refactoring
+	- pings to the server for star plays should be built up and sent periodically; not immediately
+	- rewrite Spc
 	- should we be using transform css prop instead of left and top? (probably?)
 	- replace Anm with animejs; i suppose make a wrapper around animejs with some convenience functions like fadeIn fadeOut
-
-- basic method for tracking popularity
-	| probably just ping the server if track is listened to for longer than [~5] seconds
+	- make aud submodule?
 
 - figure out how to sustain hosting costs
 	- maybe only subscribers can upload and if you cancel then at some point your track may be moved to archive.org hosting
@@ -28,6 +26,10 @@
 - draw constellation line after placing
 
 ### 2
+
+- personal sorts
+	| playlists
+	| liked/bookmarked
 
 - should we allow people to tag stars? maybe not the artists, but the public can add tags and others can vote those tags up if they feel it's relevant?
 

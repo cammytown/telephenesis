@@ -197,6 +197,16 @@ function init() {
 			// 	api.createStar(i.user.id, recreationStar);
 			// } break;
 
+			/**
+			 * This method runs somewhat regularly and handles basic exchange
+			 * of information between client and server. The server informs the
+			 * client of new stars, and the client informs the server of
+			 * media plays, etc.
+			 */
+			case 'update': { ///REVISIT naming
+
+			} break;
+
 			case 'renameStar': {
 				/// consolidate:
 				var sid = parseInt(i.body.sid);

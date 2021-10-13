@@ -20,15 +20,43 @@ function MediaPlayer() {
 		me.audio.element.addEventListener('ended', onMediaPlayerFinish);
 	}
 
-	function onMediaPlayerUpdate() {
-		///REVISIT bit ugly:
+	this.playStar = function(starElement) {
+		if(starElement == clientState.playingStar) {
+			// If already playing star, toggle play/pause:
+			me.audio.element.paused ? me.audio.play() : me.audio.pause();
 
+		} else {
+			if(clientState.playingStar) { // If there's already a star loaded
+				cor.rc(clientState.playingStar, "active");
+			}
+
+			clientState.playingStar = starElement;
+			cor.ac(starElement, "active");
+
+			// var time = starElement.getElementsByTagName('span')[1];
+
+			// Load the new star's media:
+			me.audio.load(starElement.getElementsByTagName('a')[0].href);
+			// me.audio.load('/music/'+sid+'.mp3');
+
+			// When we have media metadata (i.e. length), begin streaming:
+			me.audio.element.addEventListener('loadedmetadata', function() {
+				me.audio.play();
+			}, {
+				once: true // Remove this listener after running. /// Why not just put this listener in .init and remove `once` property? /// browser support?
+			});
+		}
+	}
+
+	function onMediaPlayerUpdate(event) {
+		// Update playback time label:
 		clientState.playingStar.getElementsByClassName('playbackTime')[0].innerHTML = me.audio.timeString;
-		// cor._('#playbackProgressBar').style.width = (me.audio.playbackProgress * 100.0) + "%";
+
+		// Update width of playback progress bar:
 		cor._('#playbackProgressBar').style.width = (me.audio.playbackProgress * 100.0) + "%";
 	}
 
-	function onMediaPlayerFinish() {
+	function onMediaPlayerFinish(event) {
 		cor.rc(clientState.playingStar, 'active');
 
 		if(clientState.playingStar.getAttribute('data-next')) {

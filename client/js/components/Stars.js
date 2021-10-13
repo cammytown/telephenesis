@@ -27,7 +27,7 @@ function ClientStarsAPI() {
 
 		for (var starIndex = 0; starIndex < starElements.length; starIndex++) {
 			var starElement = starElements[starIndex];
-			starElement.addEventListener('click', onClick);
+			starElement.addEventListener('click', onStarClick);
 		}
 
 		styleVars.starGridWidth = parseInt(styleVars.starGridWidth); ///REVISIT architecture
@@ -36,7 +36,7 @@ function ClientStarsAPI() {
 		styleVars.starGridPaddingY = parseInt(styleVars.starGridPaddingY); ///REVISIT architecture
 	}
 
-	function onClick(event) {
+	function onStarClick(event) {
 		event.preventDefault();
 
 		play(event.currentTarget);
@@ -228,27 +228,7 @@ function ClientStarsAPI() {
 		// cor._('#playingStarInfo').style.display = 'block';
 		cor.ac(document.body, 'playing')
 
-		if(starElement == clientState.playingStar) {
-			mediaPlayer.audio.element.paused ? mediaPlayer.audio.play() : mediaPlayer.audio.pause();
-		} else {
-			if(clientState.playingStar) {
-				cor.rc(clientState.playingStar, "active");
-			}
-
-			clientState.playingStar = starElement;
-			cor.ac(starElement, "active");
-
-			// var time = starElement.getElementsByTagName('span')[1];
-
-			mediaPlayer.audio.load(starElement.getElementsByTagName('a')[0].href);
-			// mediaPlayer.audio.load('/music/'+sid+'.mp3');
-
-			mediaPlayer.audio.element.addEventListener('loadedmetadata', function() {
-				mediaPlayer.audio.play();
-			}, {
-				once: true /// browser support?
-			});
-		}
+		mediaPlayer.playStar(starElement);
 	}
 
 	function remove(starElement) { /// revisit architecture
