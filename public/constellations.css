@@ -240,17 +240,17 @@ body.playing nav {
 body .user, body .create {
   display: none;
 }
-body .user {
+body.in .user {
   display: block;
+}
+body.in .guest {
+  display: none;
 }
 body.in #navigation {
   left: -140px;
 }
 body.in.creator .create {
   display: block;
-}
-body.in .guest {
-  display: none;
 }
 body nav {
   display: block;
@@ -884,18 +884,6 @@ body.playing header#playingStarInfo {
 .inverse .tutorial .btn.r:hover {
   color: #d29191;
   background: #4b0a0a;
-}
-
-.create, .admin {
-  display: none;
-}
-
-.creator .create {
-  display: block;
-}
-
-.adminor .admin {
-  display: block;
 }
 
 form#create #timeSettings {

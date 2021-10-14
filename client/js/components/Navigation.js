@@ -187,5 +187,23 @@ function ClientNavigation() {
 
 			// spc.flt(false);
 		}
+
+		function logout() { ///REVISIT placement
+			fetch('/ajax/logout', {
+				method: "POST",
+				body: {}
+			})
+				.then(response => response.json())
+				.then(result => {
+					if(result.error) {
+						console.error(result.error); ///
+					} else {
+						var login = document.getElementById('login');
+						login.children[1].value = "";
+						cor.rc(document.body, 'in');
+						cor.rc(document.body, 'creator');
+					}
+				});
+		}
 	}
 }

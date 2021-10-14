@@ -1,45 +1,58 @@
-class Pidgeon {
+class Pijin {
 	constructor() {
-		this.selectorCallbacks = {
+		this.callbacks = {
 			'submit': [],
 			'response': [],
 		};
 
-		// this.onPidgeonFormSubmit
+		this.selectorCallbacks = {
+			'submit': [],
+			'response': [],
+		};
 	}
 
-	init() { ///REVISIT architecture
-		let pidgeonForms = document.getElementsByClassName('pidgeonForm');
-		for (var formIndex = 0; formIndex < pidgeonForms.length; formIndex++) {
-			var pidgeonForm = pidgeonForms[formIndex];
-			pidgeonForm.addEventListener('submit', (event) => this.onPidgeonFormSubmit(event));
+	init(pijinClass = 'pijinForm') { ///REVISIT architecture
+		let pijinForms = document.getElementsByClassName(pijinClass);
+		for (var formIndex = 0; formIndex < pijinForms.length; formIndex++) {
+			var pijinForm = pijinForms[formIndex];
+			pijinForm.addEventListener('submit', (event) => this.onPijinFormSubmit(event));
 		}
 	}
 
-	watch(selector, event, callback) {
-		///REVISIT architecture
-
+	watch(selector, event, callback) { ///REVISIT architecture
 		this.selectorCallbacks[event][selector] = callback;
 
 		// if(selector[0] == '#') {
 		// 	// selecting an id
 		// 	var ele = document.getElementById(selector);
 		// } else {
-		// 	throw 'Pidgeon: unhandled selector'; ///REVISIT
+		// 	throw 'Pijin: unhandled selector'; ///REVISIT
 		// }
 	}
 
-	onPidgeonFormSubmit(submitEvent) { //// temporary; should find more robust solution probably // converts all form elements to ajax
+	onPijinFormSubmit(submitEvent) { //// temporary; should find more robust solution probably // converts all form elements to ajax
 		submitEvent.preventDefault();
 
 		var form = submitEvent.target;
 
-		var selector = '#' + form.id;
-		var submitCallback = this.selectorCallbacks['submit'][selector];
+		this.submit(form);
 
-		if(typeof submitCallback === 'function') {
-			///REVISIT should we make sure this returns before moving on?
+		return true;
+	}
+
+	submit(form) {
+		// Run user-defined general submit callbacks:
+		for (var cbIndex = 0; cbIndex < this.callbacks.submit.length; cbIndex++) {
+			var submitCallback = this.callbacks.submit[cbIndex];
 			submitCallback(submitEvent);
+		}
+
+		// Run user-defined callbacks for matching selectors: ///TODO currently only one callback allowed
+		var selector = '#' + form.id;
+		var selectorSubmitCallback = this.selectorCallbacks['submit'][selector];
+		if(typeof selectorSubmitCallback === 'function') {
+			///REVISIT should we make sure this returns before moving on?
+			selectorSubmitCallback(submitEvent);
 		}
 
 		var method = form.method;
@@ -72,7 +85,7 @@ class Pidgeon {
 		if(hasFile) {
 			///TODO implement!
 
-			throw 'Pidgeon does not yet handle file uploads.';
+			throw 'Pijin does not yet handle file uploads.';
 
 			method = usingBrokenMethod ? method : 'POST';
 		} else {
@@ -97,12 +110,17 @@ class Pidgeon {
 			.then(result => {
 				///TODO probably check classes, too. (and what about compound class selectors like .one.two ?)
 
-				var responseCallback = this.selectorCallbacks['response'][selector];
+				for (var cbIndex = 0; cbIndex < this.callbacks.responseText.length; cbIndex++) {
+					var responseCallback = this.callbacks.responseText[cbIndex];
+					responseCallback(result, this.parseRequest(request), submitEvent)
+				}
+
+				var selectorResponseCallback = this.selectorCallbacks['response'][selector];
 				// console.log(selectorCallback);
 
-				if(typeof responseCallback === 'function') {
-					// responsePromise = responsePromise.then(result => responseCallback);
-					responseCallback(
+				if(typeof selectorResponseCallback === 'function') {
+					// responsePromise = responsePromise.then(result => selectorResponseCallback);
+					selectorResponseCallback(
 						result, // the parsed response
 						this.parseRequest(request), // the initial request as an object of params
 						submitEvent
@@ -110,10 +128,9 @@ class Pidgeon {
 				}
 			});
 
-
 		return true;
-		// return responsePromise;
 	}
+
 
 	parseRequest(request) {
 		switch(typeof request.body) {
@@ -132,7 +149,7 @@ class Pidgeon {
 			} break;
 
 			default: {
-				throw 'Pidgeon: unhandled request.body type somehow'; ///REVISIT
+				throw 'Pijin: unhandled request.body type somehow'; ///REVISIT
 			}
 		}
 	}
@@ -149,4 +166,4 @@ class Pidgeon {
 	// }
 }
 
-export default new Pidgeon(); ///REVISIT architecture
+export default new Pijin(); ///REVISIT architecture

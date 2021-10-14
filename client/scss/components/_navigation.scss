@@ -7,10 +7,12 @@ body {
 	}
 
 	.user, .create { display: none; } ///architecture
-	.user, { display: block; } ///architecture
 
 	&.in {
 		///TODO make naming of "in" and "guest" and such clearer
+
+		.user { display: block; } ///architecture
+		.guest { display: none; }
 
 		#navigation {
 			left: -140px;
@@ -20,7 +22,6 @@ body {
 			.create { display: block; }
 		}
 
-		.guest { display: none; }
 	}
 
 	nav {

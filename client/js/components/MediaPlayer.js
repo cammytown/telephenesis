@@ -110,7 +110,6 @@ function MediaPlayer() {
 			var totalPlayTimeFloat = activeMediaState.totalMediaPlaySeconds / audio.element.duration;
 			if(totalPlayTimeFloat >= config.longPlayPercent / 100) {
 				activeMediaState.flags.longPlay = true;
-				pendingServerUpdates
 				pendingServerUpdates.push({ type: 'longPlay', starID: clientState.playingStar.id });
 			}
 		}
@@ -128,6 +127,13 @@ function MediaPlayer() {
 	}
 
 	function serverSync() {
+		// Do nothing if there are no server updates to sync ////TODO still sync but with less regularity (to check for client updates)
+		if(!pendingServerUpdates.length) {
+			return false;
+		}
+
+		console.log(pendingServerUpdates);
+
 		var request = {
 			method: "POST",
 			headers: {

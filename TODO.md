@@ -28,6 +28,8 @@
 
 ### 2
 
+- if keeping gradient background, background of inputs is blocky
+
 - personal sorts
 	| playlists
 	| liked/bookmarked
