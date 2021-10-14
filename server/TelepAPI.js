@@ -40,6 +40,22 @@ module.exports = function(db) {
 		}
 	});
 
+	me.auth = function(level) {
+		return function(req, res, next) {
+			if(!req.user) {
+				res.json({ error: "not logged in" });
+				return false; ///
+			}
+
+			if(!req.user.lv) {
+				res.json({ error: "no creator credentials" });
+				return false; ///
+			}
+
+			next();
+		}
+	}
+
 	me.getUsrMeta = function(userID, callback) {
 		usrMeta.findOne({ userID }, function(err, doc) {
 			if(err) {

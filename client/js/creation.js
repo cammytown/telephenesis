@@ -371,7 +371,7 @@ function actualizeCreation() {
 				state.updating = true;
 				navigate('/' + workingStar.starID);
 			});
-		})
+		});
 
 	// ajx('/ajax/actualize', formData, function(responseData) {
 	// 	console.log(responseData);

@@ -2,6 +2,8 @@
 ## PHASE 1
 ### 3
 
+- refactor server code
+
 - sort stars
 	popularity sort
 		i think we distinguish between partial plays and full plays; full plays count more towards popularity score
@@ -9,9 +11,8 @@
 			store play history of users; allow them to go back through it
 
 - refactor code
-	- back-end really needs a lot of rewriting/refactoring; move things into modules/components
+	- rename Stars.js so not confused with Star.js
 	- clean up how we pass star data around; very sloppy atm
-	- pings to the server for star plays should be built up and sent periodically; not immediately
 	- rewrite Spc
 	- should we be using transform css prop instead of left and top? (probably?)
 	- replace Anm with animejs; i suppose make a wrapper around animejs with some convenience functions like fadeIn fadeOut
