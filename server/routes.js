@@ -7,27 +7,248 @@ module.exports = {
 };
 
 function initializeRoutes(app) {
+	// var ajaxRouter = require('./ajax')
 	var ajaxRouter = express.Router();
 	ajaxRouter.post('/sync', syncWithClient);
+	ajaxRouter.post('/bookmark', bookmarkStar);
+	ajaxRouter.post('/actualize', actualizeStar);
+
+	ajaxRouter.post('/login', login, userCheck);
+	ajaxRouter.post('/register', register, login, userCheck);
+	ajaxRouter.post('/logout', logout);
+
 	ajaxRouter.post('/upload/:starid', api.auth('creator'), upload.single('submission'), uploadMedia);
 
 	app.use('/ajax', ajaxRouter);
 
-	app.post('/register', register);
-	app.post('/login', login);
+	// app.post('/register', register);
+	// app.post('/login', login);
 
 	app.get('/:page?', main);
 }
 
-// var ajaxOpRouter = express.Router({ mergeParams: true });
-// ajaxRouter.use('/:operation', upload.none(), ajaxOpRouter);
-
-
-
+/**
+ * This method runs somewhat regularly and handles basic exchange
+ * of information between client and server. The server informs the
+ * client of new stars, and the client informs the server of
+ * media plays, etc.
+ */
 function syncWithClient(req, res) {
 	console.log("test");
 
+	req.body.shortPlays;
+	req.body.longPlays;
+
+	// for (var updateIndex = 0; updateIndex < i.body.serverUpdates.length; updateIndex++) {
+	// 	var updateObject = i.body.serverUpdates[updateIndex];
+	// 	switch(updateObject.type) {
+	// 		case 'partialPlay':
+	// 		case 'longPlay': {
+	// 			console.log(updateObject)
+	// 		} break;
+	// 	}
+	// }
+
 	res.json({ error: false });
+}
+
+function bookmarkStar(req, res) {
+	var sid = parseInt(req.body.sid);
+	api.getStar(sid, function(err, star) {
+		if(err) {
+			///
+			console.error(err);
+			return false;
+		}
+
+		// if(!req.user || (req.user.id != star.creatorId && req.user.lv != 7)) {
+		if(!req.user) {
+			res.json({ error: "not logged in" });
+			return false;
+		}
+
+		api.bookmark(star, req.user.id, function(err, result) {
+			if(err) {
+				///
+				console.error(err);
+				res.json({ error: "couldn't bookmark..." }); ///
+				return false;
+			}
+
+			res.json({ error: 0 });
+		});
+	});
+}
+
+function userCheck(req, res) {
+	res.json({ error: !req.user });
+}
+
+function login(req, res, next) {
+	usr.li(
+		req.body.email,
+		req.body.password,
+		req.ip,
+		function(err, sessionCode) {
+			if(err.length) {
+				res.render('login', { p: req.body, errors: err });
+			} else {
+				res.cookie('usr_ss', sessionCode, {
+					// secure: true /// https only
+				});
+
+				next();
+			}
+		}
+	);
+
+}
+
+function register(req, res, next) {
+	if(!req.body['password'] != req.body['password-confirm']) {
+		return res;
+	}
+
+	usr.rg(
+		req.body.email,
+		req.body.password,
+		req.ip,
+		function(err, usrDoc, sessionCode) {
+			if(err.length) {
+				// o.render('register', { p: req.body, errors: err });
+				res.json({ error: err });
+			} else {
+				api.createProfile({
+					userID: usrDoc.id,
+					email: req.body.email,
+					creatorName: req.body.creatorName
+
+				}, function() {
+					// res.cookie('usr_ss', sessionCode, {
+					// 	// secure: true //// https only
+					// });
+
+					next();
+					// res.json({ error: 0 });
+				});
+			}
+		}
+	);
+}
+
+function logout(req, res, next) {
+	res.clearCookie('usr_ss', {});
+
+	res.json({ error: 0 });
+}
+
+function actualizeStar(req, res) {
+	if(!req.user || req.user.lv != 7) {
+		res.json({ error: "not logged in" });
+		return false;
+	}
+
+	var starID = parseInt(req.body.starID);
+
+	switch(req.body.hostType) {
+		case 'external': {
+			var starData = {
+				starID: req.body.starID,
+				x: parseInt(req.body.x),
+				y: parseInt(req.body.y),
+				color: req.body.color,
+				originStarID: parseInt(req.body.originStarID),
+				hostType: req.body.hostType,
+				fileURL: req.body.fileURL,
+				title: req.body.starTitle
+			};
+
+			api.createStar(req.user.id, starData, function(err, result) {
+				if(err) {
+					console.log(err); ///
+					res.json({ error: "could not create star" });
+					return false;
+				}
+
+				res.json({ error: 0 });
+			});
+
+			// api.actualize(starData, function(err, result) {
+			// 	if(err) {
+			// 		res.json({ error: "did not place" });
+			// 		return false;
+			// 	}
+
+			// 	if(star.lsid) {
+			// 		// $lstar = api.sid($star['lsid']);
+			// 		// $luser = $usr->gt($lstar['uid']);
+			// 		// $lmeta = api.meta($lstar['uid']);
+
+			// 		// $content = "Hello, ".$lmeta['name'].".\n\n";
+			// 		// $content .= "Someone has recreated your star on Telephenesis! Check it out here:\n\n";
+			// 		// $content .= URL.'/'.$sid."\n\n";
+			// 		// $content .= "Exciting!\n\n";
+			// 		// $content .= "Don't want these messages? Just reply to this email letting us know."; ///
+
+			// 		// api.email($luser['em'], 'Someone recreated your star', $content);
+			// 	}
+
+			// 	// res.json({ creator: umeta.name });
+			// 	res.json({ error: 0 });
+			// });
+		} break;
+
+		case 'upload': {
+			// star should already have been created ///REVISIT architecture; maybe it would be better to just have some token associated to the upload that we use when creating the star
+			res.json({ error: 0 });
+		} break;
+
+		default: {
+			console.log('unhandled hostType: ' + req.body.hostType);
+		}
+	}
+
+	// api.getStar(sid, function(err, star) {
+	// 	if(err) {
+	// 		///
+	// 		o.json({ error: "could not get source star" });
+	// 		return false;
+	// 	}
+
+	// 	if(!i.user || i.user.id != star.creator.uid) {
+	// 		o.json({ error: "not logged in" });
+	// 		return false;
+	// 	}
+
+	// 	var x = parseInt(i.body.x);
+	// 	var y = -1 * parseInt(i.body.y);
+	// 	var rgb = i.body.rgb;
+
+	// 	api.actualize(sid, x, y, rgb, function(err, result) {
+	// 		if(err) {
+	// 			o.json({ error: "did not place" });
+	// 			return false;
+	// 		}
+
+	// 		if(star.lsid) {
+	// 			// $lstar = api.sid($star['lsid']);
+	// 			// $luser = $usr->gt($lstar['uid']);
+	// 			// $lmeta = api.meta($lstar['uid']);
+
+	// 			// $content = "Hello, ".$lmeta['name'].".\n\n";
+	// 			// $content .= "Someone has recreated your star on Telephenesis! Check it out here:\n\n";
+	// 			// $content .= URL.'/'.$sid."\n\n";
+	// 			// $content .= "Exciting!\n\n";
+	// 			// $content .= "Don't want these messages? Just reply to this email letting us know."; ///
+
+	// 			// api.email($luser['em'], 'Someone recreated your star', $content);
+	// 		}
+
+	// 		// o.json({ creator: umeta.name });
+	// 		o.json({ error: 0 });
+	// 	});
+	// });
+
 }
 
 
@@ -125,121 +346,9 @@ function main(i, o) {
 	}
 }
 
-function login(i, o) {
-	usr.li(
-		i.body.email,
-		i.body.password,
-		i.ip,
-		function(err, ss) {
-			if(err.length) {
-				o.render('login', { p: i.body, errors: err });
-			} else {
-				o.cookie('usr_ss', ss, {
-					// secure: true /// https only
-				});
-
-				o.send('LOGGED EM');
-			}
-		}
-	);
-}
-
-function register(i, o) {
-	i.body['password'] == i.body['password-confirm'];
-
-	var uid = usr.rg(
-		i.body.email,
-		i.body.password,
-		i.ip,
-		function(err, usrDoc, ss) {
-			if(err.length) {
-				o.render('register', { p: i.body, errors: err });
-			} else {
-				o.cookie('usr_ss', ss, {
-					// secure: true /// https only
-				});
-
-				// console.log(results._id);
-
-				// console.log(souls);
-				// console.log(result);
-				// console.log(err);
-				o.send('got em');
-			}
-		}
-	);
-}
 
 function ajaxOp(i, o) {
 	switch(i.params.operation) {
-		// case 'create': {
-		// 	// if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
-		// 	if(!i.user) {
-		// 		o.json({ error: "not logged in" });
-		// 		return false;
-		// 	}
-
-		// 	// var gameProperties = {
-		// 	// 	access: i.body['access-setting'],
-		// 	// 	timeLimit: i.body['time-limit'],
-		// 	// 	artType: i.body['art-type'],
-		// 	// };
-
-		// 	var genesisStar = {
-		// 		artURL: i.body['file-url'],
-		// 		artType: i.body['art-type'],
-		// 		artTitle: i.body['art-title']
-		// 	};
-
-		// 	api.createStar(i.user.id, genesisStar);
-		// } break;
-
-		// case 'recreate': {
-		// 	// if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
-		// 	if(!i.user) {
-		// 		o.json({ error: "not logged in" });
-		// 		return false;
-		// 	}
-
-		// 	// var gameProperties = {
-		// 	// 	access: i.body['access-setting'],
-		// 	// 	timeLimit: i.body['time-limit'],
-		// 	// 	artType: i.body['art-type'],
-		// 	// };
-
-		// 	var recreationStar = {
-		// 		originStarId: i.body['source-star-id'],
-		// 		artURL: i.body['file-url'],
-		// 		artType: i.body['art-type'],
-		// 		artTitle: i.body['art-title']
-		// 	};
-
-		// 	api.createStar(i.user.id, recreationStar);
-		// } break;
-
-		/**
-		 * This method runs somewhat regularly and handles basic exchange
-		 * of information between client and server. The server informs the
-		 * client of new stars, and the client informs the server of
-		 * media plays, etc.
-		 */
-		case 'update': { ///REVISIT naming
-			// api.
-			i.body.shortPlays;
-			i.body.longPlays;
-			// for (var updateIndex = 0; updateIndex < i.body.serverUpdates.length; updateIndex++) {
-			// 	var updateObject = i.body.serverUpdates[updateIndex];
-			// 	switch(updateObject.type) {
-			// 		case 'partialPlay':
-			// 		case 'longPlay': {
-			// 			console.log(updateObject)
-			// 		} break;
-			// 	}
-			// }
-
-			o.json({ error: 0 });
-		} break;
-
 		case 'renameStar': {
 			/// consolidate:
 			var sid = parseInt(i.body.sid);
@@ -296,33 +405,6 @@ function ajaxOp(i, o) {
 			});
 		} break;
 
-		case 'bookmark': {
-			var sid = parseInt(i.body.sid);
-			api.getStar(sid, function(err, star) {
-				if(err) {
-					///
-					console.error(err);
-					return false;
-				}
-
-				// if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
-				if(!i.user) {
-					o.json({ error: "not logged in" });
-					return false;
-				}
-
-				api.bookmark(star, i.user.id, function(err, result) {
-					if(err) {
-						///
-						console.error(err);
-						o.json({ error: "couldn't bookmark..." }); ///
-						return false;
-					}
-
-					o.json({ error: 0 });
-				});
-			});
-		} break;
 
 		case 'settings': { /// naming (need to rename element id of form in current architecture)
 			if(!i.user) {
@@ -393,169 +475,6 @@ function ajaxOp(i, o) {
 					o.json({ error: 0 });
 				});
 			});
-		} break;
-
-		case 'actualize': {
-			if(!i.user || i.user.lv != 7) {
-				o.json({ error: "not logged in" });
-				return false;
-			}
-
-			var starID = parseInt(i.body.starID);
-
-			switch(i.body.hostType) {
-				case 'external': {
-					var starData = {
-						starID: i.body.starID,
-						x: parseInt(i.body.x),
-						y: parseInt(i.body.y),
-						color: i.body.color,
-						originStarID: parseInt(i.body.originStarID),
-						hostType: i.body.hostType,
-						fileURL: i.body.fileURL,
-						title: i.body.starTitle
-					};
-
-					api.createStar(i.user.id, starData, function(err, result) {
-						if(err) {
-							console.log(err); ///
-							o.json({ error: "could not create star" });
-							return false;
-						}
-
-						o.json({ error: 0 });
-					});
-
-					// api.actualize(starData, function(err, result) {
-					// 	if(err) {
-					// 		o.json({ error: "did not place" });
-					// 		return false;
-					// 	}
-
-					// 	if(star.lsid) {
-					// 		// $lstar = api.sid($star['lsid']);
-					// 		// $luser = $usr->gt($lstar['uid']);
-					// 		// $lmeta = api.meta($lstar['uid']);
-
-					// 		// $content = "Hello, ".$lmeta['name'].".\n\n";
-					// 		// $content .= "Someone has recreated your star on Telephenesis! Check it out here:\n\n";
-					// 		// $content .= URL.'/'.$sid."\n\n";
-					// 		// $content .= "Exciting!\n\n";
-					// 		// $content .= "Don't want these messages? Just reply to this email letting us know."; ///
-
-					// 		// api.email($luser['em'], 'Someone recreated your star', $content);
-					// 	}
-
-					// 	// o.json({ creator: umeta.name });
-					// 	o.json({ error: 0 });
-					// });
-				} break;
-
-				case 'upload': {
-					// star should already have been created ///REVISIT architecture; maybe it would be better to just have some token associated to the upload that we use when creating the star
-				} break;
-
-				default: {
-					console.log('unhandled hostType: ' + i.body.hostType);
-				}
-			}
-
-			// api.getStar(sid, function(err, star) {
-			// 	if(err) {
-			// 		///
-			// 		o.json({ error: "could not get source star" });
-			// 		return false;
-			// 	}
-
-			// 	if(!i.user || i.user.id != star.creator.uid) {
-			// 		o.json({ error: "not logged in" });
-			// 		return false;
-			// 	}
-
-			// 	var x = parseInt(i.body.x);
-			// 	var y = -1 * parseInt(i.body.y);
-			// 	var rgb = i.body.rgb;
-
-			// 	api.actualize(sid, x, y, rgb, function(err, result) {
-			// 		if(err) {
-			// 			o.json({ error: "did not place" });
-			// 			return false;
-			// 		}
-
-			// 		if(star.lsid) {
-			// 			// $lstar = api.sid($star['lsid']);
-			// 			// $luser = $usr->gt($lstar['uid']);
-			// 			// $lmeta = api.meta($lstar['uid']);
-
-			// 			// $content = "Hello, ".$lmeta['name'].".\n\n";
-			// 			// $content .= "Someone has recreated your star on Telephenesis! Check it out here:\n\n";
-			// 			// $content .= URL.'/'.$sid."\n\n";
-			// 			// $content .= "Exciting!\n\n";
-			// 			// $content .= "Don't want these messages? Just reply to this email letting us know."; ///
-
-			// 			// api.email($luser['em'], 'Someone recreated your star', $content);
-			// 		}
-
-			// 		// o.json({ creator: umeta.name });
-			// 		o.json({ error: 0 });
-			// 	});
-			// });
-
-		} break;
-
-		case 'login': {
-			usr.li(
-				i.body.email,
-				i.body.password,
-				i.ip,
-				function(err, sessionCode) {
-					if(err.length) {
-						o.json({ error: err });
-						// o.render('login', { p: i.body, errors: err });
-					} else {
-						o.cookie('usr_ss', sessionCode, {
-							// secure: true /// https only
-						});
-
-						o.json({ error: 0 });
-					}
-				}
-			);
-		} break;
-
-		case 'register': {
-			i.body['password'] == i.body['password-confirm'];
-
-			var uid = usr.rg(
-				i.body.email,
-				i.body.password,
-				i.ip,
-				function(err, usrDoc, sessionCode) {
-					if(err.length) {
-						// o.render('register', { p: i.body, errors: err });
-						o.json({ error: err });
-					} else {
-						api.createProfile({
-							userID: usrDoc.id,
-							email: i.body.email,
-							creatorName: i.body.creatorName
-
-						}, function() {
-							o.cookie('usr_ss', sessionCode, {
-								// secure: true //// https only
-							});
-
-							o.json({ error: 0 });
-						});
-					}
-				}
-			);
-		} break;
-
-		case 'logout': {
-			o.clearCookie('usr_ss', {});
-
-			o.json({ error: 0 });
 		} break;
 
 		default: {
