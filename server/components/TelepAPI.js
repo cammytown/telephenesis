@@ -57,16 +57,19 @@ module.exports = function(db) {
 	}
 
 	me.getUsrMeta = function(userID, callback) {
-		usrMeta.findOne({ userID }, function(err, doc) {
-			if(err) {
+		return usrMeta.findOne({ userID })
+			.then(doc => {
+				if(callback) callback(false, doc);
+				return doc;
+			})
+			.catch(err => {
 				console.error(err);
 				///
-				callback(err);
+				if(callback) callback(err);
 				return false;
-			}
+			})
 
-			callback(err, doc);
-		});
+			// return doc;
 	}
 
 	me.createProfile = function(profileData, callback) { /// post naming?

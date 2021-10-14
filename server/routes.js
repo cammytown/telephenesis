@@ -2,11 +2,27 @@ const express = require('express');
 const multer = require('multer');
 const upload = multer({ dest: __dirname + '/../uploads/' });
 
+// var telepServer = require('./components/TelepServer.js');
+// const api = telepServer.api;
+
 module.exports = {
 	initializeRoutes
 };
 
-function initializeRoutes(app) {
+///REVISIT architecture:
+var app;
+var api;
+var usr;
+
+function initializeRoutes(telepServer) {
+	///REVISIT architecture:
+	app = telepServer.app;
+	api = telepServer.api;
+	usr = telepServer.usr;
+
+	// Accept multipart form data (FormData):
+	app.use(upload.array()); ///REVISIT move into TelepServer somehow?
+
 	// var ajaxRouter = require('./ajax')
 	var ajaxRouter = express.Router();
 	ajaxRouter.post('/sync', syncWithClient);
@@ -91,13 +107,19 @@ function login(req, res, next) {
 		req.ip,
 		function(err, sessionCode) {
 			if(err.length) {
-				res.render('login', { p: req.body, errors: err });
+				// res.render('login', { p: req.body, errors: err });
+				throw err;
+
 			} else {
 				res.cookie('usr_ss', sessionCode, {
 					// secure: true /// https only
 				});
 
-				next();
+				usr.in(sessionCode)
+					.then(user => {
+						req.user = user;
+					})
+					.then(next);
 			}
 		}
 	);

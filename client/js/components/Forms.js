@@ -8,7 +8,7 @@ export default new ClientForms();
 function ClientForms() {
 	this.init = function() {
 		//// not a good solution:
-		var forms = document.getElementsByTagName('form');
+		// var forms = document.getElementsByTagName('form');
 		// for(var i=0, j=forms.length; i<j; i++) {
 		// 	if(cor.cc(forms[i], 'ajax')) {
 		// 		Pijin.listen(forms[i], 'response', onAjaxResponse);
@@ -16,9 +16,12 @@ function ClientForms() {
 		// 	}
 		// }
 
-		Pijin.init('ajax');
-		Pijin.callbacks.submit.push(onAjaxSubmit);
-		Pijin.callbacks.response.push(onAjaxResponse);
+		Pijin.init({
+			className: 'ajax',
+			actionAttribute: 'data-ajax-action',
+			submitCallback: onAjaxSubmit,
+			responseCallback: onAjaxResponse,
+		});
 	}
 
 	function onAjaxSubmit(event) {

@@ -17,6 +17,7 @@
 	- should we be using transform css prop instead of left and top? (probably?)
 	- replace Anm with animejs; i suppose make a wrapper around animejs with some convenience functions like fadeIn fadeOut
 	- make aud submodule?
+	- should TelepAPI be a singleton? and Usr?
 
 - figure out how to sustain hosting costs
 	- maybe only subscribers can upload and if you cancel then at some point your track may be moved to archive.org hosting

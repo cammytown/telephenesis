@@ -41,17 +41,22 @@ module.exports = function(db, vl, bcrypt) {
 	this.in = function(sessionString, cb) {
 		if(!sessionString) {
 			cb(false);
+			throw false; ///
 		} else {
-			collection.findOne({ ss: sessionString }, function(err, doc) {
-				if(err) {
+			return collection.findOne({ ss: sessionString })
+				.then(doc => {
+
+					if(!doc) {}
+
+					// cb(doc);
+					// resolve(doc);
+					return doc;
+				})
+				.catch(err => {
 					// console.log(err);
-					return false;
-				}
-
-				if(!doc) {}
-
-				cb(doc);
-			});
+					// return false;
+					throw err;
+				})
 		}
 	}
 
@@ -93,16 +98,16 @@ module.exports = function(db, vl, bcrypt) {
 			// var ts = doc.ts;
 			// var s = sl(em, ts);
 			// var cr = bcrypt.hashSync(pw, s);
-			var s = generateString(16);
+			var sessionCode = generateString(16);
 
 			collection.update(
 				{ em: em },
-				{ $set: { ip: ip, ss: s } },
+				{ $set: { ip: ip, ss: sessionCode } },
 				function(err, result) {
 					// console.log(err);
 					// console.log(result);
 
-					cb(errors, s);
+					cb(errors, sessionCode);
 				}
 			);
 		});

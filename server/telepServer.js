@@ -1,97 +1,123 @@
 const express = require('express');
-
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const session = require('express-session');
-// const bcrypt = require('bcrypt-nodejs'); /// best?
+const MongoClient = require('mongodb').MongoClient;
+const MongoStore = require('connect-mongo')(session);
 const bcrypt = require('bcrypt-nodejs'); /// best?
 const validator = require('validator'); /// best?
 
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
+const Usr = require('./libs/Usr.js');
 
-const MongoClient = require('mongodb').MongoClient;
-const MongoStore = require('connect-mongo')(session);
-
-const fs = require('fs');
-// const Lame = require('node-lame').Lame;
-// var connect = require('connect');
-// var timeout = require('connect-timeout');
-
+const TelepAPI = require('./components/TelepAPI.js');
 const routes = require('./routes');
+// const config = require('./telepServer.config.js');
 
-const app = express();
+function TelepServer() {
+	var me = this;
 
-var Usr = require('./Usr.js');
-var usr;
+	///REVISIT architecture:
+	me.config;
+	me.app;
+	me.db;
+	me.usr;
+	me.api;
 
-var TelepAPI = require('./TelepAPI.js');
+	me.initialize = function() {
+		me.config = require('./telepServer.config.js');
 
-var config = require('./telepServer.config.js');
-
-app.set('views', './views');
-app.set('view engine', 'pug');
-app.use(express.static(__dirname + '/../public'));
-
-app.use(bodyParser.json({ limit: "2400mb" }));
-app.use(bodyParser.urlencoded({ limit: "2400mb", extended: true }));
-app.use(cookieParser(config.sessionSecret));
-
-var db;
-MongoClient.connect("mongodb://mongo:27017", { useUnifiedTopology: true }, function(error, client) {
-	if(error) {
-		console.log(error);
-		return false;
+		initializeDatabase()
+			.then(initializeExpress)
+			.then(initializeTelep)
+			.then(exposeServer)
 	}
 
-	db = client.db('telephenesis');
-	usr = new Usr(db, validator, bcrypt);
-	api = new TelepAPI(db);
+	function initializeDatabase() {
+		return MongoClient.connect("mongodb://mongo:27017", { useUnifiedTopology: true })
+			.then(mongoClient => {
+				console.log("Database connection established.");
+				me.db = mongoClient.db('telephenesis');
+			})
+			.catch(error => {
+				console.error(error);
+				throw new Error(error);
+			});
+	}
 
-	console.log("Database connection established. Initializing Telephenesis...")
+	function initializeExpress() {
+		const app = express();
 
-	initialize();
-});
+		app.set('views', './views');
+		app.set('view engine', 'pug');
+		app.use(express.static(__dirname + '/../public'));
 
-function initialize() {
-	/// placement?:
-	
-	app.use(session({
-		secret: config.sessionSecret, ////
-		resave: false,
-		saveUninitialized: false, ///
-		store: new MongoStore({
-			url: "mongodb://mongo:27017/telephenesis",
-			// db: db /// ??? not working?
-		})
-		//cookie: { secure: true } /// HTTPS only
-	}));
+		app.use(bodyParser.json({ limit: "2400mb" }));
+		app.use(bodyParser.urlencoded({ limit: "2400mb", extended: true }));
+		app.use(cookieParser(me.config.sessionSecret));
 
-	app.use(function(i, o, n) {
-		console.log(i.originalUrl);
+		me.app = app;
 
-		usr.in(i.cookies.usr_ss, function(user) {
-			i.user = user;
+		return true;
+	}
 
-			if(user) {
-				api.getUsrMeta(i.user.id, function(err, usrMeta) {
-					if(err) {
-						o.status(404).send("There was a problem retrieving your account in our system. Please email us at contact@telephenesis.com"); ///
+	function initializeTelep() {
+		me.usr = new Usr(me.db, validator, bcrypt);
+		me.api = new TelepAPI(me.db);
+
+		me.app.use(session({
+			secret: me.config.sessionSecret, ////
+			resave: false,
+			saveUninitialized: false, ///
+			store: new MongoStore({
+				url: "mongodb://mongo:27017/telephenesis",
+				// db: db /// ??? not working?
+			})
+			//cookie: { secure: true } /// HTTPS only
+		}));
+
+		me.app.use(function(req, res, next) {
+			console.log(req.method + " " + req.originalUrl);
+			console.log(req.body);
+
+			me.usr.in(req.cookies.usr_ss)
+				// me.usr.in(req.cookies.usr_ss, function(user) {
+				.then(user => {
+					req.user = user;
+
+					if(user) {
+						me.api.getUsrMeta(req.user.id)
+							.then(usrMeta => {
+								req.user.usrMeta = usrMeta;
+
+								next();
+							})
+							.catch(err => {
+								if(err) {
+									console.error(err);
+									res.status(404).send("There was a problem retrieving your account in our system. Please email us at contact@telephenesis.com"); ///
+								}
+							})
+
+					} else {
+						req.user.usrMeta = {}; ///
+						next();
 					}
-
-					i.user.usrMeta = usrMeta;
-					n();
 				});
-			} else {
-				i.user.usrMeta = {}; ///
-				n();
-			}
 		});
-	});
 
-	routes.initializeRoutes(app);
+		routes.initializeRoutes(me);
+
+		return true;
+	}
+
+	function exposeServer() {
+		if(me.app.get('env') == 'production') {
+			me.app.set('trust proxy', 'loopback');
+		}
+
+		me.app.listen(me.config.port, () => console.log('telephenesis: listening on port ' + me.config.port));
+	}
 }
 
-if(app.get('env') == 'production') {
-	app.set('trust proxy', 'loopback');
-}
+module.exports = new TelepServer();
 
-app.listen(config.port, () => console.log('telephenesis: listening on port ' + config.port));
