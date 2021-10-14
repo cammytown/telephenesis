@@ -108,6 +108,7 @@ function login(req, res, next) {
 		function(err, sessionCode) {
 			if(err.length) {
 				// res.render('login', { p: req.body, errors: err });
+				next(err);
 				throw err;
 
 			} else {
@@ -116,10 +117,11 @@ function login(req, res, next) {
 				});
 
 				usr.in(sessionCode)
-					.then(user => {
-						req.user = user;
-					})
-					.then(next);
+				.then(user => {
+					req.user = user;
+				})
+				.then(next)
+				.catch(err => next(err));
 			}
 		}
 	);

@@ -148,6 +148,7 @@ function Pijin() {
 					responseCallback(result, me.parseRequest(request), submitEvent);
 				}
 
+				var selector = '#' + form.id;
 				var selectorResponseCallback = me.selectorCallbacks['response'][selector];
 				// console.log(selectorCallback);
 

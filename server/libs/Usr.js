@@ -40,15 +40,12 @@ module.exports = function(db, vl, bcrypt) {
 
 	this.in = function(sessionString, cb) {
 		if(!sessionString) {
-			cb(false);
-			throw false; ///
+			if(cb) cb(true, false);
+			return Promise.resolve(false); ///
 		} else {
 			return collection.findOne({ ss: sessionString })
 				.then(doc => {
-
-					if(!doc) {}
-
-					// cb(doc);
+					if(cb) cb(false, doc);
 					// resolve(doc);
 					return doc;
 				})
@@ -56,7 +53,7 @@ module.exports = function(db, vl, bcrypt) {
 					// console.log(err);
 					// return false;
 					throw err;
-				})
+				});
 		}
 	}
 
@@ -91,7 +88,7 @@ module.exports = function(db, vl, bcrypt) {
 	this.li = function(em, pw, ip, cb, checkOnly) { /// rename checkOnly
 		this.check(em, pw, ip, function(errors, doc) {
 			if(errors.length) { /// safe check?
-				cb(errors);
+				if(cb) cb(errors);
 				return false;
 			}
 
@@ -107,7 +104,7 @@ module.exports = function(db, vl, bcrypt) {
 					// console.log(err);
 					// console.log(result);
 
-					cb(errors, sessionCode);
+					if(cb) cb(errors, sessionCode);
 				}
 			);
 		});

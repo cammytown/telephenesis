@@ -77,32 +77,33 @@ function TelepServer() {
 
 		me.app.use(function(req, res, next) {
 			console.log(req.method + " " + req.originalUrl);
-			console.log(req.body);
+			// console.log(req.body);
 
 			me.usr.in(req.cookies.usr_ss)
-				// me.usr.in(req.cookies.usr_ss, function(user) {
-				.then(user => {
-					req.user = user;
+			.then(user => {
+				req.user = user;
 
-					if(user) {
-						me.api.getUsrMeta(req.user.id)
-							.then(usrMeta => {
-								req.user.usrMeta = usrMeta;
+				if(user) {
 
-								next();
-							})
-							.catch(err => {
-								if(err) {
-									console.error(err);
-									res.status(404).send("There was a problem retrieving your account in our system. Please email us at contact@telephenesis.com"); ///
-								}
-							})
+					me.api.getUsrMeta(req.user.id)
+						.then(usrMeta => {
+							req.user.usrMeta = usrMeta;
 
-					} else {
-						req.user.usrMeta = {}; ///
-						next();
-					}
-				});
+							next();
+						})
+						.catch(err => {
+							if(err) {
+								console.error(err);
+								res.status(404).send("There was a problem retrieving your account in our system. Please email us at contact@telephenesis.com"); ///
+							}
+						})
+
+				} else {
+					// req.user.usrMeta = {}; ///
+					next();
+				}
+			})
+			.catch(err => next(err));
 		});
 
 		routes.initializeRoutes(me);
