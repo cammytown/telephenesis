@@ -1,5 +1,6 @@
 import cor from '../libs/minlab/cor';
 import Pijin from '../libs/pijin-js';
+import HistoryTime from '../libs/history-time';
 
 import clientState from './ClientState';
 
@@ -51,7 +52,7 @@ function ClientForms() {
 			///
 			// HistoryTime.goBack()
 			history.back(); ////
-			console.log("Success?");
+
 			// window.history.go(-1);
 			// navigate('/'); /// previous screen
 
@@ -62,10 +63,12 @@ function ClientForms() {
 
 			if(op == 'register' || op == 'login') {
 				cor.ac(document.body, 'in');
+				HistoryTime.navigateTo('/'); ///
 			}
 
 			if(op == 'login' && result.lv) {
 				cor.ac(document.body, 'creator');
+				HistoryTime.navigateTo('/'); ///
 			}
 		}
 	}

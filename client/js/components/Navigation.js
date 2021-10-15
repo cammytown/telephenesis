@@ -30,7 +30,7 @@ function ClientNavigation() {
 
 			if(event.target.parentNode.id == 'spc' && HistoryTime.state.path != '/') { ///
 				// state.updating = true;
-				HistoryTime.navigate('/', "Telephenesis"); //// page title
+				HistoryTime.navigateTo('/', "Telephenesis"); //// page title
 			}
 		});
 
@@ -143,7 +143,9 @@ function ClientNavigation() {
 
 			case 'logout': {
 				close();
-				logout();
+				logout()
+					.then(() => HistoryTime.navigateTo('/'));
+
 				return true;
 			} break;
 
@@ -189,7 +191,7 @@ function ClientNavigation() {
 		}
 
 		function logout() { ///REVISIT placement
-			fetch('/ajax/logout', {
+			return fetch('/ajax/logout', {
 				method: "POST",
 				body: {}
 			})

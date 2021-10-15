@@ -50,8 +50,24 @@ function initializeRoutes(telepServer) {
  * media plays, etc.
  */
 function syncWithClient(req, res) {
-	console.log("test");
+	console.log("syncWithClient");
 
+	////TODO security to prevent spoofed plays
+
+	var serverUpdates = {
+		partialPlays: [],
+		longPlays: []
+	};
+
+	for (var updateIndex = 0; updateIndex < req.body.serverUpdates.length; updateIndex++) {
+		var update = req.body.serverUpdates[updateIndex];
+
+		////TODO validate inputs
+
+		serverUpdates[update.type] = update.starID;
+	}
+
+	stars.
 	req.body.shortPlays;
 	req.body.longPlays;
 
@@ -286,8 +302,8 @@ function uploadMedia(req, res) { /// could maybe just use .post('/create/:starid
 
 	///:
 	if(starId != -1) { ///
-		apreq.getStar(starId, function(err, originStar) {
-			apreq.createStar(req.user.id, {
+		api.getStar(starId, function(err, originStar) {
+			api.createStar(req.user.id, {
 				originStar,
 				multerFile: req.file,
 				callback: function(star) {
@@ -296,7 +312,7 @@ function uploadMedia(req, res) { /// could maybe just use .post('/create/:starid
 			});
 		});
 	} else {
-		apreq.createStar(req.user.id, {
+		api.createStar(req.user.id, {
 			multerFile: req.file,
 			callback: function(star) {
 				res.json({ error: 0, sid: star.id });

@@ -30,6 +30,10 @@ function TelepServer() {
 			.then(initializeExpress)
 			.then(initializeTelep)
 			.then(exposeServer)
+			.catch(err => {
+				console.error(err); ///
+				throw new Error(err);
+			});
 	}
 
 	function initializeDatabase() {
@@ -38,9 +42,9 @@ function TelepServer() {
 				console.log("Database connection established.");
 				me.db = mongoClient.db('telephenesis');
 			})
-			.catch(error => {
-				console.error(error);
-				throw new Error(error);
+			.catch(err => {
+				console.error(err); ///
+				throw new Error(err);
 			});
 	}
 

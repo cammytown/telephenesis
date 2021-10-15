@@ -2,8 +2,6 @@
 ## PHASE 1
 ### 3
 
-- refactor server code
-
 - sort stars
 	popularity sort
 		i think we distinguish between partial plays and full plays; full plays count more towards popularity score
@@ -11,6 +9,7 @@
 			store play history of users; allow them to go back through it
 
 - refactor code
+	- split up routes.js probably
 	- rename Stars.js so not confused with Star.js
 	- clean up how we pass star data around; very sloppy atm
 	- rewrite Spc
@@ -57,6 +56,8 @@
 	in this case, i think stars don't really shift around; but the focal point of the universe (that users -- especially new ones -- are pushed towards) moves
 
 - add numbers/tier level to stars
+
+- does/should HistoryTime.navigateTo() need a page title argument? probably have some kind of routing config that matches uris to page titles
 
 ### 1
 - hitting escape or clicking in space should close the menu; already closes uiboxes
