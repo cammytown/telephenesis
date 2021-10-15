@@ -315,11 +315,7 @@ function ClientStarsAPI() {
 				}
 
 				var lineVector = new spc.Vec2(line.endX - line.startX, line.endY - line.startY)
-					// .normalize()
 					.scale(progress);
-
-				// console.log(lineVector);
-
 
 				var drawVec = new spc.Vec2(line.startX + lineVector.x, line.startY + lineVector.y);
 

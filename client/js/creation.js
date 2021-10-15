@@ -36,9 +36,12 @@ function init(Telep) {
 	///REVISIT removed because we're only doing links atm:
 	// cor._('#submission').addEventListener('change', uploadCreation);
 
-	for(var recreateLink of cor._('.recreate')) {
-		recreateLink.addEventListener('click', onRecreateClick);
+	for(var recreateLink of cor._('.createStar')) {
+		recreateLink.addEventListener('click', onCreateStarClick);
+	}
 
+	for(var recreateLink of cor._('.recreateStar')) {
+		recreateLink.addEventListener('click', onRecreateStarClick);
 	}
 
 	validPlacementZone = document.getElementById('validPlacementZone');
@@ -46,9 +49,17 @@ function init(Telep) {
 	spc.map.appendChild(validPlacementZone);
 }
 
-function onRecreateClick(event) {
+function onCreateStarClick(event) {
 	event.preventDefault();
 
+	workingStar = new ClientStar();
+	workingStar.originStarID = -1;
+}
+
+function onRecreateStarClick(event) {
+	event.preventDefault();
+
+	workingStar = new ClientStar();
 	workingStar.originStarID = parseInt(clientState.actingStar.id.split('s')[1]);
 }
 
@@ -101,11 +112,6 @@ function initializeStarPlacement() {
 	// close the creation UI
 	HistoryTime.navigateTo('place'); ///REVISIT uris /create/place doesn't work with our thrown-together uri system
 	// close();
-
-	// create new star and use it as symbol for placement in the universe
-	var starElement = document.getElementById('placementSymbol').cloneNode(true); /// deep parameter in IE8??
-	workingStar = new ClientStar(starElement);
-
 
 	var genesis = workingStar.originStarID == -1; ///ARCHITECTURE
 
@@ -329,6 +335,8 @@ function actualizeCreation() {
 		method: "POST",
 		body: formData
 	};
+
+	console.log(workingStar);
 
 	fetch('/ajax/actualize', request) ///REVISIT old browser compatability?
 		.then(response => response.json())

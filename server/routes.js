@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const upload = multer({ dest: __dirname + '/../uploads/' });
 
+const ServerStar = require('./components/ServerStar.js');
 // const stars = require('./components/StarMapper.js');
 
 // var telepServer = require('./components/TelepServer.js');
@@ -187,37 +188,23 @@ function logout(req, res, next) {
 function actualizeStar(req, res) {
 	if(!req.user || req.user.lv != 7) {
 		res.json({ error: "not logged in" });
-		return false;
+		throw "not logged in"; ///
 	}
-
-	// var starID = parseInt(req.body.starID);
 
 	switch(req.body.hostType) {
 		case 'external': {
-			// var starData = {
-			// 	starID: req.body.starID,
-			// 	x: parseInt(req.body.x),
-			// 	y: parseInt(req.body.y),
-			// 	color: req.body.color,
-			// 	originStarID: parseInt(req.body.originStarID),
-			// 	hostType: req.body.hostType,
-			// 	fileURL: req.body.fileURL,
-			// 	title: req.body.starTitle
-			// };
-
-			var newStar = new Star();
-			star.loadData(req.body, 'client');
+			var newStar = new ServerStar(req.body);
 
 			// Create the star in the database:
-			api.createStar(req.user.id, star)
-			.then(result => {
-				res.json({ error: 0 });
-			})
-			.catch(err => {
-				console.error(err); ///
-				res.json({ error: "could not create star" });
-				throw new Error(err);
-			});
+			return api.createStar(req.user.id, newStar)
+				.then(result => {
+					res.json({ error: 0 });
+				})
+				.catch(err => {
+					console.error(err); ///
+					res.json({ error: "could not create star" });
+					throw new Error(err);
+				});
 
 			// api.actualize(starData, function(err, result) {
 			// 	if(err) {
@@ -244,13 +231,13 @@ function actualizeStar(req, res) {
 			// });
 		} break;
 
-		case 'upload': {
-			// star should already have been created ///REVISIT architecture; maybe it would be better to just have some token associated to the upload that we use when creating the star
-			res.json({ error: 0 });
-		} break;
+		// case 'upload': {
+		// 	// Star should already have been created ///REVISIT architecture; maybe it would be better to just have some token associated to the upload that we use when creating the star
+		// 	res.json({ error: 0 });
+		// } break;
 
 		default: {
-			console.log('unhandled hostType: ' + req.body.hostType);
+			console.error('unhandled hostType: ' + req.body.hostType);
 		}
 	}
 

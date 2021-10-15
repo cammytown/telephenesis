@@ -31,43 +31,11 @@ function Star() {
 	init();
 
 	function init() {
-		var allProps = identityProps.concat(serverProps);
+		var allProps = me.identityProps.concat(me.serverProps);
 
 		for (var propIndex = 0; propIndex < allProps.length; propIndex++) {
 			var prop = allProps[propIndex];
 			me[prop] = null;
-		}
-	}
-
-	me.loadData = function(data, flag = 'client') { ///REVISIT flag architecture
-		if(flag == 'client') {
-			// Remove keys that the client isn't allowed to modify:
-
-			///TODO maybe more value and type validation?
-
-			var filteredData = {};
-			var intProps = ['id', 'originStarID', 'x', 'y']
-
-			for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
-				var identityProp = me.identityProps[propIndex];
-
-				if(intProps.indexOf()) {
-
-				}
-
-				filteredData[identityProp] = data[identityProp];
-			}
-
-			data = filteredData;
-		}
-	}
-
-	me.initializeElement = function(domElement) {
-		me.element = domElement;
-
-		for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
-			var property = me.identityProps[propIndex]
-			me[property] = me.element.getAttribute('data-' + property);
 		}
 	}
 }

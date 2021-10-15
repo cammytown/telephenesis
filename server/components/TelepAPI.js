@@ -1,6 +1,7 @@
 const Lame = require('node-lame').Lame;
 const fs = require('fs');
-const Star = require('../../abstract/Star.js');
+
+const ServerStar = require('./ServerStar.js');
 
 module.exports = function(db) {
 	var constellations = db.collection('MLconstellations');
@@ -136,22 +137,16 @@ module.exports = function(db) {
 	}
 
 	me.getStar = function(starId, callback) {
-		stars.findOne({ id: starId }, function(err, doc) {
-			if(err) {
-				// console.log(err);
-				////
-				callback(err);
-				return false;
-			}
-
-			// var usrMeta = me.getUsrMeta(doc.userID); /// probably cache in the star and update whenever profile changes
-			// doc.creatorName = usrMeta.creatorName;
-
-			var creationDate = new Date(doc._id.getTimestamp());
-			doc.timestamp = creationDate.getTime(); // Convert Date to unix timestamp
-
-			callback(err, doc);
-		});
+		return stars.findOne({ id: starId })
+			.then(doc => {
+				var creationDate = new Date(doc._id.getTimestamp());
+				doc.timestamp = creationDate.getTime(); // Convert Date to unix timestamp
+				return doc;
+			})
+			.catch(err => {
+				if(callback) callback(err);
+				throw new Error(err);
+			});
 	}
 
 	me.bookmark = function(star, userID, callback) {
@@ -179,7 +174,7 @@ module.exports = function(db) {
 		);
 	}
 
-	me.createStar = function(userID, starData, callback) {
+	me.createStar = function(userID, serverStar, callback) {
 		// var defaultObject = {
 		// 	originStar: false,
 		// 	fileURL: false,
@@ -191,7 +186,7 @@ module.exports = function(db) {
 		planetCount += 1;
 		MLMeta.updateOne({ id: "persistors" }, { $inc: {planetCount: 1} });
 
-		switch(starData.hostType) {
+		switch(serverStar.hostType) {
 			case 'external': {
 
 			} break;
@@ -251,65 +246,76 @@ module.exports = function(db) {
 
 		// Get creator information:
 		return me.getUsrMeta(userID)
-		.then(usrMeta => {
-			starData.id = newStarID;
+			.then(usrMeta => {
+				serverStar.id = newStarID;
 
-			starData.creator = { ///REVISIT architecture?
-				id: usrMeta._id,
-				creatorName: usrMeta.creatorName,
-				creatorLink: usrMeta.creatorLink
-			}
-
-			starData.active = true;
-
-			// Load data into ServerStar:
-			var newStar = new Star();
-			newStar.loadData(starData, 'client');
-
-			if(starData.originStarID == -1) {
-				// Creating a new constellation.
-				var newConstellationID = constellationCount + 1;
-				constellationCount += 1;
-
-				MLMeta.updateOne({ id: "persistors" }, { $inc: { constellationCount: 1 } });
-
-				newStar.constellationID = newConstellationID;
-
-				var newConstellation = {
-					id: newConstellationID,
-					starIDs: [newStarID]
+				serverStar.creator = { ///REVISIT architecture?
+					id: usrMeta._id,
+					creatorName: usrMeta.creatorName,
+					creatorLink: usrMeta.creatorLink
 				}
 
-				constellations.insertOne(newConstellation, function(err, result) {
-					////TODO refactoring; what if there's an err?
-				});
+				serverStar.active = true;
 
-				stars.insertOne(newStar, function(err, result) {
-					if(callback) callback(err, result.ops[0]); ///
-				});
-			} else {
-				// Recreation of a star.
+				// Load data into ServerStar:
+				// var newStar = new ServerStar(serverStar);
 
-				// Get original star:
-				me.getStar(starData.originStarID)
-				.then(originStar => {
-					newStar.originStarID = originStar.id;
-					newStar.constellationID = originStar.constellationID;
-					newStar.tier = originStar.tier + 1;
+				// console.log(serverStar);
 
-					return stars.insertOne(newStar)
-				})
-				.then(result => {
-					if(callback) callback(false, result.ops[0]); ///
-				})
-				.catch(err => {
-					if(callback) callback(err);
-					return false;
-				});
-			}
+				if(serverStar.originStarID == -1) { /// is this the check we want??
+					// Creating a new constellation.
+					var newConstellationID = constellationCount + 1;
+					constellationCount += 1;
 
-			return true;
-		});
+					MLMeta.updateOne({ id: "persistors" }, { $inc: { constellationCount: 1 } });
+
+					serverStar.constellationID = newConstellationID;
+					serverStar.tier = 0;
+
+					var newConstellation = {
+						id: newConstellationID,
+						starIDs: [newStarID]
+					}
+
+					constellations.insertOne(newConstellation, function(err, result) {
+						////TODO refactoring; what if there's an err?
+					});
+
+					return stars.insertOne(serverStar)
+						.then(result => {
+							if(callback) callback(false, result.ops[0]);
+							return result.ops[0];
+						})
+						.catch(err => {
+							if(callback) callback(err);
+							throw err; ///
+						});
+				} else {
+					// Recreation of a star.
+
+					// Get original star:
+					return me.getStar(serverStar.originStarID)
+						.then(originStar => {
+							serverStar.originStarID = originStar.id;
+							serverStar.constellationID = originStar.constellationID;
+							serverStar.tier = originStar.tier + 1;
+
+							return stars.insertOne(serverStar);
+						})
+						.then(result => {
+							if(callback) callback(false, result.ops[0]); ///
+							return result.ops[0];
+						})
+						.catch(err => {
+							if(callback) callback(err);
+							return false;
+						});
+				}
+
+			})
+			.catch(err => {
+				throw err;
+			});
 	}
 
 	me.renameStar = function(starId, creatorName, callback) {
