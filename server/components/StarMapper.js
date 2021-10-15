@@ -1,12 +1,14 @@
+////REVISIT not currently in use
+
 const Lame = require('node-lame').Lame;
 const fs = require('fs');
 const Star = require('../../abstract/Star.js');
 
 module.exports = function(db) {
+	var me = this;
+
 	var constellations = db.collection('MLconstellations');
 	var stars = db.collection('MLstars');
-
-	var me = this;
 
 	var musicPath = __dirname + "/../public/music/";
 
@@ -41,36 +43,6 @@ module.exports = function(db) {
 		}
 	});
 
-	me.syncWithClient = function(serverUpdates) {
-		return Promise.all([
-			stars.updateMany(
-				{ id: { $in: serverUpdates.partialPlay } },
-				{ $inc: { partialPlays: 1 } }
-			),
-
-			stars.updateMany(
-				{ id: { $in: serverUpdates.longPlay } },
-				{ $inc: { longPlays: 1 } }
-			)
-		])
-	}
-
-	me.auth = function(level) {
-		return function(req, res, next) {
-			if(!req.user) {
-				res.json({ error: "not logged in" });
-				return false; ///
-			}
-
-			if(!req.user.lv) {
-				res.json({ error: "no creator credentials" });
-				return false; ///
-			}
-
-			next();
-		}
-	}
-
 	me.getUsrMeta = function(userID, callback) {
 		return usrMeta.findOne({ userID })
 			.then(doc => {
@@ -85,35 +57,6 @@ module.exports = function(db) {
 			})
 
 			// return doc;
-	}
-
-	me.createProfile = function(profileData, callback) { /// post naming?
-		usrMeta.insertOne(profileData, function(err, result) {
-			if(err) {
-				////
-				callback(err);
-			}
-
-			callback(err, result);
-		});
-	}
-
-	me.updateProfile = function(userID, post, callback) { /// post naming?
-		//// if post.email is in use, error
-
-		usrMeta.updateOne(
-			{ userID },
-			{
-				// "email": post.email, //// send confirmation if different
-				$set: { "creatorName": post.creatorName }
-			},
-			callback
-		);
-
-		stars.updateMany(
-			{ creatorId: userID },
-			{ $set: { "creator.creatorName": post.creatorName }}
-		); /// no callback
 	}
 
 	me.getStars = function(userID = false, cb) {
@@ -159,22 +102,6 @@ module.exports = function(db) {
 			{ userID },
 			{ $addToSet: { bookmarks: star.id } },
 			{ upsert: true },
-			callback
-		);
-	}
-
-	me.recolor = function(starId, rgb, callback) {
-		stars.updateOne(
-			{ id: starId },
-			{ $set: { rgb } },
-			callback
-		);
-	}
-
-	me.move = function(starId, x, y, callback) {
-		stars.updateOne(
-			{ id: starId },
-			{ $set: { x, y } },
 			callback
 		);
 	}

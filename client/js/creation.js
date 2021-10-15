@@ -6,39 +6,17 @@ import ColorTool from './libs/minlab/colorTool.js';
 import ajx from './libs/minlab/ajx'; ///TODO get rid of in favor or Pijin
 import HistoryTime from './libs/history-time';
 
-import clientState from './components/ClientState';
-
-// import Pijin from './js/pijin-js';
+import clientState from './components/ClientState.js';
+import ClientStar from './components/ClientStar.js';
 
 export default { init };
 
 // document.addEventListener("DOMContentLoaded", init); ///
 
 var client;
-// var spc;
 var validPlacementZone;
 
-var workingStar = {
-	hostType: null,
-	title: null,
-	starID: null,
-	originStarID: -1,
-	x: null,
-	y: null,
-	color: null,
-
-	fileReady: false,
-	isPlaced: false,
-
-	element: false,
-	linkElement: false,
-	textElement: false,
-}
-
-// var workingRecreation = {
-// 	title: null,
-// 	originStarID: null
-// }
+var workingStar;
 
 var accessSettingInput;
 var publicGameButton;
@@ -125,11 +103,9 @@ function initializeStarPlacement() {
 	// close();
 
 	// create new star and use it as symbol for placement in the universe
-	workingStar.element = document.getElementById('placementSymbol').cloneNode(true); /// deep parameter in IE8??
-	workingStar.linkElement = workingStar.element.getElementsByTagName('a')[0];
-	workingStar.textElement = workingStar.element.children[1];
-	workingStar.textElement.className = 'progress';
-	spc.map.appendChild(workingStar.element);
+	var starElement = document.getElementById('placementSymbol').cloneNode(true); /// deep parameter in IE8??
+	workingStar = new ClientStar(starElement);
+
 
 	var genesis = workingStar.originStarID == -1; ///ARCHITECTURE
 
@@ -343,15 +319,11 @@ function actualizeCreation() {
 	}
 
 	var formData = new FormData();
-	formData.append('starID', workingStar.starID); ///NOTE not currently in use
-	formData.append('starTitle', workingStar.title);
-	formData.append('x', workingStar.x);
-	formData.append('y', workingStar.y);
-	formData.append('color', workingStar.color);
-	// formData.append('color', workingStar.color);
-	formData.append('originStarID', workingStar.originStarID);
-	formData.append('hostType', workingStar.hostType);
-	formData.append('fileURL', workingStar.fileURL);
+	for (var propIndex = 0; propIndex < workingStar.identityProps.length; propIndex++) {
+		var identityProp = workingStar.identityProps[propIndex];
+
+		formData.append(identityProp, workingStar[identityProp]);
+	}
 
 	var request = {
 		method: "POST",

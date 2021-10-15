@@ -2,6 +2,8 @@ const express = require('express');
 const multer = require('multer');
 const upload = multer({ dest: __dirname + '/../uploads/' });
 
+// const stars = require('./components/StarMapper.js');
+
 // var telepServer = require('./components/TelepServer.js');
 // const api = telepServer.api;
 
@@ -55,8 +57,8 @@ function syncWithClient(req, res) {
 	////TODO security to prevent spoofed plays
 
 	var serverUpdates = {
-		partialPlays: [],
-		longPlays: []
+		partialPlay: [],
+		longPlay: []
 	};
 
 	for (var updateIndex = 0; updateIndex < req.body.serverUpdates.length; updateIndex++) {
@@ -64,24 +66,24 @@ function syncWithClient(req, res) {
 
 		////TODO validate inputs
 
-		serverUpdates[update.type] = update.starID;
+		switch(update.type) {
+			case 'partialPlay':
+			case 'longPlay': {
+				serverUpdates[update.type].push(update.starID);
+			} break;
+
+			default: {
+			}
+		}
 	}
 
-	stars.
-	req.body.shortPlays;
-	req.body.longPlays;
-
-	// for (var updateIndex = 0; updateIndex < i.body.serverUpdates.length; updateIndex++) {
-	// 	var updateObject = i.body.serverUpdates[updateIndex];
-	// 	switch(updateObject.type) {
-	// 		case 'partialPlay':
-	// 		case 'longPlay': {
-	// 			console.log(updateObject)
-	// 		} break;
-	// 	}
-	// }
-
-	res.json({ error: false });
+	return api.syncWithClient(serverUpdates)
+		.then(values => {
+			res.json({ error: false }); ///REVISIT do we really care to wait for server updates?
+		})
+		.catch(err => {
+			throw new Error(err); ///
+		});
 }
 
 function bookmarkStar(req, res) {
@@ -188,29 +190,33 @@ function actualizeStar(req, res) {
 		return false;
 	}
 
-	var starID = parseInt(req.body.starID);
+	// var starID = parseInt(req.body.starID);
 
 	switch(req.body.hostType) {
 		case 'external': {
-			var starData = {
-				starID: req.body.starID,
-				x: parseInt(req.body.x),
-				y: parseInt(req.body.y),
-				color: req.body.color,
-				originStarID: parseInt(req.body.originStarID),
-				hostType: req.body.hostType,
-				fileURL: req.body.fileURL,
-				title: req.body.starTitle
-			};
+			// var starData = {
+			// 	starID: req.body.starID,
+			// 	x: parseInt(req.body.x),
+			// 	y: parseInt(req.body.y),
+			// 	color: req.body.color,
+			// 	originStarID: parseInt(req.body.originStarID),
+			// 	hostType: req.body.hostType,
+			// 	fileURL: req.body.fileURL,
+			// 	title: req.body.starTitle
+			// };
 
-			api.createStar(req.user.id, starData, function(err, result) {
-				if(err) {
-					console.log(err); ///
-					res.json({ error: "could not create star" });
-					return false;
-				}
+			var newStar = new Star();
+			star.loadData(req.body, 'client');
 
+			// Create the star in the database:
+			api.createStar(req.user.id, star)
+			.then(result => {
 				res.json({ error: 0 });
+			})
+			.catch(err => {
+				console.error(err); ///
+				res.json({ error: "could not create star" });
+				throw new Error(err);
 			});
 
 			// api.actualize(starData, function(err, result) {

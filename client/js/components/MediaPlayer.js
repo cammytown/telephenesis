@@ -31,8 +31,8 @@ function MediaPlayer() {
 		me.audio.element.addEventListener('ended', onMediaPlayerFinish);
 
 		////DEBUG:
-		pendingServerUpdates.push({ type: 'longPlay', starID: 41 });
-		serverSync();
+		// pendingServerUpdates.push({ type: 'longPlay', starID: 42 });
+		// serverSync();
 
 		setInterval(serverSync, config.syncInterval); ////TODO probably don't use or use something in addition to setInterval
 	}

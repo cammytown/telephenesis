@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:14.18.1
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -16,4 +16,4 @@ RUN npm install
 COPY . .
 
 EXPOSE 8777
-CMD [ "node", "server/telepServer.js" ]
+CMD [ "node", "server/main.js" ]
