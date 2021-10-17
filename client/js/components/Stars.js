@@ -15,6 +15,11 @@ function ClientStarsAPI() {
 	var me = this;
 
 	var starElements;
+	var constellationLines = []; // Array of start and end points for lines between stars.
+	var animatingLines = []; // Array of indices in constellationLines[] for lines which are not finished drawing.
+	var lineDrawStartMS; // When the constellation drawing animation began.
+
+	var isAnimating = false;
 
 	me.view = 'galaxy'; ///REVISIT architecture
 
@@ -262,12 +267,15 @@ function ClientStarsAPI() {
 	/**
 	 * Draws constellation lines between stars.
 	 */
-	this.generateConstellationLines = function() {
-		var lineDrawStartMS = performance.now();
-		var queuedConstellationLines = [];
+	me.generateConstellationLines = function() {
+		lineDrawStartMS = performance.now();
+		constellationLines = [];
+		animatingLines = [];
+		isAnimating = true;
 
 		// Loop through stars and queue an animated line draw.
 		var starElements = document.getElementsByClassName('star');
+		var lineIndex = 0;
 		for (var starIndex = 0; starIndex < starElements.length; starIndex++) {
 			var starElement = starElements[starIndex];
 			if(starElement.getAttribute('data-prev')) {
@@ -277,7 +285,7 @@ function ClientStarsAPI() {
 					var rootStar = document.getElementById('s' + originStarID);
 					rootStar.setAttribute('data-next', starElement.id.split('s')[1]); ///TODO figure out what "next" means when there are multiple child stars; also this shouldn't be here if it were being used
 
-					queuedConstellationLines.push({
+					constellationLines.push({
 						startX: parseInt(rootStar.style.left),
 						startY: parseInt(rootStar.style.top),
 						endX: parseInt(starElement.style.left),
@@ -286,67 +294,76 @@ function ClientStarsAPI() {
 						endColor: starElement.getElementsByTagName('a')[0].style.backgroundColor, ///
 						tier: parseInt(starElement.getAttribute('data-tier'))
 					});
+
+					animatingLines.push(lineIndex++);
 				}
 			}
 		}
 
-		window.requestAnimationFrame(drawLineStep);
+		window.requestAnimationFrame(me.drawLineStep);
+	}
 
-		function drawLineStep(currentMS) {
-			console.log('drawLineStep');
+	me.drawLineStep = function(currentMS) {
+		effects.context.clearRect(0, 0, effects.canvas.width, effects.canvas.height);
 
-			effects.context.clearRect(0, 0, effects.canvas.width, effects.canvas.height);
+		var elapsedMS = currentMS - lineDrawStartMS;
+		// for (var animationIndex = 0; animationIndex < animatingLines.length; animationIndex++) {
+			// var lineIndex = animatingLines[animationIndex];
+		for (var lineIndex = 0; lineIndex < constellationLines.length; lineIndex++) {
+			var line = constellationLines[lineIndex];
 
-			var elapsedMS = currentMS - lineDrawStartMS;
-			for (var lineIndex = 0; lineIndex < queuedConstellationLines.length; lineIndex++) {
-				var line = queuedConstellationLines[lineIndex];
-
+			var progress;
+			if(isAnimating) {
 				////
 				// var delay = (line.tier * 1000) - (line.tier * 350);
 				var delay = ((line.tier) * 1000) - (line.tier * 800);
 				// var delay = (line.tier * 1000) / (line.tier / 2);
 				// var delay = ((line.tier * line.tier / 2) * 1000) - (line.tier * line.tier * 475);
 
-				var progress = (elapsedMS - delay) / 1000;
+				progress = (elapsedMS - delay) / 1000;
 				if(progress < 0) {
 					continue;
 				}
 
 				if(progress >= 1) {
 					progress = 1;
-					queuedConstellationLines.splice(queuedConstellationLines.indexOf(line), 1);
+					animatingLines.splice(animatingLines.indexOf(lineIndex), 1);
 				}
-
-				var lineVector = new spc.Vec2(line.endX - line.startX, line.endY - line.startY)
-					.scale(progress);
-
-				var drawVec = new spc.Vec2(line.startX + lineVector.x, line.startY + lineVector.y);
-
-				// var lineGradient = effects.context.createLinearGradient(0,0,170,0);
-				// var lineGradient = effects.context.createLinearGradient(line.startX,line.startY,line.endX,line.endY);
-				// var lineGradient = effects.context.createLinearGradient(0, 0, line.endX + line.startX, line.endY + line.startY);
-				var lineGradient = effects.context.createLinearGradient(
-					line.startX + spc.x,
-					line.startY + spc.y,
-					drawVec.x + spc.x,
-					drawVec.y + spc.y
-				);
-
-				lineGradient.addColorStop("0", line.startColor);
-				lineGradient.addColorStop("1.0", line.endColor);
-
-				// effects.context.strokeStyle = 'rgb(200, 200, 200)';
-				effects.context.strokeStyle = lineGradient;
-				effects.context.beginPath();
-				effects.context.moveTo(line.startX + spc.x, line.startY + spc.y);
-				effects.context.lineTo(drawVec.x + spc.x, drawVec.y + spc.y);
-				effects.context.stroke();
+			} else {
+				progress = 1;
 			}
 
-			/// optimize
-			if(queuedConstellationLines.length) {
-				window.requestAnimationFrame(drawLineStep); ////
-			}
+			var lineVector = new spc.Vec2(line.endX - line.startX, line.endY - line.startY)
+				.scale(progress);
+
+			var drawVec = new spc.Vec2(line.startX + lineVector.x, line.startY + lineVector.y);
+
+			// var lineGradient = effects.context.createLinearGradient(0,0,170,0);
+			// var lineGradient = effects.context.createLinearGradient(line.startX,line.startY,line.endX,line.endY);
+			// var lineGradient = effects.context.createLinearGradient(0, 0, line.endX + line.startX, line.endY + line.startY);
+			var lineGradient = effects.context.createLinearGradient( ///TODO maybe save this with the line? or the data involved?
+				line.startX + spc.x,
+				line.startY + spc.y,
+				drawVec.x + spc.x,
+				drawVec.y + spc.y
+			);
+
+			lineGradient.addColorStop("0", line.startColor);
+			lineGradient.addColorStop("1.0", line.endColor);
+
+			// effects.context.strokeStyle = 'rgb(200, 200, 200)';
+			effects.context.strokeStyle = lineGradient;
+			effects.context.beginPath();
+			effects.context.moveTo(line.startX + spc.x, line.startY + spc.y);
+			effects.context.lineTo(drawVec.x + spc.x, drawVec.y + spc.y);
+			effects.context.stroke();
+		}
+
+		/// optimize
+		if(animatingLines.length) {
+			window.requestAnimationFrame(me.drawLineStep); ////
+		} else {
+			isAnimating = false;
 		}
 	}
 }

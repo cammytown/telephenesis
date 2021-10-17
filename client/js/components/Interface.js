@@ -1,7 +1,8 @@
 ///TODO convert to ES6 class
 
 import cor from '../libs/minlab/cor';
-import ajx from '../libs/minlab/ajx';
+// import ajx from '../libs/minlab/ajx';
+import spc from '../libs/minlab/spc';
 import HistoryTime from '../libs/history-time';
 
 import clientState from './ClientState';
@@ -11,8 +12,6 @@ function Interface(Telep) {
 	var currentOrderLink
 
 	this.init = function() {
-		var menuToggleElement = document.getElementsByClassName('menuToggle')[0]; ////
-		currentOrderLink = document.getElementsByClassName('sort active')[0]; ///REVISIT naming/architecture
 
 		// var closes = document.getElementsByClassName('close');
 		// if(closes.length) for(var i=0, j=closes.length; i<j; i++) {
@@ -22,7 +21,29 @@ function Interface(Telep) {
 		// 	});
 		// }
 
-		/* shortcuts */
+		spc.moveCallbacks.push(Stars.drawLineStep);
+
+		/* NAVIGATION */
+		var menuToggleElement = document.getElementsByClassName('menuToggle')[0]; ////
+		currentOrderLink = document.getElementsByClassName('sort active')[0]; ///REVISIT naming/architecture
+
+		// Open header menu when button is clicked
+		cor.al(menuToggleElement, 'click', toggleMenu);
+		function toggleMenu(e) {
+			var menu = document.getElementById('menu');
+			var isActive = cor.cc(menu, 'active');
+			if(isActive) {
+				e.target.innerHTML = '|||';
+				cor.rc(e.target, 'active');
+				cor.rc(menu, 'active');
+			} else {
+				e.target.innerHTML = '&rarr;';
+				cor.ac(e.target, 'active');
+				cor.ac(menu, 'active');
+			}
+		}
+
+		/* SHORTCUTS */
 		cor.al(window, 'keydown', function(e) {
 			switch(e.keyCode) {
 				case 39: { // right arrow
@@ -60,24 +81,11 @@ function Interface(Telep) {
 			}
 		});
 
-		/* navigation */
-		// Open header menu when button is clicked
-		cor.al(menuToggleElement, 'click', toggleMenu);
-		function toggleMenu(e) {
-			var menu = document.getElementById('menu');
-			var isActive = cor.cc(menu, 'active');
-			if(isActive) {
-				e.target.innerHTML = '|||';
-				cor.rc(e.target, 'active');
-				cor.rc(menu, 'active');
-			} else {
-				e.target.innerHTML = '&rarr;';
-				cor.ac(e.target, 'active');
-				cor.ac(menu, 'active');
-			}
+		/* SORTING */
+		for(var sortRecentLinks of cor._('.sort')) {
+			cor.al(sortRecentLinks, 'click', onSortClick);
 		}
 
-		/* SORTING */
 		// for(var sortRecentLinks of cor._('.sort-most-recent')) {
 		// 	cor.al(sortRecentLinks, 'click', () => sort('most-recent'));
 		// }
@@ -86,9 +94,6 @@ function Interface(Telep) {
 		// 	cor.al(sortRecentLinks, 'click', () => sort(null, 'galaxy'));
 		// }
 
-		for(var sortRecentLinks of cor._('.sort')) {
-			cor.al(sortRecentLinks, 'click', onSortClick);
-		}
 	}
 
 	function onSortClick(event) {
