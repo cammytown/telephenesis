@@ -19,7 +19,7 @@ function ClientStarsAPI() {
 	me.view = 'galaxy'; ///REVISIT architecture
 
 	me.cachedSorts = {
-		'newest': null
+		'most-recent': null
 	}
 
 	this.init = function() {
@@ -43,19 +43,19 @@ function ClientStarsAPI() {
 		// if(state.path == path) return true;
 	}
 
-	this.getSortedStars = function(order = "newest") {
+	this.getSortedStars = function(order = "most-recent") {
 		// Rank stars according to order
 		switch(order) {
-			case 'newest': {
-				// me.cachedSorts['newest'] = [];
-				me.cachedSorts['newest'] = starElements.sort((a, b) => {
+			case 'most-recent': {
+				// me.cachedSorts['most-recent'] = [];
+				me.cachedSorts['most-recent'] = starElements.sort((a, b) => {
 					return parseInt(b.getAttribute('data-timestamp'))
 						- parseInt(a.getAttribute('data-timestamp'));
 				});
 
 				// for (var eleIndex = 0; eleIndex < starElements.length; eleIndex++) {
 				// 	var starEle = starElements[eleIndex];
-				// 	me.cachedSorts['newest']
+				// 	me.cachedSorts['most-recent']
 				// }
 			} break;
 
@@ -67,7 +67,8 @@ function ClientStarsAPI() {
 		return me.cachedSorts[order];
 	}
 
-	this.sort = function(order = "newest", view = "list") { ///REVISIT maybe separate into its own component? probably rename when we better understand how we will architect things
+	this.sort = function(order = "most-recent", view = "list") { ///REVISIT maybe separate into its own component? probably rename when we better understand how we will architect things
+		if(!view) view = "list"; // Explicit because we pass in the value of getAttribute('data-view')
 
 		var xOffset = -spc.x;
 		var yOffset = -spc.y;
@@ -292,6 +293,8 @@ function ClientStarsAPI() {
 		window.requestAnimationFrame(drawLineStep);
 
 		function drawLineStep(currentMS) {
+			console.log('drawLineStep');
+
 			effects.context.clearRect(0, 0, effects.canvas.width, effects.canvas.height);
 
 			var elapsedMS = currentMS - lineDrawStartMS;
@@ -311,7 +314,7 @@ function ClientStarsAPI() {
 
 				if(progress >= 1) {
 					progress = 1;
-					// queuedConstellationLines.splice(queuedConstellationLines.indexOf(line), 1);
+					queuedConstellationLines.splice(queuedConstellationLines.indexOf(line), 1);
 				}
 
 				var lineVector = new spc.Vec2(line.endX - line.startX, line.endY - line.startY)
@@ -341,9 +344,9 @@ function ClientStarsAPI() {
 			}
 
 			/// optimize
-			// if(queuedConstellationLines.length) {
+			if(queuedConstellationLines.length) {
 				window.requestAnimationFrame(drawLineStep); ////
-			// }
+			}
 		}
 	}
 }

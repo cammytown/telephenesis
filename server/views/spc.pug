@@ -1,5 +1,19 @@
 #sortingUI
-	h2 Sorting by Most Recent
+	nav
+		span view: 
+		a.sort.active(data-view="galaxy") galaxy
+
+		ul
+			li
+				a.sort(data-order="most-recent") by date
+			li
+				a.sort(data-order="popular") by popularity
+			li
+				a.sort(data-order="bookmarks") bookmarks
+			//- li recently played
+
+	header
+		h2 Sorting by Most Recent
 
 #spc
 	div.lyr.a

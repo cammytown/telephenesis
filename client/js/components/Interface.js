@@ -8,8 +8,11 @@ import clientState from './ClientState';
 import Stars from './Stars';
 
 function Interface(Telep) {
+	var currentOrderLink
+
 	this.init = function() {
 		var menuToggleElement = document.getElementsByClassName('menuToggle')[0]; ////
+		currentOrderLink = document.getElementsByClassName('sort active')[0]; ///REVISIT naming/architecture
 
 		// var closes = document.getElementsByClassName('close');
 		// if(closes.length) for(var i=0, j=closes.length; i<j; i++) {
@@ -53,13 +56,6 @@ function Interface(Telep) {
 				case 27: { // escape key
 					// state.updating = true;
 					HistoryTime.navigateTo('/', "Telephenesis"); //// page title
-
-					////:
-					if(Stars.view == 'galaxy') {
-						Stars.sort('newest', 'list');
-					} else {
-						Stars.sort(null, 'galaxy');
-					}
 				} break;
 			}
 		});
@@ -80,6 +76,44 @@ function Interface(Telep) {
 				cor.ac(menu, 'active');
 			}
 		}
+
+		/* SORTING */
+		// for(var sortRecentLinks of cor._('.sort-most-recent')) {
+		// 	cor.al(sortRecentLinks, 'click', () => sort('most-recent'));
+		// }
+
+		// for(var sortRecentLinks of cor._('.sort-galaxy')) {
+		// 	cor.al(sortRecentLinks, 'click', () => sort(null, 'galaxy'));
+		// }
+
+		for(var sortRecentLinks of cor._('.sort')) {
+			cor.al(sortRecentLinks, 'click', onSortClick);
+		}
+	}
+
+	function onSortClick(event) {
+		var orderLink = event.currentTarget;
+
+		const swap = function (nodeA, nodeB) { ////TODO move somewhere.. into cor?
+		    const parentA = nodeA.parentNode;
+		    const siblingA = nodeA.nextSibling === nodeB ? nodeA : nodeA.nextSibling;
+
+		    // Move `nodeA` to before the `nodeB`
+		    nodeB.parentNode.insertBefore(nodeA, nodeB);
+
+		    // Move `nodeB` to before the sibling of `nodeA`
+		    parentA.insertBefore(nodeB, siblingA);
+		};
+
+		swap(orderLink, currentOrderLink);
+
+		currentOrderLink = orderLink;
+
+		sort(orderLink.getAttribute('data-order'), orderLink.getAttribute('data-view'));
+	}
+
+	function sort(order, view = 'list') {
+		Stars.sort(order, view);
 	}
 
 	// me.invite = function(event) {

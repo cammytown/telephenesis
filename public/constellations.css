@@ -252,7 +252,7 @@ body.in #navigation {
 body.in.creator .create {
   display: block;
 }
-body nav {
+body nav.site-nav {
   display: block;
   position: absolute;
   top: 7px;
@@ -261,7 +261,7 @@ body nav {
   text-align: right;
   transition: top 250ms;
 }
-body nav a#logo {
+body nav.site-nav a#logo {
   display: block;
   z-index: 4;
   font-family: "Strait";
@@ -269,10 +269,10 @@ body nav a#logo {
   text-decoration: none;
   text-transform: uppercase;
 }
-body nav a#logo:hover {
+body nav.site-nav a#logo:hover {
   color: #edf;
 }
-body nav a.menuToggle {
+body nav.site-nav a.menuToggle {
   position: absolute;
   top: 1px;
   right: -35px;
@@ -290,16 +290,16 @@ body nav a.menuToggle {
   -webkit-transform: rotate(90deg);
   -ms-transform: rotate(90deg);
 }
-body nav a.menuToggle:hover {
+body nav.site-nav a.menuToggle:hover {
   background: #bae;
   color: #111;
 }
-body nav a.menuToggle.active {
+body nav.site-nav a.menuToggle.active {
   transform: none;
   -webkit-transform: none;
   -ms-transform: none;
 }
-body nav #menu {
+body nav.site-nav #menu {
   position: absolute;
   top: 33px;
   right: 0;
@@ -311,10 +311,10 @@ body nav #menu {
   overflow: hidden;
   transition: 0.3s;
 }
-body nav #menu.active {
+body nav.site-nav #menu.active {
   width: 165px;
 }
-body nav #menu a {
+body nav.site-nav #menu a {
   padding: 3px 0;
   font-size: 1.25em;
   white-space: nowrap;
@@ -1008,20 +1008,38 @@ form#create label.rightsAgreement input.rights-confirmation {
 }
 
 #sortingUI {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1;
+}
+#sortingUI nav {
+  position: inline-block;
+  padding: 10px;
+}
+#sortingUI nav ul {
+  margin-top: 0;
+  display: none;
+}
+#sortingUI nav:hover ul {
+  display: block;
+}
+#sortingUI header {
   position: absolute;
+  width: 500px;
   left: 175px;
   top: 135px;
   z-index: 1;
   opacity: 0;
   transition: opacity 1s;
 }
-#sortingUI h2 {
+#sortingUI header h2 {
   display: none;
 }
-body.sorting #sortingUI {
+body.sorting #sortingUI header {
   opacity: 1;
 }
-body.sorting #sortingUI h2 {
+body.sorting #sortingUI header h2 {
   display: block;
 }
 
