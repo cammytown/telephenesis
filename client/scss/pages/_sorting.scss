@@ -1,13 +1,17 @@
 #sortingUI {
-	position: fixed;
-	left: 0;
-	top: 0;
-	z-index: 1;
+	// position: fixed;
+	// left: 0;
+	// top: 0;
+	// z-index: 1;
 
 	nav {
 		position: inline-block;
 		// width: 100px;
-		padding: 10px;
+		padding: 2px 10px;
+
+		span.current-view {
+			color: $purple;
+		}
 
 		ul {
 			// padding: 0;

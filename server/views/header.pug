@@ -13,11 +13,31 @@ nav.site-nav
 
 		a.nav(href="/help") help
 
-header#playingStarInfo.inactive
-	div#playbackProgress
-		div#playbackProgressBar
-		// div#playbackProgressAccent
+header#galaxy-ui
+	header#playingStarInfo.inactive
+		div#playbackProgress
+			div#playbackProgressBar
+			// div#playbackProgressAccent
 
-	h2#playingStarTitle Song Title
-	h3#playingCreatorName Artist Name
-	a#playingCreatorLink artistwebsite.com
+		h2#playingStarTitle Song Title
+		h3#playingCreatorName Artist Name
+		a#playingCreatorLink artistwebsite.com
+
+	#sortingUI
+		nav
+			span view: 
+			span.current-view galaxy
+
+			ul
+				li
+					a.sort(data-view="galaxy") galaxy
+				li
+					a.sort(data-order="most-recent") by date
+				li
+					a.sort(data-order="most-popular") by popularity
+				li
+					a.sort(data-order="bookmarks") bookmarks
+				//- li recently played
+
+		header
+			h2 Sorting by Most Recent

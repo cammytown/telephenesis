@@ -322,60 +322,40 @@ function uploadMedia(req, res) { /// could maybe just use .post('/create/:starid
 	// break;
 }
 
-
-
-
-// app.get('/', (i, o) => {
-// 	api.getStars(i.user, function(stars) {
-// 		var className = "";
-// 		if(i.user) {
-// 			className = "in";
-
-// 			if(i.user.lv > 0) {
-// 				className += " creator";
-// 			} else if(i.user.lv == 7) {
-// 				className += " adminor";
-// 			}
-// 		}
-
-// 		o.render('main', {
-// 			pageTitle: 'telephenesis : musical exploration',
-// 			className,
-// 			stars,
-// 			user: i.user
-// 		});
-// 	});
-// });
-
-function main(i, o) {
+function main(req, res) {
 	var realPages = ['help', 'login', 'register', 'settings', 'create'];
 
 	var className = "";
-	if(i.user) {
+	if(req.user) {
 		className = "in";
 
-		if(i.user.lv > 0) {
+		if(req.user.lv > 0) {
 			className += " creator";
-		} else if(i.user.lv == 7) {
+		} else if(req.user.lv == 7) {
 			className += " adminor";
 		}
 	}
 
 	if(
-		i.params.page !== undefined ///REVISIT best check?
-		&& realPages.indexOf(i.params.page) == -1
-		&& isNaN(parseInt(i.params.page))
+		req.params.page !== undefined ///REVISIT best check?
+		&& realPages.indexOf(req.params.page) == -1
+		&& isNaN(parseInt(req.params.page))
 	) { /// isNaN necessary?
-		o.status(404).send("Sorry, no page exists there."); ///
+		res.status(404).send("Sorry, no page exists there."); ///
 	} else {
-		api.getStars(i.user, function(stars) { /// consolidate
-			o.render('main', {
-				pageTitle: 'telephenesis : ' + i.params.page, /// not if it is a number
-				className,
-				stars,
-				user: i.user
+		return api.getStars(req.user)
+			.then(stars => { /// consolidate
+				res.render('main', {
+					pageTitle: 'telephenesis : ' + req.params.page, /// not if it is a number
+					className,
+					stars,
+					// popularitySort: JSON.stringify(),
+					user: req.user
+				});
+			})
+			.catch(err => {
+				res.status(404).send("Our website appears to be down. Sorry about that.");
 			});
-		});
 	}
 }
 

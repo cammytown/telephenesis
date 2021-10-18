@@ -119,21 +119,27 @@ module.exports = function(db) {
 
 	me.getStars = function(userID = false, cb) {
 		// stars.find({ initialized: true }).toArray(function(err, results) {
-		return stars.find({ active: true }).toArray(function(err, results) {
-			if(err) {
+		return stars.find({ active: true })
+			.sort({ longPlays: -1 })
+			// .then(mongoCursor => mongoCursor.toArray)
+			// .then(results => {
+			.toArray()
+			.then(results => {
+				results.forEach(document => {
+					var creationDate = new Date(document._id.getTimestamp());
+					document.timestamp = creationDate.getTime(); // Convert Date to unix timestamp
+				} );
+
+				if(cb) cb(results);
+
+				return results;
+			})
+			.catch(err => {
 				// console.log(err);
 				////
 				// cb(err);
 				return false;
-			}
-
-			results.forEach(document => {
-				var creationDate = new Date(document._id.getTimestamp());
-				document.timestamp = creationDate.getTime(); // Convert Date to unix timestamp
-			} );
-
-			cb(results);
-		});
+			});
 	}
 
 	me.getStar = function(starId, callback) {

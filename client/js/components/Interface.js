@@ -9,7 +9,7 @@ import clientState from './ClientState';
 import Stars from './Stars';
 
 function Interface(Telep) {
-	var currentOrderLink
+	// var currentOrderLink;
 
 	this.init = function() {
 
@@ -25,7 +25,7 @@ function Interface(Telep) {
 
 		/* NAVIGATION */
 		var menuToggleElement = document.getElementsByClassName('menuToggle')[0]; ////
-		currentOrderLink = document.getElementsByClassName('sort active')[0]; ///REVISIT naming/architecture
+		// currentOrderLink = document.getElementsByClassName('sort active')[0]; ///REVISIT naming/architecture
 
 		// Open header menu when button is clicked
 		cor.al(menuToggleElement, 'click', toggleMenu);
@@ -77,6 +77,10 @@ function Interface(Telep) {
 				case 27: { // escape key
 					// state.updating = true;
 					HistoryTime.navigateTo('/', "Telephenesis"); //// page title
+
+					if(Stars.view != "galaxy") {
+						Stars.sort(null, "galaxy");
+					}
 				} break;
 			}
 		});
@@ -99,20 +103,24 @@ function Interface(Telep) {
 	function onSortClick(event) {
 		var orderLink = event.currentTarget;
 
-		const swap = function (nodeA, nodeB) { ////TODO move somewhere.. into cor?
-		    const parentA = nodeA.parentNode;
-		    const siblingA = nodeA.nextSibling === nodeB ? nodeA : nodeA.nextSibling;
+		// const swap = function (nodeA, nodeB) { ////TODO move somewhere.. into cor?
+		//     const parentA = nodeA.parentNode;
+		//     const siblingA = nodeA.nextSibling === nodeB ? nodeA : nodeA.nextSibling;
 
-		    // Move `nodeA` to before the `nodeB`
-		    nodeB.parentNode.insertBefore(nodeA, nodeB);
+		//     // Move `nodeA` to before the `nodeB`
+		//     nodeB.parentNode.insertBefore(nodeA, nodeB);
 
-		    // Move `nodeB` to before the sibling of `nodeA`
-		    parentA.insertBefore(nodeB, siblingA);
-		};
+		//     // Move `nodeB` to before the sibling of `nodeA`
+		//     parentA.insertBefore(nodeB, siblingA);
+		// };
 
-		swap(orderLink, currentOrderLink);
+		// swap(orderLink, currentOrderLink);
 
-		currentOrderLink = orderLink;
+		// currentOrderLink = orderLink;
+
+		for(var viewLabelEle of document.getElementsByClassName('current-view')) {
+			viewLabelEle.innerText = orderLink.innerText;
+		}
 
 		sort(orderLink.getAttribute('data-order'), orderLink.getAttribute('data-view'));
 	}

@@ -2,8 +2,10 @@
 ## PHASE 1
 ### 3
 - sort stars
-	some kind of ui for it
 	popularity sort
+	bookmark sort
+
+- consolidate grid and list view code where possible
 
 - figure out how to sustain hosting costs
 	- maybe only subscribers can upload and if you cancel then at some point your track may be moved to archive.org hosting
@@ -14,7 +16,13 @@
 - draw constellation line after placing
 
 ### 2
+- i think fade context menus in a little bit
+
+- improve star sorting UI
+
 - if keeping gradient background, background of inputs is blocky
+
+- bug: lines sometimes not there when i come back after a while?
 
 - personal sorts
 	| playlists

@@ -54,6 +54,7 @@ function ClientStarsAPI() {
 			case 'most-recent': {
 				// me.cachedSorts['most-recent'] = [];
 				me.cachedSorts['most-recent'] = starElements.sort((a, b) => {
+					// If B is more recent than A, return true
 					return parseInt(b.getAttribute('data-timestamp'))
 						- parseInt(a.getAttribute('data-timestamp'));
 				});
@@ -62,6 +63,10 @@ function ClientStarsAPI() {
 				// 	var starEle = starElements[eleIndex];
 				// 	me.cachedSorts['most-recent']
 				// }
+			} break;
+
+			case 'most-popular': {
+				return document.getElementsByClassName('star');
 			} break;
 
 			default: {
@@ -86,6 +91,9 @@ function ClientStarsAPI() {
 
 		cor.rc(document.body, me.view); ////
 		cor.ac(document.body, view); ////
+
+		me.order = order;
+		me.view = view;
 
 		// Reposition each star
 		switch(view) {
@@ -211,8 +219,6 @@ function ClientStarsAPI() {
 				}
 			} break;
 		}
-
-		me.view = view;
 	}
 
 	function play(starElement) {

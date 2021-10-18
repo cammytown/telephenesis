@@ -1,14 +1,9 @@
 body {
 	header#playingStarInfo { ///placement
-		position: absolute;
-		top: 0;
-		left: 0;
-		z-index: 1;
-		width: 100%;
-		display: none;
-		// opacity: 0;
-		height: 0;
-		// transition: height 500ms, opacity 500ms;
+		// display: none;
+		opacity: 0;
+		height: 0; ///REVISIT does this always work?
+		transition: height 500ms, opacity 500ms;
 		overflow: hidden;
 
 		h2, h3 {
@@ -40,9 +35,8 @@ body {
 			}
 		}
 
+		// Player shadow:
 		&::after {
-			// player shadow
-
 			display: block;
 			position: absolute;
 			top: 20px;
@@ -57,9 +51,9 @@ body {
 
 	&.playing {
 		header#playingStarInfo {
-			display: block;
-			// opacity: 1;
-			height: 120px;
+			// display: block;
+			opacity: 1;
+			height: auto; ///TODO auto doesn't work for transitions
 		}
 	}
 }
