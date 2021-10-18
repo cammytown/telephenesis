@@ -325,9 +325,9 @@ function uploadMedia(req, res) { /// could maybe just use .post('/create/:starid
 function main(req, res) {
 	var realPages = ['help', 'login', 'register', 'settings', 'create'];
 
-	var className = "";
+	var className = "galaxy";
 	if(req.user) {
-		className = "in";
+		className += " in";
 
 		if(req.user.lv > 0) {
 			className += " creator";

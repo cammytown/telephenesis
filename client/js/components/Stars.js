@@ -69,6 +69,10 @@ function ClientStarsAPI() {
 				return document.getElementsByClassName('star');
 			} break;
 
+			case 'bookmarks': {
+				return document.getElementsByClassName('star bookmarked'); ///REVISIT optimize?
+			} break;
+
 			default: {
 				console.error("Unhandled order mode: " + order);
 			}
@@ -89,8 +93,19 @@ function ClientStarsAPI() {
 		// 	return true;
 		// }
 
+		me.clearConstellationLines();
+
+		///TODO probably move some of this into Interface.js:
 		cor.rc(document.body, me.view); ////
 		cor.ac(document.body, view); ////
+
+		if(me.order) {
+			cor.rc(document.body, me.order); ////
+		}
+
+		if(order) {
+			cor.ac(document.body, order); ////
+		}
 
 		me.order = order;
 		me.view = view;
@@ -138,7 +153,7 @@ function ClientStarsAPI() {
 						targets: starEle,
 						left: starEle.getAttribute('data-x') + 'px',
 						top: starEle.getAttribute('data-y') + 'px',
-						duration: 1000,
+						duration: 500,
 						complete: function() {
 							me.generateConstellationLines();
 						}
@@ -156,11 +171,16 @@ function ClientStarsAPI() {
 				for (var starEleIndex = 0; starEleIndex < sortedElements.length; starEleIndex++) {
 					var starEle = sortedElements[starEleIndex];
 
-					starEle.className = 'star ' + (starEleIndex % 2 ? 'odd' : 'even'); ///TODO don't just overwrite className
+					///REVISIT architecture:
+					cor.rc(starEle, 'odd');
+					cor.rc(starEle, 'even');
+					cor.ac(starEle, starEleIndex % 2 ? 'odd' : 'even');
 
 					// Calculate target position of the star
 					var newX = styleVars.sortGridSquareSize * (starEleIndex % rowCount);
 					var newY = styleVars.sortGridSquareSize * currentRow;
+
+					cor.ac(document.body, 'sorting'); ////
 
 					// Animate the star to its target position
 					anime({
@@ -170,7 +190,6 @@ function ClientStarsAPI() {
 						duration: 500,
 						complete: function() {
 							me.generateConstellationLines();
-							cor.ac(document.body, 'sorting'); ////
 						}
 					});
 
@@ -194,11 +213,15 @@ function ClientStarsAPI() {
 				for (var starEleIndex = 0; starEleIndex < sortedElements.length; starEleIndex++) {
 					var starEle = sortedElements[starEleIndex];
 
-					starEle.className = 'star ' + (starEleIndex % 2 ? 'odd' : 'even'); ///TODO don't just overwrite className
+					cor.rc(starEle, 'odd');
+					cor.rc(starEle, 'even');
+					cor.ac(starEle, starEleIndex % 2 ? 'odd' : 'even');
 
 					// Calculate target position of the star
 					var newX = 0;
 					var newY = (styleVars.sortGridSquareSize + rowMargin) * starEleIndex;
+
+					cor.ac(document.body, 'sorting'); ////
 
 					// Animate the star to its target position
 					anime({
@@ -208,7 +231,6 @@ function ClientStarsAPI() {
 						duration: 500,
 						complete: function() {
 							me.generateConstellationLines();
-							cor.ac(document.body, 'sorting'); ////
 						}
 					});
 
@@ -371,5 +393,11 @@ function ClientStarsAPI() {
 		} else {
 			isAnimating = false;
 		}
+	}
+
+	me.clearConstellationLines = function() {
+		effects.context.clearRect(0, 0, effects.canvas.width, effects.canvas.height);
+		constellationLines = [];
+		animatingLines = [];
 	}
 }

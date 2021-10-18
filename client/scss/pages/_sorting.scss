@@ -50,3 +50,18 @@
 		}
 	}
 }
+
+body.sorting.bookmarks {
+	.star {
+		display: none;
+
+		&.bookmarked {
+			display: flex;
+		}
+	}
+
+	#uiEffects {
+		///REVISIT setting to display: none is probably more of a quick-fix:
+		display: none;
+	}
+}

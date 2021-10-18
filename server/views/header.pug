@@ -32,12 +32,12 @@ header#galaxy-ui
 				li
 					a.sort(data-view="galaxy") galaxy
 				li
-					a.sort(data-order="most-recent") by date
+					a.sort(data-order="most-recent" data-header="Sorting by Most Recent") by date
 				li
-					a.sort(data-order="most-popular") by popularity
+					a.sort(data-order="most-popular" data-header="Sorting by Most Popular") by popularity
 				li
-					a.sort(data-order="bookmarks") bookmarks
+					a.sort(data-order="bookmarks" data-header="Your Bookmarks") bookmarks
 				//- li recently played
 
 		header
-			h2 Sorting by Most Recent
+			h2.view-header Sorting by Most Recent

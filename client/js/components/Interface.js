@@ -78,7 +78,7 @@ function Interface(Telep) {
 					// state.updating = true;
 					HistoryTime.navigateTo('/', "Telephenesis"); //// page title
 
-					if(Stars.view != "galaxy") {
+					if(Stars.view != "galaxy") { ///REVISIT this should probably just happen as a consequence of navigating to /
 						Stars.sort(null, "galaxy");
 					}
 				} break;
@@ -103,29 +103,19 @@ function Interface(Telep) {
 	function onSortClick(event) {
 		var orderLink = event.currentTarget;
 
-		// const swap = function (nodeA, nodeB) { ////TODO move somewhere.. into cor?
-		//     const parentA = nodeA.parentNode;
-		//     const siblingA = nodeA.nextSibling === nodeB ? nodeA : nodeA.nextSibling;
-
-		//     // Move `nodeA` to before the `nodeB`
-		//     nodeB.parentNode.insertBefore(nodeA, nodeB);
-
-		//     // Move `nodeB` to before the sibling of `nodeA`
-		//     parentA.insertBefore(nodeB, siblingA);
-		// };
-
-		// swap(orderLink, currentOrderLink);
-
-		// currentOrderLink = orderLink;
-
 		for(var viewLabelEle of document.getElementsByClassName('current-view')) {
 			viewLabelEle.innerText = orderLink.innerText;
+		}
+
+		for(var viewHeaderEle of document.getElementsByClassName('view-header')) {
+			viewHeaderEle.innerText = orderLink.getAttribute('data-header');
 		}
 
 		sort(orderLink.getAttribute('data-order'), orderLink.getAttribute('data-view'));
 	}
 
 	function sort(order, view = 'list') {
+
 		Stars.sort(order, view);
 	}
 

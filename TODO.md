@@ -1,11 +1,9 @@
 # TODO
 ## PHASE 1
 ### 3
-- sort stars
-	popularity sort
-	bookmark sort
-
 - consolidate grid and list view code where possible
+
+- reimplement creation
 
 - figure out how to sustain hosting costs
 	- maybe only subscribers can upload and if you cancel then at some point your track may be moved to archive.org hosting
@@ -19,6 +17,8 @@
 - i think fade context menus in a little bit
 
 - improve star sorting UI
+
+- give sorts their own URIs
 
 - if keeping gradient background, background of inputs is blocky
 
@@ -67,6 +67,8 @@
 - does/should HistoryTime.navigateTo() need a page title argument? probably have some kind of routing config that matches uris to page titles
 
 ### 1
+- server side rendering or at least populating page with correct content per URI
+
 - hitting escape or clicking in space should close the menu; already closes uiboxes
 
 - improve appearance/interface of bookmarks (probably part of general UI work on navigating stars)

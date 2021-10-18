@@ -1044,6 +1044,16 @@ body.sorting #sortingUI header h2 {
   display: block;
 }
 
+body.sorting.bookmarks .star {
+  display: none;
+}
+body.sorting.bookmarks .star.bookmarked {
+  display: flex;
+}
+body.sorting.bookmarks #uiEffects {
+  display: none;
+}
+
 #ui {
   position: absolute;
   top: 5px;
