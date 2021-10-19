@@ -198,7 +198,7 @@ function actualizeStar(req, res) {
 			// Create the star in the database:
 			return api.createStar(req.user.id, newStar)
 				.then(result => {
-					res.json({ error: 0 });
+					res.json({ error: 0, creatorName: req.user.usrMeta.creatorName });
 				})
 				.catch(err => {
 					console.error(err); ///

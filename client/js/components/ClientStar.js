@@ -12,7 +12,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 	me.element;
 	me.linkElement;
-	me.textElement;
+	me.titleElement;
 
 	me.fileReady = false;
 	me.isPlaced = false;
@@ -27,8 +27,8 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 		me.element = element;
 		me.linkElement = me.element.getElementsByTagName('a')[0];
-		me.textElement = me.element.children[1];
-		me.textElement.className = 'progress';
+		me.titleElement = me.element.getElementsByClassName('text title')[0];
+		me.titleElement.className = 'progress';
 
 		for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
 			var property = me.identityProps[propIndex]

@@ -244,10 +244,8 @@ function initializeStarColoring(genesis) {
 
 				limbo.appendChild(validPlacementZone);
 
-				document.body.removeAttribute('class');
-
-				spc.on = true;
-
+				// document.body.removeAttribute('class');
+				// spc.on = true;
 				workingStar.isPlaced = true;
 				actualizeCreation();
 
@@ -341,11 +339,10 @@ function actualizeCreation() {
 	fetch('/ajax/actualize', request) ///REVISIT old browser compatability?
 		.then(response => response.json())
 		.then(result => {
-			workingStar.textElement.className = 'text name';
-			workingStar.textElement.innerHTML = result.creator;
+			workingStar.titleElement.className = 'text name';
+			workingStar.titleElement.innerText = workingStar.title;
 
 			workingStar.linkElement.href = '/' + workingStar.starID;
-
 			cor.al(workingStar.linkElement, 'click', function(e) {
 				e.preventDefault();
 				state.updating = true;
@@ -357,8 +354,8 @@ function actualizeCreation() {
 	// 	console.log(responseData);
 	// 	var response = JSON.parse(responseData);
 	// 	workingStar.element.className = 'star';
-	// 	workingStar.textElement.className = 'text name';
-	// 	workingStar.textElement.innerHTML = response.creator;
+	// 	workingStar.titleElement.className = 'text name';
+	// 	workingStar.titleElement.innerHTML = response.creator;
 
 	// 	workingStar.linkElement.href = '/' + workingStar.starID;
 

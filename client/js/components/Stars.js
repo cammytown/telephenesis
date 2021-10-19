@@ -19,7 +19,7 @@ function ClientStarsAPI() {
 	var animatingLines = []; // Array of indices in constellationLines[] for lines which are not finished drawing.
 	var lineDrawStartMS; // When the constellation drawing animation began.
 
-	var isAnimating = false;
+	// var isAnimating = false;
 
 	me.view = 'galaxy'; ///REVISIT architecture
 
@@ -270,7 +270,7 @@ function ClientStarsAPI() {
 		lineDrawStartMS = performance.now();
 		constellationLines = [];
 		animatingLines = [];
-		isAnimating = true;
+		// isAnimating = true;
 
 		// Loop through stars and queue an animated line draw.
 		var starElements = document.getElementsByClassName('star');
@@ -291,7 +291,8 @@ function ClientStarsAPI() {
 						endY: parseInt(starElement.style.top),
 						startColor: rootStar.getElementsByTagName('a')[0].style.backgroundColor, ///
 						endColor: starElement.getElementsByTagName('a')[0].style.backgroundColor, ///
-						tier: parseInt(starElement.getAttribute('data-tier'))
+						tier: parseInt(starElement.getAttribute('data-tier')),
+						isAnimating: true /// OPTIMIZATION?
 					});
 
 					animatingLines.push(lineIndex++);
@@ -303,6 +304,8 @@ function ClientStarsAPI() {
 	}
 
 	me.drawLineStep = function(currentMS) {
+		console.log("drawLineStep");
+
 		effects.context.clearRect(0, 0, effects.canvas.width, effects.canvas.height);
 
 		var elapsedMS = currentMS - lineDrawStartMS;
@@ -312,12 +315,13 @@ function ClientStarsAPI() {
 			var line = constellationLines[lineIndex];
 
 			var progress;
-			if(isAnimating) {
+			if(line.isAnimating) {
 				////
 				// var delay = (line.tier * 1000) - (line.tier * 350);
-				var delay = ((line.tier) * 1000) - (line.tier * 800);
+				var delay = ((line.tier) * 1000) - ((line.tier * 800));
 				// var delay = (line.tier * 1000) / (line.tier / 2);
 				// var delay = ((line.tier * line.tier / 2) * 1000) - (line.tier * line.tier * 475);
+
 
 				progress = (elapsedMS - delay) / 1000;
 				if(progress < 0) {
@@ -326,7 +330,12 @@ function ClientStarsAPI() {
 
 				if(progress >= 1) {
 					progress = 1;
+
+					// Line fully drawn; remove line from animatingLines:
 					animatingLines.splice(animatingLines.indexOf(lineIndex), 1);
+					line.isAnimating = false;
+					// Reduce lineIndex now that animatingLines has been spliced:
+					lineIndex -= 1;
 				}
 			} else {
 				progress = 1;
@@ -361,8 +370,6 @@ function ClientStarsAPI() {
 		/// optimize
 		if(animatingLines.length) {
 			window.requestAnimationFrame(me.drawLineStep); ////
-		} else {
-			isAnimating = false;
 		}
 	}
 

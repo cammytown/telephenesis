@@ -4,40 +4,21 @@
 	div.lyr.c
 
 	#map
-		each star, i in stars
+		each starData, i in stars
 			// star.id
 			//- .star(data-prev=star.lsid data-next=star.)
-
-			.star(
-				id = "s" + star.id
-				class = user.usrMeta && user.usrMeta.bookmarks.indexOf(star.id) != -1 ? "bookmarked" : ""
-				data-prev = star.originStarID
-				data-originStarID = star.originStarID
-				data-tier = star.tier
-				data-title = star.title
-				data-x = star.x
-				data-y = star.y
-				data-creatorName = star.creator.creatorName
-				data-creatorLink = star.creator.creatorLink
-				data-constellation = star.constellationID
-				data-timestamp = star.timestamp
-				style = "left: " + star.x + "px; top: " + star.y + "px"
+			+star(starData)(
+				id = "s" + starData.id
+				data-prev = starData.originStarID
+				data-originStarID = starData.originStarID
+				data-tier = starData.tier
+				data-title = starData.title
+				data-x = starData.x
+				data-y = starData.y
+				data-creatorName = starData.creator ? starData.creator.creatorName : ""
+				data-creatorLink = starData.creator ? starData.creator.creatorLink : ""
+				data-constellation = starData.constellationID
+				data-timestamp = starData.timestamp
+				class = user.usrMeta && user.usrMeta.bookmarks.indexOf(starData.id) != -1 ? "bookmarked" : ""
+				style = "left: " + starData.x + "px; top: " + starData.y + "px"
 			)
-				a(
-					href=star.fileURL
-					style="background-color: rgb(" + star.color + ')'
-				)
-
-				//- div.gridBackground
-
-				div.meta
-					span.text.title= star.title
-
-					if star.creator.creatorName
-						| by
-						span.text.creator= star.creator.creatorName
-
-					///COMPAT check:
-					div.text.creationTime= new Date(star.timestamp).toLocaleDateString()
-
-					div.text.playbackTime

@@ -1,7 +1,7 @@
 # TODO
 ## PHASE 1
 ### 3
-- reimplement creation
+- UI for change view
 
 - figure out how to sustain hosting costs
 	- maybe only subscribers can upload and if you cancel then at some point your track may be moved to archive.org hosting
