@@ -5,7 +5,8 @@
  ***/
 :export {
   starGridWidth: 500px;
-  sortGridSquareSize: 50px;
+  starGridSquareSize: 50px;
+  starGridMargin: 20px;
   starGridPaddingX: 200px;
   starGridPaddingY: 200px;
 }

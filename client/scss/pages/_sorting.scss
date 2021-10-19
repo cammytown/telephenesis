@@ -29,8 +29,8 @@
 	header {
 		position: absolute;
 		width: 500px; ////REVISIT bad solution
-		left: $gridPaddingX - 25;
-		top: $gridPaddingY - 65;
+		left: $starGridPaddingX - 25;
+		top: $starGridPaddingY - 65;
 		z-index: 1;
 		opacity: 0;
 		transition: opacity 1s;

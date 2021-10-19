@@ -35,10 +35,10 @@ function ClientStarsAPI() {
 			starElement.addEventListener('click', onStarClick);
 		}
 
-		styleVars.starGridWidth = parseInt(styleVars.starGridWidth); ///REVISIT architecture
-		styleVars.sortGridSquareSize = parseInt(styleVars.sortGridSquareSize); ///REVISIT architecture
-		styleVars.starGridPaddingX = parseInt(styleVars.starGridPaddingX); ///REVISIT architecture
-		styleVars.starGridPaddingY = parseInt(styleVars.starGridPaddingY); ///REVISIT architecture
+		// Convert all styleVar properties to ints (from i.e. "20px" to 20)
+		for(var property in styleVars) {
+			styleVars[property] = parseInt(styleVars[property]);
+		}
 	}
 
 	function onStarClick(event) {
@@ -111,7 +111,7 @@ function ClientStarsAPI() {
 		me.view = view;
 
 		// Reposition each star
-		switch(view) {
+		switch(me.view) {
 			// case 'constellationRows': {
 			// 	var constellationOrder = [];
 
@@ -119,7 +119,7 @@ function ClientStarsAPI() {
 			// 		var starEle = me.cachedSorts[order][starEleIndex];
 
 			// 		// Calculate target position of the star
-			// 		var newX = styleVars.sortGridSquareSize * starEleIndex;
+			// 		var newX = styleVars.starGridSquareSize * starEleIndex;
 
 			// 		var constellationID = starEle.getAttribute('data-constellation');
 			// 		var constellationOrderIndex = constellationOrder.indexOf(constellationID);
@@ -128,7 +128,7 @@ function ClientStarsAPI() {
 			// 			constellationOrder.push(constellationID);
 			// 		}
 
-			// 		var newY = constellationOrderIndex * styleVars.sortGridSquareSize;
+			// 		var newY = constellationOrderIndex * styleVars.starGridSquareSize;
 
 			// 		// Animate the star to its target position
 			// 		anime({
@@ -161,13 +161,16 @@ function ClientStarsAPI() {
 				}
 			} break;
 
-			case 'grid': {
+			case 'grid':
+			case 'list': {
 				spc.s = false;
 
-				var currentRow = 0;
-				var rowCount = Math.floor(styleVars.starGridWidth / styleVars.sortGridSquareSize);
-
 				var sortedElements = this.getSortedStars(order);
+
+				///REVISIT these variables only used by grid me.view; sort of odd placed here:
+				var currentRow = 0;
+				var columnCount = Math.floor(styleVars.starGridWidth / styleVars.starGridSquareSize);
+
 				for (var starEleIndex = 0; starEleIndex < sortedElements.length; starEleIndex++) {
 					var starEle = sortedElements[starEleIndex];
 
@@ -177,49 +180,15 @@ function ClientStarsAPI() {
 					cor.ac(starEle, starEleIndex % 2 ? 'odd' : 'even');
 
 					// Calculate target position of the star
-					var newX = styleVars.sortGridSquareSize * (starEleIndex % rowCount);
-					var newY = styleVars.sortGridSquareSize * currentRow;
-
-					cor.ac(document.body, 'sorting'); ////
-
-					// Animate the star to its target position
-					anime({
-						targets: starEle,
-						left: newX + styleVars.starGridPaddingX + xOffset + 'px',
-						top: newY + styleVars.starGridPaddingY + yOffset + 'px',
-						duration: 500,
-						complete: function() {
-							me.generateConstellationLines();
-						}
-					});
-
-					// Wrap grid if row filled
-					if(newX >= styleVars.starGridWidth - styleVars.sortGridSquareSize) {
-						currentRow += 1;
+					var newX;
+					var newY;
+					if(me.view == 'grid') {
+						newX = styleVars.starGridSquareSize * (starEleIndex % columnCount);
+						newY = styleVars.starGridSquareSize * currentRow;
+					} else if(me.view == 'list') {
+						newX = 0;
+						newY = (styleVars.starGridSquareSize + styleVars.starGridMargin) * starEleIndex;
 					}
-				}
-			} break;
-
-			case 'list': {
-				spc.s = false;
-
-				var sortedElements = this.getSortedStars(order);
-
-				// var currentRow = 0;
-				var rowMargin = 20;
-				var rowCount = Math.floor(styleVars.starGridWidth / styleVars.sortGridSquareSize);
-
-				var sortedElements = this.getSortedStars(order);
-				for (var starEleIndex = 0; starEleIndex < sortedElements.length; starEleIndex++) {
-					var starEle = sortedElements[starEleIndex];
-
-					cor.rc(starEle, 'odd');
-					cor.rc(starEle, 'even');
-					cor.ac(starEle, starEleIndex % 2 ? 'odd' : 'even');
-
-					// Calculate target position of the star
-					var newX = 0;
-					var newY = (styleVars.sortGridSquareSize + rowMargin) * starEleIndex;
 
 					cor.ac(document.body, 'sorting'); ////
 
@@ -234,10 +203,12 @@ function ClientStarsAPI() {
 						}
 					});
 
-					// Wrap grid if row filled
-					// if(newX >= styleVars.starGridWidth - styleVars.sortGridSquareSize) {
-					// 	currentRow += 1;
-					// }
+					if(view == 'grid') {
+						// Wrap grid if row filled
+						if(newX >= styleVars.starGridWidth - styleVars.starGridSquareSize) {
+							currentRow += 1;
+						}
+					}
 				}
 			} break;
 		}

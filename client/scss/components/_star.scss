@@ -241,10 +241,10 @@ $inactiveBorderWidth: 1px;
 				// opacity: 0;
 				// transition: opacity 500ms;
 				// position: absolute;
-				// left: -$sortGridSquareSize * 0.5;
-				// top: -$sortGridSquareSize * 0.5;
-				width: $sortGridSquareSize;
-				height: $sortGridSquareSize;
+				// left: -$starGridSquareSize * 0.5;
+				// top: -$starGridSquareSize * 0.5;
+				width: $starGridSquareSize;
+				height: $starGridSquareSize;
 				background: rgba(40, 40, 40, 0.55);
 
 				&.even {

@@ -5,7 +5,7 @@ First, someone composes a piece of music and uploads it in digital form to the w
 
 Then, other artists can come along and remix or recreate a star's music. They upload their version and it, too, is represented as a star; this time with a line to its origin.
 
-Listeners and browse through a growing constellation of the progression of musical ideas as they are relayed from one mind to another.
+Listeners can browse through a growing constellation of the progression of musical ideas as they are relayed from one mind to another.
 
 ## Development Environment
 - `docker-compose up`
@@ -23,5 +23,5 @@ Listeners and browse through a growing constellation of the progression of music
 * [MongoDB](https://www.mongodb.com/)
 
 ## Credits
-* **Chris Marianetti** - [nopiano.com](http://nopiano.com) - game design, web design
-* **Cameron Steele** - [steelecameron.com](https://steelecameron.com) - programming, web design, game design
+* **Cameron Steele** - [steelecameron.com](https://steelecameron.com)
+* **Chris Marianetti** - [nopiano.com](http://nopiano.com)

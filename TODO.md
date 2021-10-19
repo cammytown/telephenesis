@@ -1,8 +1,6 @@
 # TODO
 ## PHASE 1
 ### 3
-- consolidate grid and list view code where possible
-
 - reimplement creation
 
 - figure out how to sustain hosting costs
