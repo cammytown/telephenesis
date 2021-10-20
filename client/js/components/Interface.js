@@ -123,7 +123,7 @@ function Interface(Telep) {
 			cor.ac(document.body, order + '-order'); ////
 
 			if(order == 'galaxy') {
-				me.view = 'galaxy'; ///REVISIT this solution; not sure it's best architecture
+				view = 'galaxy'; ///REVISIT this solution; not sure it's best architecture
 			} else {
 				// If view is not galaxy:
 

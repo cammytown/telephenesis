@@ -23,5 +23,5 @@ Listeners can browse through a growing constellation of the progression of music
 * [MongoDB](https://www.mongodb.com/)
 
 ## Credits
-* **Cameron Steele** - [steelecameron.com](https://steelecameron.com)
-* **Chris Marianetti** - [nopiano.com](http://nopiano.com)
+* **Chris Marianetti** - [nopiano.com](http://nopiano.com) - design
+* **Cameron Steele** - [steelecameron.com](https://steelecameron.com) - programming, design

@@ -627,7 +627,6 @@ body #menu .user a, body #menu .guest a {
 }
 
 body header#playingStarInfo {
-  display: none;
   opacity: 0;
   height: 0;
   transition: height 500ms, opacity 500ms;
@@ -650,18 +649,14 @@ body header#playingStarInfo #playbackProgress #playbackProgressBar {
   height: 100%;
   background: rgba(227, 63, 84, 0.7);
 }
-body header#playingStarInfo::after {
+body header#playingStarInfo #playbackProgress::after {
   display: block;
-  position: absolute;
-  top: 20px;
-  z-index: 0;
   width: 100%;
   height: 7px;
   background: rgba(76, 20, 200, 0.19);
   content: "";
 }
 body.playing header#playingStarInfo {
-  display: block;
   opacity: 1;
   height: auto;
 }

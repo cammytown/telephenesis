@@ -1,6 +1,6 @@
 body {
 	header#playingStarInfo { ///placement
-		display: none;
+		// display: none;
 		opacity: 0;
 		height: 0; ///REVISIT does this always work?
 		transition: height 500ms, opacity 500ms;
@@ -33,25 +33,25 @@ body {
 				height: 100%;
 				background: rgba(227, 63, 84, 0.7);
 			}
-		}
 
-		// Player shadow:
-		&::after {
-			display: block;
-			position: absolute;
-			top: 20px;
-			// left: 5px;
-			z-index: 0;
-			width: 100%;
-			height: 7px;
-			background: $darkPurple;
-			content: "";
+			// Player shadow:
+			&::after {
+				display: block;
+				// position: absolute;
+				// top: 20px;
+				// left: 5px;
+				// z-index: 0;
+				width: 100%;
+				height: 7px;
+				background: $darkPurple;
+				content: "";
+			}
 		}
 	}
 
 	&.playing {
 		header#playingStarInfo {
-			display: block;
+			// display: block;
 			opacity: 1;
 			height: auto; ///TODO auto doesn't work for transitions
 		}

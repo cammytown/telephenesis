@@ -1,15 +1,13 @@
 # TODO
 ## PHASE 1
 ### 3
-- UI for change view
-
 - future-proof star placement
 
-- figure out how to sustain hosting costs
-	- maybe only subscribers can upload and if you cancel then at some point your track may be moved to archive.org hosting
-		- alternatively, we just monthly make a big archive.org post with the tracks if they don't mind
-
 ### 2
+- better aesthetic for scrolling through list view
+
+- future-proof large amounts of stars
+
 - consider drawing constellations during view transition; just don't cache line start and end
 
 - draw constellation line after placing
@@ -23,6 +21,10 @@
 - if keeping gradient background, background of inputs is blocky
 
 - bug: lines sometimes not there when i come back after a while?
+
+- figure out how to sustain hosting costs
+	- maybe only subscribers can upload and if you cancel then at some point your track may be moved to archive.org hosting
+		- alternatively, we just monthly make a big archive.org post with the tracks if they don't mind
 
 - personal sorts
 	| playlists
