@@ -5,8 +5,6 @@
 
 	#map
 		each starData, i in stars
-			// star.id
-			//- .star(data-prev=star.lsid data-next=star.)
 			+star(starData)(
 				id = "s" + starData.id
 				data-prev = starData.originStarID
@@ -19,6 +17,6 @@
 				data-creatorLink = starData.creator ? starData.creator.creatorLink : ""
 				data-constellation = starData.constellationID
 				data-timestamp = starData.timestamp
-				class = user.usrMeta && user.usrMeta.bookmarks.indexOf(starData.id) != -1 ? "bookmarked" : ""
+				class = (user.usrMeta && user.usrMeta.bookmarks.indexOf(starData.id) != -1) ? "bookmarked" : ""
 				style = "left: " + starData.x + "px; top: " + starData.y + "px"
 			)

@@ -235,46 +235,11 @@ $inactiveBorderWidth: 1px;
 		}
 	}
 
-	@at-root {
-		body.sorting {
-			#{$star} {
-				// opacity: 0;
-				// transition: opacity 500ms;
-				// position: absolute;
-				// left: -$starGridSquareSize * 0.5;
-				// top: -$starGridSquareSize * 0.5;
-				width: $starGridSquareSize;
-				height: $starGridSquareSize;
-				background: rgba(40, 40, 40, 0.55);
+	// @at-root {
+	// 	body.sorting {
 
-				&.even {
-					background: rgba(60, 60, 60, 0.55);
-				}
-
-				&:hover {
-					background: rgba(232, 177, 150, 0.37);
-				}
-
-				.meta {
-					left: 100%;
-
-					.creationTime {
-						display: block;
-					}
-				}
-			}
-
-			&.list {
-				#{$star} {
-					.meta {
-						display: inline-block;
-						cursor: auto;
-						pointer-events: all;
-					}
-				}
-			}
-		}
-	}
+	// 	}
+	// }
 
 	// &.active .name, &.menu .name, &.menu .time {
 	// 	display: none;

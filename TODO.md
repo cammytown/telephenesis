@@ -3,15 +3,17 @@
 ### 3
 - UI for change view
 
+- future-proof star placement
+
 - figure out how to sustain hosting costs
 	- maybe only subscribers can upload and if you cancel then at some point your track may be moved to archive.org hosting
 		- alternatively, we just monthly make a big archive.org post with the tracks if they don't mind
 
-- future-proof star placement
+### 2
+- consider drawing constellations during view transition; just don't cache line start and end
 
 - draw constellation line after placing
 
-### 2
 - i think fade context menus in a little bit
 
 - improve star sorting UI
@@ -31,6 +33,8 @@
 - i think we distinguish between partial plays and full plays; full plays count more towards popularity score
 	also distinguish between total/guest plays and confirmed user plays
 	store play history of users; allow them to go back through it
+
+- zooming
 
 - clicking stars should open a menu near them
 	| maybe it's a radial menu
@@ -62,7 +66,7 @@
 
 - add numbers/tier level to stars
 
-- does/should HistoryTime.navigateTo() need a page title argument? probably have some kind of routing config that matches uris to page titles
+- page titles; does/should HistoryTime.navigateTo() need a page title argument? probably have some kind of routing config that matches uris to page titles
 
 ### 1
 - server side rendering or at least populating page with correct content per URI

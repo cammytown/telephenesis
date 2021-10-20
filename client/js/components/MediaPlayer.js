@@ -37,31 +37,32 @@ function MediaPlayer() {
 		setInterval(serverSync, config.syncInterval); ////TODO probably don't use or use something in addition to setInterval
 	}
 
-	this.playStar = function(star) {
+	this.playStar = function(clientStar) {
 		// If star is already focused by player:
-		if(star.element == clientState.playingStar) {
+		if(clientState.playingStar == clientStar) {
 			// Toggle playback play/pause:
 			me.audio.element.paused ? me.audio.play() : me.audio.pause();
 
 		} else { // Loading a new star into the player
 			// If there's already a star loaded:
 			if(clientState.playingStar) {
-				cor.rc(clientState.playingStar, "active");
+				cor.rc(clientState.playingStar.element, "active");
 			}
 
-			clientState.playingStar = star;
-			cor.ac(star.element, "active");
+
+			clientState.playingStar = clientStar;
+			cor.ac(clientStar.element, "active");
 
 			// Load the new star's media:
-			me.audio.load(star.element.getElementsByTagName('a')[0].href);
+			me.audio.load(clientStar.element.getElementsByTagName('a')[0].href);
 			// me.audio.load('/music/'+sid+'.mp3');
 
 			if(activeMediaState) {
-				mediaStates[star.id] = activeMediaState;
+				mediaStates[clientStar.id] = activeMediaState;
 			}
 
-			if(mediaStates[star.id]) {
-				activeMediaState = mediaStates[star.id];
+			if(mediaStates[clientStar.id]) {
+				activeMediaState = mediaStates[clientStar.id];
 			} else {
 				activeMediaState = {
 					lastUpdateMediaTime: 0,
@@ -84,14 +85,14 @@ function MediaPlayer() {
 
 	function onMediaTimeUpdate(event) {
 		// Update playback time label:
-		clientState.playingStar.getElementsByClassName('playbackTime')[0].innerHTML = me.audio.timeString;
+		clientState.playingStar.element.getElementsByClassName('playbackTime')[0].innerHTML = me.audio.timeString;
 
 		// Update width of playback progress bar:
 		cor._('#playbackProgressBar').style.width = (me.audio.playbackProgress * 100.0) + "%";
 
 		// Get time since last run:
-		var delta = audio.element.currentTime - activeMediaState.lastUpdateMediaTime;
-		activeMediaState.lastUpdateMediaTime = audio.element.currentTime;
+		var delta = me.audio.element.currentTime - activeMediaState.lastUpdateMediaTime;
+		activeMediaState.lastUpdateMediaTime = me.audio.element.currentTime;
 
 		// Add to total play time of media:
 		activeMediaState.totalMediaPlaySeconds += delta;
@@ -107,7 +108,7 @@ function MediaPlayer() {
 			}
 
 			// If played long enough to flag long play:
-			var totalPlayTimeFloat = activeMediaState.totalMediaPlaySeconds / audio.element.duration;
+			var totalPlayTimeFloat = activeMediaState.totalMediaPlaySeconds / me.audio.element.duration;
 			if(totalPlayTimeFloat >= config.longPlayPercent / 100) {
 				activeMediaState.flags.longPlay = true;
 				pendingServerUpdates.push({ type: 'longPlay', starID: clientState.playingStar.id });
@@ -116,10 +117,10 @@ function MediaPlayer() {
 	}
 
 	function onMediaPlayerFinish(event) {
-		cor.rc(clientState.playingStar, 'active');
+		cor.rc(clientState.playingStar.element, 'active');
 
-		if(clientState.playingStar.getAttribute('data-next')) {
-			var star = document.getElementById('s' + clientState.playingStar.getAttribute('data-next'));
+		if(clientState.playingStar.element.getAttribute('data-next')) {
+			var star = document.getElementById('s' + clientState.playingStar.element.getAttribute('data-next'));
 			load(star);
 		} else {
 			clientState.playingStar = false;

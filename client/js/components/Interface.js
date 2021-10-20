@@ -6,10 +6,15 @@ import spc from '../libs/minlab/spc';
 import HistoryTime from '../libs/history-time';
 
 import clientState from './ClientState';
+import mediaPlayer from './MediaPlayer';
 import Stars from './Stars';
 
 function Interface(Telep) {
 	// var currentOrderLink;
+	var me = this;
+
+	me.order = "galaxy";
+	me.view = "galaxy";
 
 	this.init = function() {
 
@@ -101,22 +106,70 @@ function Interface(Telep) {
 	}
 
 	function onSortClick(event) {
-		var orderLink = event.currentTarget;
-
-		for(var viewLabelEle of document.getElementsByClassName('current-view')) {
-			viewLabelEle.innerText = orderLink.innerText;
-		}
-
-		for(var viewHeaderEle of document.getElementsByClassName('view-header')) {
-			viewHeaderEle.innerText = orderLink.getAttribute('data-header');
-		}
-
-		sort(orderLink.getAttribute('data-order'), orderLink.getAttribute('data-view'));
+		sort(
+			event.currentTarget.getAttribute('data-order'),
+			event.currentTarget.getAttribute('data-view'),
+			event.currentTarget
+		);
 	}
 
-	function sort(order, view = 'list') {
+	function sort(order, view, clickedEle = false) {
+		///TODO probably move some of this into Interface.js:
+		if(order) {
+			if(me.order) {
+				cor.rc(document.body, me.order + '-order'); ////
+			}
 
-		Stars.sort(order, view);
+			cor.ac(document.body, order + '-order'); ////
+
+			if(order == 'galaxy') {
+				me.view = 'galaxy'; ///REVISIT this solution; not sure it's best architecture
+			} else {
+				// If view is not galaxy:
+
+				if(!view) {
+					if(me.view != 'galaxy') {
+						// Keep current view.
+					} else {
+						// There's no current table view; default to list:
+						view = 'list';
+					}
+				}
+			}
+
+			if(clickedEle.getAttribute('data-order')) {
+				for(var orderLabelEle of document.getElementsByClassName('current-order')) {
+					///REVISIT should we prefer just a data-menu-label attribute or something instead?:
+					orderLabelEle.innerText = clickedEle.innerText;
+					// orderLabelEle.innerText = clickedEle.getAttribute('data-order').replace('-', ' ');
+				}
+			}
+
+			me.order = order;
+		}
+
+		if(view && view != me.view) {
+			if(me.view) {
+				cor.rc(document.body, me.view + '-view'); ////
+			}
+
+			cor.ac(document.body, view + '-view'); ////
+
+			for(var viewLabelEle of document.getElementsByClassName('current-view')) {
+				viewLabelEle.innerText = view;
+				// viewLabelEle.innerText = clickedEle.getAttribute('data-view').replace('-', ' ');
+			}
+
+			me.view = view;
+		}
+
+		if(clickedEle.getAttribute('data-header')) {
+			for(var viewHeaderEle of document.getElementsByClassName('view-header')) {
+				viewHeaderEle.innerText = clickedEle.getAttribute('data-header');
+			}
+		}
+
+		Stars.sort(me.order, me.view);
 	}
 
 	// me.invite = function(event) {

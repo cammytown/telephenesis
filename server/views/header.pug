@@ -24,13 +24,14 @@ header#galaxy-ui
 		a#playingCreatorLink artistwebsite.com
 
 	#sortingUI
-		nav
-			span view: 
-			span.current-view galaxy
+		//-///REVISIT not sure about use of nav in terms of best semantics
+		nav.order-nav
+			span order: 
+			span.current-order galaxy
 
 			ul
 				li
-					a.sort(data-view="galaxy") galaxy
+					a.sort(data-order="galaxy") galaxy
 				li
 					a.sort(data-order="most-recent" data-header="Sorting by Most Recent") by date
 				li
@@ -38,6 +39,16 @@ header#galaxy-ui
 				li
 					a.sort(data-order="bookmarks" data-header="Your Bookmarks") bookmarks
 				//- li recently played
+
+		nav.view-nav
+			span view: 
+			span.current-view galaxy
+
+			ul
+				li
+					a.sort(data-view="list") list
+				li
+					a.sort(data-view="grid") grid
 
 		header
 			h2.view-header Sorting by Most Recent

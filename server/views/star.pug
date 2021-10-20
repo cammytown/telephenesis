@@ -1,0 +1,23 @@
+mixin star(starData = {})
+	.star&attributes(attributes)
+		a(
+			href=starData.fileURL
+			style="background-color: rgb(" + starData.color + ')'
+		)
+
+		//- div.gridBackground
+
+		div.meta
+			span.text.title= starData.title
+
+			if starData.creator && starData.creator.name
+				| by
+				span.text.creator= starData.creator.creatorName
+
+			///COMPAT check:
+			div.text.creationTime= new Date(starData.timestamp).toLocaleDateString()
+
+			div.text.playbackTime
+
+		if block
+			block
