@@ -13,5 +13,9 @@ public/music/*
 
 *.sublime-workspace
 
+#/// maybe commit docs when things are more stable:
+docs/*
+!docs/telephenesis-jsdoc.config.json
+
 #/// temporary, probably:
 mongodata/*
