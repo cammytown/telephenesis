@@ -8,6 +8,7 @@ import HistoryTime from './libs/history-time';
 
 import clientState from './components/ClientState.js';
 import ClientStar from './components/ClientStar.js';
+import Stars from './components/Stars.js';
 
 export default { init };
 
@@ -53,6 +54,7 @@ function onCreateStarClick(event) {
 	event.preventDefault();
 
 	workingStar = new ClientStar();
+	workingStar.id = "placeholder"; ///REVISIT architecture
 	workingStar.originStarID = -1;
 }
 
@@ -60,6 +62,7 @@ function onRecreateStarClick(event) {
 	event.preventDefault();
 
 	workingStar = new ClientStar();
+	workingStar.id = "placeholder"; ///REVISIT architecture
 	workingStar.originStarID = parseInt(clientState.actingStar.id.split('s')[1]);
 }
 
@@ -139,25 +142,23 @@ function initializeStarPlacement() {
 	}
 
 	function moveWorkingStarToMouse(event) {
-		var x = event.clientX - spc.map.offsetLeft;
-		var y = event.clientY - spc.map.offsetTop;
-
-		workingStar.element.style.left = x + 'px';
-		workingStar.element.style.top = y + 'px';
+		workingStar.moveToXY(
+			event.clientX - spc.map.offsetLeft,
+			event.clientY - spc.map.offsetTop
+		);
 	}
 
 	function workingStarClick(event) {
 		// User has selected the position for their star.
 
-		workingStar.x = event.clientX - spc.map.offsetLeft;
-		workingStar.y = event.clientY - spc.map.offsetTop;
+		// workingStar.moveToXY( ///REVISIT do we need to have this code both here and in moveWorkingStarToMouse?
+		// 	event.clientX - spc.map.offsetLeft,
+		// 	event.clientY - spc.map.offsetTop
+		// );
 
 		Stars.addStar(workingStar);
 
-		workingStar.element.style.left = workingStar.x + 'px';
-		workingStar.element.style.top = workingStar.y + 'px';
-
-		// spc.ctr(workingStar.x, workingStar.y); /// create callback function for ctr? currently using validPlacementZone fadeOut delay
+		// spc.ctr(workingStar.position.x, workingStar.position.y); /// create callback function for ctr? currently using validPlacementZone fadeOut delay
 
 		if(genesis) {
 			cor.rl(spc.element, 'mousemove', moveWorkingStarToMouse);
@@ -199,8 +200,8 @@ function initializeStarColoring(genesis) {
 		});
 
 		function getColorFromWheelPosition(e) {
-			var cx = -(workingStar.x + (spc.map.offsetLeft - e.clientX));
-			var cy = (workingStar.y + (spc.map.offsetTop - e.clientY));
+			var cx = -(workingStar.position.x + (spc.map.offsetLeft - e.clientX));
+			var cy = (workingStar.position.y + (spc.map.offsetTop - e.clientY));
 
 			var angle = -Math.atan2(cy, cx) * 180 / Math.PI + 180;
 
@@ -223,10 +224,10 @@ function initializeStarColoring(genesis) {
 		var colorShiftSelect = document.getElementById('colorShiftSelect');
 		var rgb = clientState.actingStar.getElementsByTagName('a')[0].style.backgroundColor.substr(4).split(',');
 		var hsl = ColorTool.rgb(rgb[0], rgb[1], parseInt(rgb[2]));
-		console.log(clientState.actingStar.getElementsByTagName('a')[0].style.backgroundColor)
-		console.log(clientState.actingStar.getElementsByTagName('a')[0])
-		console.log(rgb);
-		console.log(hsl);
+		// console.log(clientState.actingStar.getElementsByTagName('a')[0].style.backgroundColor)
+		// console.log(clientState.actingStar.getElementsByTagName('a')[0])
+		// console.log(rgb);
+		// console.log(hsl);
 		colorShiftSelect.children[0].style.background = 'hsl('+(hsl[0]-17)+', 45%, 80%)';
 		colorShiftSelect.children[1].style.background = 'hsl('+(hsl[0]+17)+', 45%, 80%)';
 		workingStar.element.appendChild(colorShiftSelect);

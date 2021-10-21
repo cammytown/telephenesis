@@ -8,6 +8,7 @@
  * @constructor
  */
 function Star() {
+	// PROPERTIES:
 	var me = this;
 
 	me.identityProps = [
@@ -32,18 +33,14 @@ function Star() {
 
 	init();
 
+	// METHODS:
 	function init() {
 		var allProps = me.identityProps.concat(me.serverProps);
 
 		for (var propIndex = 0; propIndex < allProps.length; propIndex++) {
 			var prop = allProps[propIndex];
 			me[prop] = null;
-		}
-	}
-
-	me.observeStar = function(observedStar) { ///REVISIT naming; observeStarMovement?
-		// If star is too close:
-		observedStar.x - me.x
+		};
 	}
 }
 

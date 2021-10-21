@@ -11,12 +11,26 @@ import ClientStar from './ClientStar';
 
 export default new ClientStarsAPI();
 
+/**
+ * Handles star sorting and physics.
+ * @constructor
+ **/
 function ClientStarsAPI() {
 	var me = this;
 
 	var clientStars = [];
-	var constellationLines = []; // Array of start and end points for lines between stars.
-	var animatingLines = []; // Array of indices in constellationLines[] for lines which are not finished drawing.
+
+	var newPositions = {}; ///REVISIT naming
+
+	/** Enforced margin between stars. **/
+	var starSpacing = 50; ///REVISIT placement; in a central config file maybe?
+
+	/** Array of start and end points for lines between stars. **/
+	var constellationLines = [];
+
+	/** Array of indices in constellationLines[] for lines which are not finished drawing. **/
+	var animatingLines = [];
+
 	var lineDrawStartMS; // When the constellation drawing animation began.
 
 	// var isAnimating = false;
@@ -27,10 +41,16 @@ function ClientStarsAPI() {
 
 	this.init = function() {
 		// Convert DOMList to Array for utility:
-		// var starElements = Array.from(document.getElementsByClassName('star')); ////TODO not supported in IE, make sure there's something to fill the gap
+		///REVISIT I have no idea why we need to convert this to an actual array but trying to iterate over
+		/// just getElementsByClassName() is not returning all of the elements and I just spent
+		/// hours trying to figure out why and I'm losing my mind and I give up so:
+		var starElements = Array.from(document.getElementsByClassName('star')); ////TODO not supported in IE, make sure there's something to fill the gap
 
-		// for (var starIndex = 0; starIndex < starElements.length; starIndex++) {
-		for (var starElement of document.getElementsByClassName('star')) {
+		// var starElements = document.getElementsByClassName('star');
+		// for (var starElement of document.getElementsByClassName('star')) {
+		for (var starIndex = 0; starIndex < starElements.length; starIndex++) {
+			var starElement = starElements[starIndex];
+
 			// Skip placement symbol; not a real star:
 			if(starElement.classList.contains('placementSymbol')) {
 				continue;
@@ -38,15 +58,6 @@ function ClientStarsAPI() {
 
 			clientStars.push(new ClientStar(starElement));
 		}
-
-		// for(var starElement of document.getElementsByClassName('star')) {
-		// 	if(starElement.classList.contains('placementSymbol')) {
-		// 		// Skip placement symbol; not a real star:
-		// 		continue;
-		// 	}
-
-		// 	new ClientStar(starElement);
-		// }
 
 		// Convert all styleVar properties to ints (from i.e. "20px" to 20)
 		for(var property in styleVars) {
@@ -61,10 +72,103 @@ function ClientStarsAPI() {
 	// 	// if(state.path == path) return true;
 	// }
 
-	me.addStar = function(clientStar) {
-		for(clientStar of clientStars) {
-			clientStar.observeStar(clientStar);
+	me.addStar = function(newStar) {
+		me.attemptPosition(newStar, newStar.position);
+		clientStars.push(newStar);
+	}
+
+	// /**
+	//  * Observe the placement or movement of a star and adjust positions if necessary.
+	//  * @param observedStar {Star} - The star which has moved or been placed.
+	//  */
+	// this.observeStar = function(observedStar) { ///REVISIT naming; observeStarMovement?
+	// 	// If star is too close:
+	// 	var differenceVector = observedStar.position.subtract(me.position);
+	// 	var starDistance = differenceVector.getMagnitude();
+
+	// 	// If star is too close and adjustments must be made:
+	// 	if(starDistance < starSpacing) {
+	// 		const marginExcess = starSpacing - distance;
+
+	// 		// Move observedStar away from this star:
+	// 		var observedStarMovement = differenceVector.normalize().scale(marginExcess);
+	// 		observedStar.attemptPosition(observedStar.position.add(observedStarMovement));
+
+	// 		// Move this star away from observed star:
+	// 		var starMovement = differenceVector.normalize.scale(-1 * marginExcess);
+	// 		me.attemptPosition(me.position.add(starMovement));
+	// 	}
+	// }
+
+	/**
+	 * Attempt to move the star to a position, signaling nearby stars to also move if necessary.
+	 * @param targetStar {ClientStar} - The star to move.
+	 * @param newPosition {Vector} - Position to move the star to.
+	 */
+	this.attemptPosition = function(targetStar, newPosition) { ///REVISIT naming/architecture
+		////TODO this is currently a very dumb function, simply randomly checking for stars and
+		//// moving directly away from any stars which are too close. This likely can lead to
+		//// very inefficient loops where stars are constantly moving back and forth.
+		//// Perhaps the answer is pick a point and push stars outward from there, like a ripple.
+
+		// me.position = newPosition;
+		// var movingStars = []; ///REVISIT architecture
+
+		// if(newPositions[targetStar.id]) { ////DEBUGGING
+		// 	return;
+		// }
+
+		newPositions[targetStar.id] = newPosition; ///REVISIT 
+		// newPositions[targetStar.id] = newPosition;
+
+		// for(var clientStar of clientStars) {
+		for (var starIndex = 0; starIndex < clientStars.length; starIndex++) {
+			var clientStar = clientStars[starIndex];
+
+			if(clientStar.id == targetStar.id) { ///REVISIT best check?
+				console.log('skipping self');
+				continue;
+			}
+
+			var checkPosition = clientStar.position;
+
+			// Check if we're already planning to move this star:
+			if(newPositions.hasOwnProperty(clientStar.id)) {
+				checkPosition = newPositions[clientStar.id];
+			}
+
+			// Get distance between stars:
+			var differenceVector = newPosition.subtract(checkPosition);
+			var starDistance = differenceVector.getMagnitude();
+
+			if(starDistance == 0) {
+				console.log(targetStar);
+				console.log(clientStar);
+				throw "yeah okay";
+			}
+
+			// If star is too close and adjustments must be made:
+			if(starDistance < starSpacing) {
+				// console.log(differenceVector);
+				const marginExcess = starSpacing - starDistance;
+
+				// Move this clientStar away from targetStar:
+				var clientStarMovement = differenceVector.normalize().scale(-1 * (marginExcess + 10)/2);
+				me.attemptPosition(clientStar, checkPosition.add(clientStarMovement));
+
+				// Move targetStar away from clientStar:
+				var targetStarMovement = differenceVector.normalize().scale((marginExcess + 10)/2);
+				me.attemptPosition(targetStar, newPosition.add(targetStarMovement));
+			}
 		}
+
+		///REVISIT should this wait until the root attemptPosition resolves?:
+		// console.log('actualize ' + targetStar.id);
+		// console.log(newPositions[targetStar.id]);
+		targetStar.position = newPositions[targetStar.id];
+		// for(var movingStar of movingStars) {
+		// 	movingStar.position = newPositions[movingStar.id];
+		// }
 	}
 
 	me.getSortedStars = function(order) {

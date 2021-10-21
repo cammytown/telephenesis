@@ -10,7 +10,6 @@ export default ClientStar;
 
 /**
  * Star data structure for client use.
- * 
  * @param [element] {Element} - Optional pre-existing DOM element which holds the star and attributes.
  * @extends Star
  * @constructor
@@ -45,17 +44,41 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		// Attach event listeners:
 		me.linkElement.addEventListener('click', onClick);
 
+		// Function-scoped variable so we can use getter/setter with same name.
+		var positionValue;
+
 		// Create identity properties:
 		for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
 			var property = me.identityProps[propIndex];
 
-			if(property == 'position') {
-				me.position = new Vector(
-					parseInt(me.element.getAttribute('data-x')),
-					parseInt(me.element.getAttribute('data-y')),
-				);
-			} else {
-				me[property] = me.element.getAttribute('data-' + property);
+			switch(property) {
+				case 'position': {
+					Object.defineProperty(me, 'position', { ///REVISIT architecture
+						get: function() {
+							return positionValue;
+						},
+						set: function(newPos) {
+							positionValue = newPos;
+							me.element.style.left = newPos.x + 'px';
+							me.element.style.top = newPos.y + 'px';
+						},
+						// configurable: true,
+					});
+
+					me.position = new Vector(
+						parseInt(me.element.getAttribute('data-x')),
+						parseInt(me.element.getAttribute('data-y')),
+					);
+					// console.log(me.position);
+				} break;
+
+				case 'id': {
+					me.id = me.element.id;
+				} break;
+
+				default: {
+					me[property] = me.element.getAttribute('data-' + property);
+				}
 			}
 		}
 
@@ -66,6 +89,15 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	function onClick(event) {
 		event.preventDefault();
 		me.play();
+	}
+
+	/**
+	 * Moves the star to a 2D coordinate.
+	 * @param x {int}
+	 * @param y {int}
+	 */
+	this.moveToXY = function(x, y) {
+		me.position = new Vector(x, y);
 	}
 
 	me.play = function() {
