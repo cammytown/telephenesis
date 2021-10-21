@@ -3,10 +3,18 @@ import spc from '../libs/minlab/spc'; //// ultimately whatever spc becomes proba
 
 // import clientState from './components/ClientState';
 import Star from '../../../abstract/Star.js';
+import Vector from '../../../abstract/Vector.js';
 import mediaPlayer from './MediaPlayer';
 
 export default ClientStar;
 
+/**
+ * Star data structure for client use.
+ * 
+ * @param [element] {Element} - Optional pre-existing DOM element which holds the star and attributes.
+ * @extends Star
+ * @constructor
+ */
 function ClientStar(element) { ///REVISIT element not in use atm
 	var me = this;
 
@@ -40,7 +48,15 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		// Create identity properties:
 		for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
 			var property = me.identityProps[propIndex];
-			me[property] = me.element.getAttribute('data-' + property);
+
+			if(property == 'position') {
+				me.position = new Vector(
+					parseInt(me.element.getAttribute('data-x')),
+					parseInt(me.element.getAttribute('data-y')),
+				);
+			} else {
+				me[property] = me.element.getAttribute('data-' + property);
+			}
 		}
 
 		// Add to DOM:

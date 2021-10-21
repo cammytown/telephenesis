@@ -14,7 +14,7 @@ export default new ClientStarsAPI();
 function ClientStarsAPI() {
 	var me = this;
 
-	var starElements;
+	var clientStars = [];
 	var constellationLines = []; // Array of start and end points for lines between stars.
 	var animatingLines = []; // Array of indices in constellationLines[] for lines which are not finished drawing.
 	var lineDrawStartMS; // When the constellation drawing animation began.
@@ -27,17 +27,16 @@ function ClientStarsAPI() {
 
 	this.init = function() {
 		// Convert DOMList to Array for utility:
-		starElements = Array.from(document.getElementsByClassName('star')); ////TODO not supported in IE, make sure there's something to fill the gap
+		// var starElements = Array.from(document.getElementsByClassName('star')); ////TODO not supported in IE, make sure there's something to fill the gap
 
-		for (var starIndex = 0; starIndex < starElements.length; starIndex++) {
-			var starElement = starElements[starIndex];
-
+		// for (var starIndex = 0; starIndex < starElements.length; starIndex++) {
+		for (var starElement of document.getElementsByClassName('star')) {
 			// Skip placement symbol; not a real star:
 			if(starElement.classList.contains('placementSymbol')) {
 				continue;
 			}
 
-			new ClientStar(starElement);
+			clientStars.push(new ClientStar(starElement));
 		}
 
 		// for(var starElement of document.getElementsByClassName('star')) {
@@ -62,7 +61,13 @@ function ClientStarsAPI() {
 	// 	// if(state.path == path) return true;
 	// }
 
-	this.getSortedStars = function(order) {
+	me.addStar = function(clientStar) {
+		for(clientStar of clientStars) {
+			clientStar.observeStar(clientStar);
+		}
+	}
+
+	me.getSortedStars = function(order) {
 		// if(me.cachedSorts[order] != null) {
 		// 	////CHECK if there have been changes to the loaded stars, we cannot use cache
 		// 	return true;
@@ -72,18 +77,13 @@ function ClientStarsAPI() {
 		switch(order) {
 			case 'most-recent': {
 				// me.cachedSorts['most-recent'] = [];
-				me.cachedSorts['most-recent'] = starElements.sort((a, b) => {
+				me.cachedSorts['most-recent'] = clientStars.sort((a, b) => {
 					// If B is more recent than A, return true
-					return parseInt(b.getAttribute('data-timestamp'))
-						- parseInt(a.getAttribute('data-timestamp'));
+					return parseInt(b.element.getAttribute('data-timestamp'))
+						- parseInt(a.element.getAttribute('data-timestamp'));
 				});
 
 				return me.cachedSorts['most-recent'];
-
-				// for (var eleIndex = 0; eleIndex < starElements.length; eleIndex++) {
-				// 	var starEle = starElements[eleIndex];
-				// 	me.cachedSorts['most-recent']
-				// }
 			} break;
 
 			case 'most-popular': {
@@ -113,8 +113,8 @@ function ClientStarsAPI() {
 			case 'galaxy': {
 				spc.s = true;
 
-				for (var starIndex = 0; starIndex < starElements.length; starIndex++) {
-					var starEle = starElements[starIndex];
+				for (var starIndex = 0; starIndex < clientStars.length; starIndex++) {
+					var starEle = clientStars[starIndex].element;
 
 					cor.rc(document.body, 'sorting'); ////
 
@@ -275,10 +275,11 @@ function ClientStarsAPI() {
 		// isAnimating = true;
 
 		// Loop through stars and queue an animated line draw.
-		var starElements = document.getElementsByClassName('star');
 		var lineIndex = 0;
-		for (var starIndex = 0; starIndex < starElements.length; starIndex++) {
-			var starElement = starElements[starIndex];
+		for (var starIndex = 0; starIndex < clientStars.length; starIndex++) {
+			var clientStar = clientStars[starIndex];
+			var starElement = clientStar.element;
+
 			if(starElement.getAttribute('data-prev')) {
 				var originStarID = starElement.getAttribute('data-prev');
 
@@ -289,8 +290,10 @@ function ClientStarsAPI() {
 					constellationLines.push({
 						startX: parseInt(rootStar.style.left),
 						startY: parseInt(rootStar.style.top),
-						endX: parseInt(starElement.style.left),
-						endY: parseInt(starElement.style.top),
+						endX: clientStar.position.x,
+						endY: clientStar.position.y,
+						// endX: parseInt(starElement.style.left),
+						// endY: parseInt(starElement.style.top),
 						startColor: rootStar.getElementsByTagName('a')[0].style.backgroundColor, ///
 						endColor: starElement.getElementsByTagName('a')[0].style.backgroundColor, ///
 						tier: parseInt(starElement.getAttribute('data-tier')),

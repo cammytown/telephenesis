@@ -147,10 +147,12 @@ function initializeStarPlacement() {
 	}
 
 	function workingStarClick(event) {
-		// user has selected the position for their star
+		// User has selected the position for their star.
 
 		workingStar.x = event.clientX - spc.map.offsetLeft;
 		workingStar.y = event.clientY - spc.map.offsetTop;
+
+		Stars.addStar(workingStar);
 
 		workingStar.element.style.left = workingStar.x + 'px';
 		workingStar.element.style.top = workingStar.y + 'px';

@@ -17,11 +17,13 @@ Listeners can browse through a growing constellation of the progression of music
 - Community features like discussion.
 
 ## Built using
-* [Node.js](https://nodejs.org/en/)
-* [Express](https://expressjs.com/)
-* [LAME](https://lame.buanzo.org/)
-* [MongoDB](https://www.mongodb.com/)
+- [Node.js](https://nodejs.org/en/)
+- [Express](https://expressjs.com/)
+- [LAME](https://lame.buanzo.org/)
+- [MongoDB](https://www.mongodb.com/)
+- Pug template engine
+- SASS
 
 ## Credits
-* **Chris Marianetti** - [nopiano.com](http://nopiano.com) - design
-* **Cameron Steele** - [steelecameron.com](https://steelecameron.com) - programming, design
+- **Chris Marianetti** - [nopiano.com](http://nopiano.com) - design, concept
+- **Cameron Steele** - [steelecameron.com](https://steelecameron.com) - programming, design

@@ -2,6 +2,11 @@
 ## PHASE 1
 ### 3
 - future-proof star placement
+	a star is placed.
+	client repositions stars.
+	color star
+	actualize
+	server validates repo
 
 ### 2
 - better aesthetic for scrolling through list view

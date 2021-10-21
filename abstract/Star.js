@@ -4,8 +4,9 @@
  * This class is used by both server and client to
  * work with stars; largely as a centralized
  * data structure.
+ * 
+ * @constructor
  */
-
 function Star() {
 	var me = this;
 
@@ -13,8 +14,9 @@ function Star() {
 		'id',
 		'originStarID',
 		'title',
-		'x',
-		'y',
+		// 'x',
+		// 'y',
+		'position',
 		'color',
 		'tier',
 		'creator',
@@ -37,6 +39,11 @@ function Star() {
 			var prop = allProps[propIndex];
 			me[prop] = null;
 		}
+	}
+
+	me.observeStar = function(observedStar) { ///REVISIT naming; observeStarMovement?
+		// If star is too close:
+		observedStar.x - me.x
 	}
 }
 
