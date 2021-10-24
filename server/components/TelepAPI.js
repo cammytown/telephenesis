@@ -261,12 +261,14 @@ module.exports = function(db) {
 					creatorLink: usrMeta.creatorLink
 				}
 
+				return true;
+			})
+			.then(attemptPlacement(serverStar))
+			.then(starMovements => {
 				serverStar.active = true;
 
 				// Load data into ServerStar:
 				// var newStar = new ServerStar(serverStar);
-
-				// console.log(serverStar);
 
 				if(serverStar.originStarID == -1) { /// is this the check we want??
 					// Creating a new constellation.
@@ -322,6 +324,81 @@ module.exports = function(db) {
 			.catch(err => {
 				throw err;
 			});
+	}
+
+		// get stars
+	}
+
+	/**
+	 * Attempt to move the star to a position, signaling nearby stars to also move if necessary.
+	 * @param targetStar {ServerStar} - The ServerStar containing the proposed position.
+	 */
+	// this.attemptPosition = function(targetStar, newPosition) { ///REVISIT naming/architecture
+	var starMovements = {}; ///ARCHITECTURE
+	me.attemptPlacement = function(targetStar, position = false) {
+		////TODO this is currently a very dumb function, simply randomly checking for stars and
+		//// moving directly away from any stars which are too close. This likely can lead to
+		//// very inefficient loops where stars are constantly moving back and forth.
+		//// Perhaps the answer is pick a point and push stars outward from there, like a ripple.
+
+		var newPosition;
+		if(position) {
+			newPosition = position;
+		} else {
+			newPosition = targetStar.position;
+		}
+
+		starMovements[targetStar.id] = newPosition; ///REVISIT
+
+		
+
+		for (var starIndex = 0; starIndex < clientStars.length; starIndex++) {
+			var clientStar = clientStars[starIndex];
+
+			if(clientStar.id == targetStar.id) { ///REVISIT best check?
+				console.log('skipping self');
+				continue;
+			}
+
+			var checkPosition = clientStar.position;
+
+			// Check if we're already planning to move this star:
+			if(starMovements.hasOwnProperty(clientStar.id)) {
+				checkPosition = starMovements[clientStar.id];
+			}
+
+			// Get distance between stars:
+			var differenceVector = newPosition.subtract(checkPosition);
+			var starDistance = differenceVector.getMagnitude();
+
+			if(starDistance == 0) {
+				console.log(targetStar);
+				console.log(clientStar);
+				throw "yeah okay";
+			}
+
+			// If star is too close and adjustments must be made:
+			if(starDistance < starSpacing) {
+				// console.log(differenceVector);
+				const marginExcess = starSpacing - starDistance;
+
+				// Move this clientStar away from targetStar:
+				var clientStarMovement = differenceVector.normalize().scale(-1 * (marginExcess + 10)/2);
+				me.attemptPosition(clientStar, checkPosition.add(clientStarMovement));
+
+				// Move targetStar away from clientStar:
+				var targetStarMovement = differenceVector.normalize().scale((marginExcess + 10)/2);
+				me.attemptPosition(targetStar, newPosition.add(targetStarMovement));
+			}
+		}
+
+		///REVISIT should this wait until the root attemptPosition resolves?:
+		// console.log('actualize ' + targetStar.id);
+		// console.log(starMovements[targetStar.id]);
+		targetStar.position = starMovements[targetStar.id];
+		// for(var movingStar of movingStars) {
+		// 	movingStar.position = starMovements[movingStar.id];
+		// }
 	}
 
 	me.renameStar = function(starId, creatorName, callback) {

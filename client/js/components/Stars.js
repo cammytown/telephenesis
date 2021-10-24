@@ -103,13 +103,12 @@ function ClientStarsAPI() {
 	 * @param targetStar {ClientStar} - The star to move.
 	 * @param newPosition {Vector} - Position to move the star to.
 	 */
+	var starMovements = {}; ///ARCHITECTURE
 	this.attemptPosition = function(targetStar, newPosition) { ///REVISIT naming/architecture
 		////TODO this is currently a very dumb function, simply randomly checking for stars and
 		//// moving directly away from any stars which are too close. This likely can lead to
 		//// very inefficient loops where stars are constantly moving back and forth.
 		//// Perhaps the answer is pick a point and push stars outward from there, like a ripple.
-
-		var starMovements = {};
 
 		// me.position = newPosition;
 		// var movingStars = []; ///REVISIT architecture

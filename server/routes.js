@@ -205,7 +205,7 @@ function actualizeStar(req, res) {
 					res.json({
 						error: 0,
 						creatorName: req.user.usrMeta.creatorName,
-						movedStars: ,
+						starMovements: ,
 					});
 				})
 				.catch(err => {
