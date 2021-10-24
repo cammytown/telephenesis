@@ -57,36 +57,42 @@ module.exports = function(db, vl, bcrypt) {
 		}
 	}
 
-	this.check = function(em, pw, ip, cb) { /// rename
-		validate(em, pw, ip, function(errors, doc) {
-			collection.findOne({em: em}, function(findErrors, doc) {
-				if(findErrors) {
-					// console.log(findErrors);
-					cb(findErrors, doc);
-					return false;
-				}
+	this.check = function(em, pw, ip, cb) { /// rename; what is diff between this and validate?
+		return validate(em, pw, ip)
+			.then(isValid => {
+				return collection.findOne({em: em})
+					.then(doc => {
+						if(!doc) { /// safe check?
+							cb("No user with email " + em); ////
+							return false;
+						}
 
-				if(!doc) { /// safe check?
-					cb("No user with email " + em); ////
-					return false;
-				}
+						var ts = doc.ts;
+						var s = sl(em, ts);
 
-				var ts = doc.ts;
-				var s = sl(em, ts);
+						if(!bcrypt.compareSync(pw+s, doc.pw)) {
+							errors.push("Invalid email/password combination.");
+							cb(errors, doc);
+							throw errors;
+						}
 
-				if(!bcrypt.compareSync(pw+s, doc.pw)) {
-					errors.push("Invalid email/password combination.");
-					cb(errors, doc);
-					return false;
-				}
-
-				cb(errors, doc);
+						cb(false, doc);
+						return doc;
+					})
+					.catch(findErrors => {
+						// console.log(findErrors);
+						cb(findErrors, doc);
+						throw findErrors;
+					});
+			})
+			.catch(errors => {
+				if(cb) cb(errors);
+				throw errors;
 			});
-		});
 	}
 
 	this.li = function(em, pw, ip, cb, checkOnly) { /// rename checkOnly
-		this.check(em, pw, ip, function(errors, doc) {
+		return this.check(em, pw, ip, function(errors, doc) {
 			if(errors.length) { /// safe check?
 				if(cb) cb(errors);
 				return false;
@@ -157,9 +163,9 @@ module.exports = function(db, vl, bcrypt) {
 		var errors = [];
 
 		if(!em.length) { /// safe check?
-			errors.push("U NEED AN EMAIL BRO.");
+			errors.push("No email entered.");
 		} else if(!vl.isEmail(em)) {
-			errors.push("DAT AIN'T NO EMAIL.");
+			errors.push("Not a valid email.");
 		}
 
 		if(!pw.length) {
@@ -168,9 +174,13 @@ module.exports = function(db, vl, bcrypt) {
 			errors.push("Please use a stronger password.");
 		}
 
-		cb(errors);
+		if(cb) cb(errors);
 
-		return false;
+		if(errors.length) {
+			throw errors;
+		}
+
+		return true;
 	}
 
 	function sl(em, ts) {

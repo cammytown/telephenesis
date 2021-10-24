@@ -20,8 +20,6 @@ function ClientStarsAPI() {
 
 	var clientStars = [];
 
-	var newPositions = {}; ///REVISIT naming
-
 	/** Enforced margin between stars. **/
 	var starSpacing = 50; ///REVISIT placement; in a central config file maybe?
 
@@ -111,15 +109,17 @@ function ClientStarsAPI() {
 		//// very inefficient loops where stars are constantly moving back and forth.
 		//// Perhaps the answer is pick a point and push stars outward from there, like a ripple.
 
+		var starMovements = {};
+
 		// me.position = newPosition;
 		// var movingStars = []; ///REVISIT architecture
 
-		// if(newPositions[targetStar.id]) { ////DEBUGGING
+		// if(starMovements[targetStar.id]) { ////DEBUGGING
 		// 	return;
 		// }
 
-		newPositions[targetStar.id] = newPosition; ///REVISIT 
-		// newPositions[targetStar.id] = newPosition;
+		starMovements[targetStar.id] = newPosition; ///REVISIT 
+		// starMovements[targetStar.id] = newPosition;
 
 		// for(var clientStar of clientStars) {
 		for (var starIndex = 0; starIndex < clientStars.length; starIndex++) {
@@ -133,8 +133,8 @@ function ClientStarsAPI() {
 			var checkPosition = clientStar.position;
 
 			// Check if we're already planning to move this star:
-			if(newPositions.hasOwnProperty(clientStar.id)) {
-				checkPosition = newPositions[clientStar.id];
+			if(starMovements.hasOwnProperty(clientStar.id)) {
+				checkPosition = starMovements[clientStar.id];
 			}
 
 			// Get distance between stars:
@@ -164,10 +164,10 @@ function ClientStarsAPI() {
 
 		///REVISIT should this wait until the root attemptPosition resolves?:
 		// console.log('actualize ' + targetStar.id);
-		// console.log(newPositions[targetStar.id]);
-		targetStar.position = newPositions[targetStar.id];
+		// console.log(starMovements[targetStar.id]);
+		targetStar.position = starMovements[targetStar.id];
 		// for(var movingStar of movingStars) {
-		// 	movingStar.position = newPositions[movingStar.id];
+		// 	movingStar.position = starMovements[movingStar.id];
 		// }
 	}
 
@@ -185,7 +185,7 @@ function ClientStarsAPI() {
 					// If B is more recent than A, return true
 					return parseInt(b.element.getAttribute('data-timestamp'))
 						- parseInt(a.element.getAttribute('data-timestamp'));
-				});
+				}).map(star => star.element);
 
 				return me.cachedSorts['most-recent'];
 			} break;
@@ -239,6 +239,7 @@ function ClientStarsAPI() {
 				spc.s = false;
 
 				var sortedElements = this.getSortedStars(order);
+				console.log(sortedElements);
 
 				///REVISIT these variables only used by grid view; sort of odd placed here:
 				var currentRow = 0;

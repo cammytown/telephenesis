@@ -7,6 +7,9 @@ form#login.uibox.ajax(action="/login" method="POST" data-ajax-action="/ajax/logi
 
 	button.btn.main(type="submit") Login
 
+	ul.errors
+
+
 form#register.uibox.ajax(action="/register" method="POST" data-ajax-action="/ajax/register")
 	label.floatBeside(for="email") Email
 	input(name="email" value=user.em type="text" placeholder="email")
@@ -26,3 +29,5 @@ form#register.uibox.ajax(action="/register" method="POST" data-ajax-action="/aja
 	input(type="password" name="password-confirm" placeholder="password again")
 
 	button.btn.main(type="submit") Register
+
+	ul.errors

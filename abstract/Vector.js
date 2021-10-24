@@ -88,5 +88,5 @@ class Vector {
 	}
 }
 
-// module.exports = Vector;
-export default Vector;
+module.exports = Vector;
+// export default Vector;

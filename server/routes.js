@@ -38,6 +38,8 @@ function initializeRoutes(telepServer) {
 
 	ajaxRouter.post('/upload/:starid', api.auth('creator'), upload.single('submission'), uploadMedia);
 
+	ajaxRouter.use(ajaxErrorHandler);
+
 	app.use('/ajax', ajaxRouter);
 
 	// app.post('/register', register);
@@ -116,35 +118,37 @@ function bookmarkStar(req, res) {
 }
 
 function userCheck(req, res) {
-	res.json({ error: !req.user });
+	if(!req.user) {
+		throw "Not logged in.";
+	}
+
+	return true;
+	// res.json({ error: err });
+}
+
+function ajaxErrorHandler(err, req, res, next) {
+	res.json({ errors: err });
 }
 
 function login(req, res, next) {
-	usr.li(
-		req.body.email,
-		req.body.password,
-		req.ip,
-		function(err, sessionCode) {
-			if(err.length) {
-				// res.render('login', { p: req.body, errors: err });
-				next(err);
-				throw err;
+	return usr.li(req.body.email, req.body.password, req.ip)
+		.then(sessionCode => {
+			res.cookie('usr_ss', sessionCode, {
+				// secure: true /// https only
+			});
 
-			} else {
-				res.cookie('usr_ss', sessionCode, {
-					// secure: true /// https only
-				});
-
-				usr.in(sessionCode)
+			return usr.in(sessionCode)
 				.then(user => {
 					req.user = user;
 				})
 				.then(next)
 				.catch(err => next(err));
-			}
-		}
-	);
-
+		})
+		.catch(errors => {
+			// res.render('login', { p: req.body, errors: err });
+			next(errors);
+			// throw err;
+		});
 }
 
 function register(req, res, next) {
@@ -198,7 +202,11 @@ function actualizeStar(req, res) {
 			// Create the star in the database:
 			return api.createStar(req.user.id, newStar)
 				.then(result => {
-					res.json({ error: 0, creatorName: req.user.usrMeta.creatorName });
+					res.json({
+						error: 0,
+						creatorName: req.user.usrMeta.creatorName,
+						movedStars: ,
+					});
 				})
 				.catch(err => {
 					console.error(err); ///

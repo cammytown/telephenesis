@@ -1,4 +1,12 @@
+/**
+ * Handles history state navigation in web browsers.
+ * @external
+ */
 class HistoryTime { //v0.1
+	/**
+	 * Create a new instance of this class.
+	 * @param [gtag] {Object}
+	 */
 	constructor(gtag = false) {
 		this.gtag = gtag;
 
@@ -25,6 +33,7 @@ class HistoryTime { //v0.1
 	// 	history.back();
 	// }
 
+	/** Test **/
 	popState(event) {
 		this.state = event.state;
 		// var pageTitle = this.state.url.split('/').pop();

@@ -169,6 +169,8 @@ function Interface(Telep) {
 			}
 		}
 
+		console.log([me.order, me.view]);
+
 		Stars.sort(me.order, me.view);
 	}
 

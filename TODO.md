@@ -1,15 +1,12 @@
 # TODO
 ## PHASE 1
 ### 3
-- future-proof star placement
-	a star is placed.
-	client repositions stars.
-	color star
-	actualize
-	server validates repo
+- move star placement code to server side
 
 ### 2
 - better aesthetic for scrolling through list view
+
+- pressing escape on login when trying to get rid of autofill minimizes the login screen
 
 - future-proof large amounts of stars
 
@@ -20,6 +17,8 @@
 - i think fade context menus in a little bit
 
 - improve star sorting UI
+
+- make bookmarks order link appear disabled if no bookmarks (or if guest)
 
 - give sorts their own URIs
 

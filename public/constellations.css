@@ -54,6 +54,11 @@ header#galaxy-ui {
 }
 
 /* forms */
+form .errors label {
+  display: block;
+  color: #e66;
+}
+
 input[type=text],
 input[type=password],
 textarea {

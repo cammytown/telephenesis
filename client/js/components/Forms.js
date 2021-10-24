@@ -45,9 +45,25 @@ function ClientForms() {
 		// var children = form.children;
 		var op = form.id; ///REVISIT bad architecture
 
-		if(result.error) {
-			console.error(result.error);
-			throw new Error(result.error);
+		if(result.errors) {
+			// console.error(result.error);
+			// throw new Error(result.error);
+
+			var errorsWrapper = form.getElementsByClassName('errors')[0]; ///REVISIT architecture
+
+			if(!errorsWrapper) {
+				throw "No .errors wrapper available in <form> element.";
+			}
+
+			for(var error of result.errors) {
+				///REVISIT architecture:
+				var errorItemEle = document.createElement('li');
+				var errorLabelEle = document.createElement('label');
+				errorLabelEle.innerText = error;
+				///TODO add 'for' attribute and link it to correlated form field if appropriate
+				errorItemEle.appendChild(errorLabelEle);
+				errorsWrapper.appendChild(errorLabelEle);
+			}
 		} else {
 			///
 			// HistoryTime.goBack()

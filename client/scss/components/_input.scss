@@ -1,4 +1,13 @@
 /* forms */
+form {
+	.errors {
+		label {
+			display: block;
+			color: $errorText;
+		}
+	}
+}
+
 input[type="text"],
 input[type="password"],
 textarea {
@@ -57,8 +66,6 @@ textarea#code {
 		background-color: rgba(150, 175, 200, 0.3);
 	}
 }
-
-
 
 .upload { ///sloppy?
 	position: relative;
