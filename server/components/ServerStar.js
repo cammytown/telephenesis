@@ -28,15 +28,22 @@ function ServerStar(starData) {
 		///TODO maybe more value and type validation? log when bad values/props are used
 
 		// var filteredData = {};
-		var intProps = ['id', 'originStarID', 'x', 'y'];
+		var intProps = ['id', 'originStarID'];
 
 		for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
 			var identityProp = me.identityProps[propIndex];
 
+			// If property is an object, convert from string:
+			if(me.objectProps.indexOf(identityProp) != -1) {
+				if(data[identityProp] instanceof Object == false) {
+					data[identityProp] = JSON.parse(data[identityProp]);
+				}
+			}
+
 			if(intProps.indexOf(identityProp) != -1) {
 				me[identityProp] = parseInt(data[identityProp]);
 			} else if(identityProp == 'position') {
-				me.position = new Vector();
+				me.position = new Vector(data.position.x, data.position.y);
 			} else {
 				me[identityProp] = data[identityProp];
 			}

@@ -4,15 +4,15 @@
 class Vector {
 	/**
 	 * Create a new Vector.
-	 * @param [x=0] {int} - x coordinate
-	 * @param [y=0] {int} - y coordinate
+	 * @param [x=0] {float} - x coordinate
+	 * @param [y=0] {float} - y coordinate
 	 */
 	constructor(x = 0, y = 0) {
 		/** X value. **/
-		this.x = x;
+		this.x = parseFloat(x);
 
 		/** Y value. **/
-		this.y = y;
+		this.y = parseFloat(y);
 	}
 
 	/**
@@ -33,9 +33,9 @@ class Vector {
 	 * @returns {Vector} Result of subtracting inputVector from this one.
 	 */
 	subtract(inputVector) {
-		if(inputVector instanceof Vector == false) {
+		if(inputVector instanceof Vector == false) { ///MOVE
 			console.error("not a vector");
-			throw "inputVector not a Vector";
+			throw new Error("inputVector not a Vector");
 		}
 
 		return new Vector(
@@ -85,6 +85,14 @@ class Vector {
 	 */
 	getMagnitude() {
 		return Math.sqrt(this.x*this.x + this.y*this.y);
+	}
+
+	/**
+	 * Returns new vector with properties of this vector rounded down.
+	 * @returns {Vector} rounded vector.
+	 */
+	floor() {
+		return new Vector(Math.floor(this.x), Math.floor(this.y));
 	}
 }
 

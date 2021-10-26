@@ -127,6 +127,7 @@ function userCheck(req, res) {
 }
 
 function ajaxErrorHandler(err, req, res, next) {
+	console.log(err.stack);
 	console.log('ajax error: ' + err);
 	// console.trace();
 	res.json({ errors: err });

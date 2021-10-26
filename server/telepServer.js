@@ -66,7 +66,7 @@ function TelepServer() {
 
 	function initializeTelep() {
 		me.usr = new Usr(me.db, validator, bcrypt);
-		me.api = new TelepAPI(me.db);
+		me.api = new TelepAPI(me.db, me.config);
 
 		me.app.use(session({
 			secret: me.config.sessionSecret, ////

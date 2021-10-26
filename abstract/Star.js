@@ -31,6 +31,10 @@ function Star() {
 		'active',
 	];
 
+	me.objectProps = [
+		'position'
+	];
+
 	init();
 
 	// METHODS:

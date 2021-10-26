@@ -329,7 +329,15 @@ function actualizeCreation() {
 	for (var propIndex = 0; propIndex < workingStar.identityProps.length; propIndex++) {
 		var identityProp = workingStar.identityProps[propIndex];
 
-		formData.append(identityProp, workingStar[identityProp]);
+		// If property is an object:
+		if(workingStar.objectProps.indexOf(identityProp) != -1) { ///probably keep array of which properties are objects in Star class
+			formData.append(identityProp, JSON.stringify(workingStar[identityProp]));
+
+		// Property is a literal value; no need to stringify:
+		} else {
+			formData.append(identityProp, workingStar[identityProp]);
+		}
+
 	}
 
 	var request = {
@@ -337,15 +345,21 @@ function actualizeCreation() {
 		body: formData
 	};
 
-	console.log(workingStar);
-
 	fetch('/ajax/actualize', request) ///REVISIT old browser compatability?
 		.then(response => response.json())
 		.then(result => {
+			// Shift stars around according to server instructions:
+			for(var starID in result.starMovements) {
+				var newPosition = result.starMovements[starID];
+				Stars.clientStars[starID].move(newPosition);
+			}
+
+			// Update star element attributes:
 			workingStar.titleElement.className = 'text name';
 			workingStar.titleElement.innerText = workingStar.title;
-
 			workingStar.linkElement.href = '/' + workingStar.starID;
+
+			// Add normal star click listener:
 			cor.al(workingStar.linkElement, 'click', function(e) {
 				e.preventDefault();
 				state.updating = true;

@@ -1,13 +1,15 @@
 const Lame = require('node-lame').Lame;
 const fs = require('fs');
+const Vector = require('../../abstract/Vector.js');
 
 const ServerStar = require('./ServerStar.js');
 
-module.exports = function(db) {
+module.exports = function TelepAPI(db, config) {
 	var constellations = db.collection('MLconstellations');
 	var stars = db.collection('MLstars');
 
 	var me = this;
+	var config = config;
 
 	var musicPath = __dirname + "/../public/music/";
 
@@ -125,10 +127,11 @@ module.exports = function(db) {
 			// .then(results => {
 			.toArray()
 			.then(results => {
-				results.forEach(document => {
+				results.forEach(document => { ///ARCHITECTURE create some kind of decorator method probably:
 					var creationDate = new Date(document._id.getTimestamp());
 					document.timestamp = creationDate.getTime(); // Convert Date to unix timestamp
-				} );
+					document.position = new Vector(document.position.x, document.position.y);
+				});
 
 				if(cb) cb(results);
 
@@ -252,90 +255,92 @@ module.exports = function(db) {
 
 		// Get creator information:
 		return me.getUsrMeta(userID)
-		.then(usrMeta => {
-			serverStar.id = newStarID;
+			.then(usrMeta => {
+				serverStar.id = newStarID;
 
-			serverStar.creator = { ///REVISIT architecture?
-				id: usrMeta._id,
-				creatorName: usrMeta.creatorName,
-				creatorLink: usrMeta.creatorLink
-			}
-
-			return true;
-		})
-		.then(attemptPlacement(serverStar))
-		.then(starMovements => {
-			serverStar.active = true;
-
-			// Load data into ServerStar:
-			// var newStar = new ServerStar(serverStar);
-
-			// If this is an origin star; first in a constellation.
-			if(serverStar.originStarID == -1) { /// is this the check we want??
-				// Create a new constellation:
-				var newConstellationID = constellationCount + 1;
-				constellationCount += 1;
-				MLMeta.updateOne({ id: "persistors" }, { $inc: { constellationCount: 1 } });
-
-				var newConstellation = {
-					id: newConstellationID,
-					starIDs: [newStarID]
+				serverStar.creator = { ///REVISIT architecture?
+					id: usrMeta._id,
+					creatorName: usrMeta.creatorName,
+					creatorLink: usrMeta.creatorLink
 				}
 
-				constellations.insertOne(newConstellation, function(err, result) {
-					////TODO refactoring; what if there's an err?
-					if(err) {
-						console.error(err);
+				return true;
+			})
+			.then(success => me.attemptPlacement(serverStar))
+			.then(starMovements => {
+				serverStar.active = true;
+				serverStar.position = starMovements[serverStar.id];
+
+				// Load data into ServerStar:
+				// var newStar = new ServerStar(serverStar);
+
+				// If this is an origin star; first in a constellation.
+				if(serverStar.originStarID == -1) { /// is this the check we want??
+					// Create a new constellation:
+					var newConstellationID = constellationCount + 1;
+					constellationCount += 1;
+					MLMeta.updateOne({ id: "persistors" }, { $inc: { constellationCount: 1 } });
+
+					var newConstellation = {
+						id: newConstellationID,
+						starIDs: [newStarID]
 					}
-				});
 
-				// Update star data to reflect new constellation:
-				serverStar.constellationID = newConstellationID;
-				serverStar.tier = 0;
-
-				return stars.insertOne(serverStar)
-					.then(result => {
-						if(callback) callback(false, result.ops[0]);
-
-						return {
-							newStar: result.ops[0],
-							starMovements
+					constellations.insertOne(newConstellation, function(err, result) {
+						////TODO refactoring; what if there's an err?
+						if(err) {
+							console.error(err);
 						}
-					})
-					.catch(err => {
-						if(callback) callback(err);
-						throw err; ///
 					});
 
-			// Else this is a recreation of a star:
-			} else {
-				// Get original star:
-				return me.getStar(serverStar.originStarID)
-					.then(originStar => {
-						// Store some originStar data in the new star for quick reference: ///ARCHITECTURE
-						serverStar.originStarID = originStar.id;
-						serverStar.constellationID = originStar.constellationID;
-						serverStar.tier = originStar.tier + 1;
+					// Update star data to reflect new constellation:
+					serverStar.constellationID = newConstellationID;
+					serverStar.tier = 0;
 
-						return stars.insertOne(serverStar);
-					})
-					.then(result => {
-						if(callback) callback(false, result.ops[0]); ///
+					return stars.insertOne(serverStar)
+						.then(result => {
+							if(callback) callback(false, result.ops[0]);
 
-						return {
-							newStar: result.ops[0],
-							starMovements
-						}
-					})
-					.catch(err => {
-						if(callback) callback(err);
-						throw err;
-					});
-			}
-		})
-		.catch(err => {
-			throw err;
-		});
+							return {
+								newStar: result.ops[0],
+								starMovements
+							}
+						})
+						.catch(err => {
+							if(callback) callback(err);
+							console.error(err);
+							throw err; ///
+						});
+
+				// Else this is a recreation of a star:
+				} else {
+					// Get original star:
+					return me.getStar(serverStar.originStarID)
+						.then(originStar => {
+							// Store some originStar data in the new star for quick reference: ///ARCHITECTURE
+							serverStar.originStarID = originStar.id;
+							serverStar.constellationID = originStar.constellationID;
+							serverStar.tier = originStar.tier + 1;
+
+							return stars.insertOne(serverStar);
+						})
+						.then(result => {
+							if(callback) callback(false, result.ops[0]); ///
+
+							return {
+								newStar: result.ops[0],
+								starMovements
+							}
+						})
+						.catch(err => {
+							if(callback) callback(err);
+							throw err;
+						});
+				}
+			})
+			.catch(err => {
+				throw err;
+			});
 	}
 
 	/**
@@ -349,8 +354,41 @@ module.exports = function(db) {
 		//// very inefficient loops where stars are constantly moving back and forth.
 		//// Perhaps the answer is pick a point and push stars outward from there, like a ripple.
 
+		if(!position) {
+			position = targetStar.position;
+		}
+
 		return me.getStars()
-			.then(stars => initializeMovementLoop(stars, targetStar, position));
+			.then(stars => initializeMovementLoop(stars, targetStar, position))
+			.then(starMovements => {
+				///ARCHITECURE/OPTIMIZATION:
+
+				// Write movements to the server:
+				for(starID in starMovements) {
+					if(starID == targetStar.id) {
+						continue; ///// this assumes that the star we've passed in has not yet been created in the database. rework, probably. at least add a flag
+					}
+
+					var newPosition = starMovements[starID];
+
+					stars.updateOne(
+						{ id: parseInt(starID) },
+						{ $set: { "position": newPosition } }
+					)
+					.then(result => {
+						if(!result.modifiedCount) {
+							console.error("Couldn't reposition star for some reason."); ///
+						}
+					})
+					.catch(errors => {
+						console.log("??");
+						console.log(errors);
+						throw errors;
+					});
+				}
+
+				return starMovements;
+			});
 
 		function initializeMovementLoop(starSet, targetStar, position) { ///NAMING
 			var starMovements = {};
@@ -366,14 +404,16 @@ module.exports = function(db) {
 
 			singleAttempt(targetStar, position);
 
-			function singleAttempt(targetStar, position) { ///NAMING
-				var newPosition;
-				if(position) {
-					newPosition = position;
-				} else {
-					newPosition = targetStar.position;
-				}
+			// Convert to array and round vectors down to ints:
+			// var returnArray = [];
+			for(var id in starMovements) {
+				starMovements[id] = starMovements[id].floor();
+				// returnArray.push(starMovements[id].floor());
+			}
 
+			return starMovements;
+
+			function singleAttempt(targetStar, newPosition) { ///NAMING
 				starMovements[targetStar.id] = newPosition; ///REVISIT
 
 				for(var starIndex = 0; starIndex < starSet.length; starIndex++) {
@@ -385,10 +425,10 @@ module.exports = function(db) {
 					}
 
 					var checkPosition;
-					// If we're already moving this star:
+					// If we're already moving this star, get it's working position:
 					if(starMovements.hasOwnProperty(interactingStar.id)) {
 						checkPosition = starMovements[interactingStar.id];
-					// First time observing this star in this placement:
+					// First time observing this star in the method call, use it's current position.
 					} else {
 						checkPosition = interactingStar.position;
 					}
@@ -404,13 +444,13 @@ module.exports = function(db) {
 					}
 
 					// If star is too close and adjustments must be made:
-					if(starDistance < starSpacing) {
+					if(starDistance < config.starSpacing) {
 						// console.log(differenceVector);
-						const marginExcess = starSpacing - starDistance;
+						const marginExcess = config.starSpacing - starDistance;
 
 						// Move this interactingStar away from targetStar:
 						var interactingStarMovement = differenceVector.normalize().scale(-1 * (marginExcess + 10)/2);
-						singleAttempt(interactingStar, checkPosition.add(dbStarMovement));
+						singleAttempt(interactingStar, checkPosition.add(interactingStarMovement));
 
 						// Move targetStar away from clientStar:
 						var targetStarMovement = differenceVector.normalize().scale((marginExcess + 10)/2);
@@ -418,8 +458,6 @@ module.exports = function(db) {
 					}
 				}
 			}
-
-			return starMovements;
 		}
 
 		// for (var starIndex = 0; starIndex < starMovements.length; starIndex++) {

@@ -59,6 +59,8 @@
 	| allow for user to select consistent color(s)
 
 - refactor code
+	- centralize star shifting code in client and server
+		| maybe Star has a method which takes a starSet and a new position and returns the shifted set
 	- probably get rid of passing callbacks around now that everything is Promises
 	- split up routes.js probably
 	- rename Stars.js so not confused with Star.js
