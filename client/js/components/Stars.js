@@ -18,7 +18,8 @@ export default new ClientStarsAPI();
 function ClientStarsAPI() {
 	var me = this;
 
-	var clientStars = [];
+	/** Active stars currently loaded on the client. **/
+	me.clientStars = [];
 
 	/** Enforced margin between stars. **/
 	var starSpacing = 50; ///REVISIT placement; in a central config file maybe?
@@ -54,7 +55,8 @@ function ClientStarsAPI() {
 				continue;
 			}
 
-			clientStars.push(new ClientStar(starElement));
+			var clientStar = new ClientStar(starElement);
+			me.clientStars[clientStar.id] = clientStar;
 		}
 
 		// Convert all styleVar properties to ints (from i.e. "20px" to 20)
@@ -71,8 +73,8 @@ function ClientStarsAPI() {
 	// }
 
 	me.addStar = function(newStar) {
-		me.attemptPosition(newStar, newStar.position);
-		clientStars.push(newStar);
+		// me.attemptPosition(newStar, newStar.position);
+		me.clientStars[newStar.id] =  newStar;
 	}
 
 	// /**
@@ -120,13 +122,13 @@ function ClientStarsAPI() {
 		starMovements[targetStar.id] = newPosition; ///REVISIT 
 		// starMovements[targetStar.id] = newPosition;
 
-		// for(var clientStar of clientStars) {
-		for (var starIndex = 0; starIndex < clientStars.length; starIndex++) {
-			var clientStar = clientStars[starIndex];
-
+		// for(var clientStar of me.clientStars) {
+		// for (var starIndex = 0; starIndex < me.clientStars.length; starIndex++) {
+		// 	var clientStar = me.clientStars[starIndex];
+		me.clientStars.forEach((clientStar, starIndex) => {
 			if(clientStar.id == targetStar.id) { ///REVISIT best check?
 				console.log('skipping self');
-				continue;
+				return; //continue;
 			}
 
 			var checkPosition = clientStar.position;
@@ -159,7 +161,7 @@ function ClientStarsAPI() {
 				var targetStarMovement = differenceVector.normalize().scale((marginExcess + 10)/2);
 				me.attemptPosition(targetStar, newPosition.add(targetStarMovement));
 			}
-		}
+		});
 
 		///REVISIT should this wait until the root attemptPosition resolves?:
 		// console.log('actualize ' + targetStar.id);
@@ -180,7 +182,7 @@ function ClientStarsAPI() {
 		switch(order) {
 			case 'most-recent': {
 				// me.cachedSorts['most-recent'] = [];
-				me.cachedSorts['most-recent'] = clientStars.sort((a, b) => {
+				me.cachedSorts['most-recent'] = me.clientStars.sort((a, b) => {
 					// If B is more recent than A, return true
 					return parseInt(b.element.getAttribute('data-timestamp'))
 						- parseInt(a.element.getAttribute('data-timestamp'));
@@ -216,9 +218,9 @@ function ClientStarsAPI() {
 			case 'galaxy': {
 				spc.s = true;
 
-				for (var starIndex = 0; starIndex < clientStars.length; starIndex++) {
-					var starEle = clientStars[starIndex].element;
-
+				// for (var starIndex = 0; starIndex < me.clientStars.length; starIndex++) {
+				// 	var starEle = me.clientStars[starIndex].element;
+				me.clientStars.forEach((clientStar, starIndex) => {
 					cor.rc(document.body, 'sorting'); ////
 
 					anime({
@@ -230,7 +232,7 @@ function ClientStarsAPI() {
 							me.generateConstellationLines();
 						}
 					});
-				}
+				});
 			} break;
 
 			case 'grid':
@@ -238,7 +240,6 @@ function ClientStarsAPI() {
 				spc.s = false;
 
 				var sortedElements = this.getSortedStars(order);
-				console.log(sortedElements);
 
 				///REVISIT these variables only used by grid view; sort of odd placed here:
 				var currentRow = 0;
@@ -380,8 +381,9 @@ function ClientStarsAPI() {
 
 		// Loop through stars and queue an animated line draw.
 		var lineIndex = 0;
-		for (var starIndex = 0; starIndex < clientStars.length; starIndex++) {
-			var clientStar = clientStars[starIndex];
+		// for (var starIndex = 0; starIndex < me.clientStars.length; starIndex++) {
+		// 	var clientStar = me.clientStars[starIndex];
+		me.clientStars.forEach((clientStar, starIndex) => {
 			var starElement = clientStar.element;
 
 			if(starElement.getAttribute('data-prev')) {
@@ -407,7 +409,7 @@ function ClientStarsAPI() {
 					animatingLines.push(lineIndex++);
 				}
 			}
-		}
+		});
 
 		window.requestAnimationFrame(me.drawLineStep);
 	}

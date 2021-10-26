@@ -1,3 +1,4 @@
+import anime from 'animejs/lib/anime.es.js';
 import cor from '../libs/minlab/cor';
 import spc from '../libs/minlab/spc'; //// ultimately whatever spc becomes probably won't output a singleton
 
@@ -18,6 +19,12 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	var me = this;
 
 	// Inherits properties from Star.js ...
+
+	///ARCHITECTURE:
+	var currentAnimation = false;
+	var animationLength = 200;
+	var animationTimer;
+	var animatingPosition;
 
 	me.element;
 	me.linkElement;
@@ -73,7 +80,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 				} break;
 
 				case 'id': {
-					me.id = me.element.id;
+					me.id = parseInt(me.element.id.split('s')[1]); ///ARCHITECTURE
 				} break;
 
 				default: {
@@ -95,9 +102,33 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	 * Moves the star to a 2D coordinate.
 	 * @param x {int}
 	 * @param y {int}
+	 * @param animate {bool}
 	 */
-	this.moveToXY = function(x, y) {
-		me.position = new Vector(x, y);
+	this.moveToXY = function(x, y, animate = true) {
+		var newPos = new Vector(x, y);
+		if(!animate) {
+			me.position = newPos;
+		} else {
+			animatingPosition = newPos;
+			animationTimer = animationLength;
+
+			if(!currentAnimation) {
+				var animation = anime({
+					/// move this block somewhere central:
+					targets: me.element,
+					left: () => { return animatingPosition.x + 'px' },
+					top: () => { return animatingPosition.y + 'px' },
+					duration: () => { return animationTimer },
+					complete: () => {
+						// Stars.generateConstellationLines();
+						currentAnimation = false;
+						this.moveToXY(x, y, false);
+					}
+				});
+
+				return animation.finished;
+			}
+		}
 	}
 
 	me.play = function() {

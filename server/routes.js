@@ -213,6 +213,7 @@ function actualizeStar(req, res) {
 					res.json({
 						error: 0,
 						creatorName: req.user.usrMeta.creatorName,
+						newStarID: newStar.id,
 						starMovements: result.starMovements,
 					});
 				})

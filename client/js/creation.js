@@ -156,7 +156,7 @@ function initializeStarPlacement() {
 		// 	event.clientY - spc.map.offsetTop
 		// );
 
-		Stars.addStar(workingStar);
+		// Stars.addStar(workingStar);
 
 		// spc.ctr(workingStar.position.x, workingStar.position.y); /// create callback function for ctr? currently using validPlacementZone fadeOut delay
 
@@ -307,8 +307,8 @@ function uploadCreation() {
 			throw(response.error);
 		}
 
-		workingStar.starID = response.sid;
-		workingStar.element.id = 's'+workingStar.starID;
+		workingStar.id = response.sid;
+		workingStar.element.id = 's'+workingStar.id;
 		workingStar.element.setAttribute('data-prev', originStarID);
 
 		actualizeCreation();
@@ -348,22 +348,26 @@ function actualizeCreation() {
 	fetch('/ajax/actualize', request) ///REVISIT old browser compatability?
 		.then(response => response.json())
 		.then(result => {
+			// Update star element attributes:
+			workingStar.id = result.newStarID;
+			workingStar.titleElement.className = 'text name';
+			workingStar.titleElement.innerText = workingStar.title;
+			workingStar.linkElement.href = '/' + result.newStarID;
+
+			Stars.addStar(workingStar);
+
 			// Shift stars around according to server instructions:
 			for(var starID in result.starMovements) {
 				var newPosition = result.starMovements[starID];
-				Stars.clientStars[starID].move(newPosition);
+				Promise.resolve(Stars.clientStars[starID].moveToXY(newPosition.x, newPosition.y))
+					.then(() => Stars.generateConstellationLines());
 			}
-
-			// Update star element attributes:
-			workingStar.titleElement.className = 'text name';
-			workingStar.titleElement.innerText = workingStar.title;
-			workingStar.linkElement.href = '/' + workingStar.starID;
 
 			// Add normal star click listener:
 			cor.al(workingStar.linkElement, 'click', function(e) {
 				e.preventDefault();
 				state.updating = true;
-				navigate('/' + workingStar.starID);
+				navigate('/' + workingStar.id);
 			});
 		});
 

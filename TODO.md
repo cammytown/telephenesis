@@ -1,7 +1,7 @@
 # TODO
 ## PHASE 1
 ### 3
-- move star placement code to server side
+- draw constellation lines to new stars
 
 ### 2
 - better aesthetic for scrolling through list view
