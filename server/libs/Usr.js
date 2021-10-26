@@ -38,128 +38,127 @@ module.exports = function(db, vl, bcrypt) {
 		// }
 	});
 
-	this.in = function(sessionString, cb) {
+	this.in = function(sessionString, callback) {
 		if(!sessionString) {
-			if(cb) cb(true, false);
-			return Promise.resolve(false); ///
+			///REVISIT should this throw an error?
+			if(callback) callback(false, false);
+			return false;
+			// throw "No session string provided."; ///
 		} else {
 			return collection.findOne({ ss: sessionString })
 				.then(doc => {
-					if(cb) cb(false, doc);
-					// resolve(doc);
+					if(callback) callback(false, doc);
+
+					if(!doc) {
+						throw "No user with sessionString.";
+					}
+
 					return doc;
 				})
-				.catch(err => {
+				.catch(error => {
 					// console.log(err);
 					// return false;
-					throw err;
+					throw [error];
 				});
 		}
 	}
 
-	this.check = function(em, pw, ip, cb) { /// rename; what is diff between this and validate?
-		return validate(em, pw, ip)
-			.then(isValid => {
-				return collection.findOne({em: em})
-					.then(doc => {
-						if(!doc) { /// safe check?
-							cb("No user with email " + em); ////
-							return false;
-						}
+	this.check = function(em, pw, ip, callback) { /// rename; what is diff between this and getInputErrors?
+		var inputErrors = getInputErrors(em, pw, ip);
+		if(inputErrors.length) {
+			throw inputErrors;
+		}
 
-						var ts = doc.ts;
-						var s = sl(em, ts);
+		return collection.findOne({em: em})
+			.then(doc => {
+				if(!doc) { /// safe check?
+					if(callback) callback("No user with email " + em); ////
+					throw ["No user with email " + em];
+				}
 
-						if(!bcrypt.compareSync(pw+s, doc.pw)) {
-							errors.push("Invalid email/password combination.");
-							cb(errors, doc);
-							throw errors;
-						}
+				var ts = doc.ts;
+				var salt = createSalt(em, ts);
 
-						cb(false, doc);
-						return doc;
+				if(!bcrypt.compareSync(pw + salt, doc.pw)) {
+					// errors.push("Invalid email/password combination.");
+					if(callback) callback(["Invalid email/password combination."]);
+					throw ["Invalid email/password combination."];
+				}
+
+				if(callback) callback(false, doc);
+				return doc;
+			})
+			.catch(findErrors => {
+				// console.log(findErrors);
+				if(callback) callback(findErrors);
+				throw findErrors;
+			});
+	}
+
+	this.li = function(em, pw, ip, callback, checkOnly) { /// rename checkOnly
+		return this.check(em, pw, ip)
+			.then(userDoc => {
+				// var ts = doc.ts;
+				// var s = createSalt(em, ts);
+				// var cr = bcrypt.hashSync(pw, s);
+				var sessionCode = generateString(16);
+
+				return collection.update( ///ARCHITECTURE
+					{ em: em },
+					{ $set: { ip: ip, ss: sessionCode } }
+				)
+					.then(success => {
+						// Update userDoc with new sessionCode before returning:
+						userDoc.ss = sessionCode;
+						return userDoc;
 					})
-					.catch(findErrors => {
-						// console.log(findErrors);
-						cb(findErrors, doc);
-						throw findErrors;
+			})
+			.catch(errors => {
+				if(callback) callback(errors);
+				throw errors;
+			})
+	}
+
+	this.rg = function(em, pw, ip, callback) { /// pass ip here?
+		var errors = getInputErrors(em, pw, ip);
+
+		if(errors.length) {
+			throw errors;
+		}
+
+		/// s because of function names?
+		var ts = Date.now();
+		var salt = createSalt(em, ts);
+		var cr = bcrypt.hashSync(pw+salt, bcrypt.genSaltSync(12)); /// use async? ///// increase rounds?
+		var sessionCode = generateString(16);
+
+		collection.findOne({em: em})
+			.then(doc => {
+				if(doc) { /// safe check?
+					throw ["Email already in use."];
+				}
+			
+				return collection.insert({
+					id: MLPuserIndex,
+					lv: 0,
+					em: em,
+					pw: cr,
+					ip: ip,
+					ts: ts,
+					ss: sessionCode
+				})
+					.then(results => {
+						var doc = results[0];
+						if(callback) callback(errors, doc, sessionCode); /// separate ss from rg/li?
 					});
 			})
 			.catch(errors => {
-				if(cb) cb(errors);
+				if(callback) callback(errors);///
 				throw errors;
 			});
 	}
 
-	this.li = function(em, pw, ip, cb, checkOnly) { /// rename checkOnly
-		return this.check(em, pw, ip, function(errors, doc) {
-			if(errors.length) { /// safe check?
-				if(cb) cb(errors);
-				return false;
-			}
-
-			// var ts = doc.ts;
-			// var s = sl(em, ts);
-			// var cr = bcrypt.hashSync(pw, s);
-			var sessionCode = generateString(16);
-
-			collection.update(
-				{ em: em },
-				{ $set: { ip: ip, ss: sessionCode } },
-				function(err, result) {
-					// console.log(err);
-					// console.log(result);
-
-					if(cb) cb(errors, sessionCode);
-				}
-			);
-		});
-	}
-
-	this.rg = function(em, pw, ip, cb) { /// pass ip here?
-		validate(em, pw, ip, function(errors) {
-			if(errors.length) {
-				cb(errors);
-				return false;
-			}
-
-			/// s because of function names?
-			var ts = Date.now();
-			var s = sl(em, ts);
-			var cr = bcrypt.hashSync(pw+s, bcrypt.genSaltSync(12)); /// use async? ///// increase rounds?
-			var s = generateString(16);
-
-			collection.findOne({em: em}, function(err, doc) {
-				if(err) {
-					console.log(err);
-					return false;
-				}
-
-				if(doc) { /// safe check?
-					errors.push("DAT EMAIL IS IN USE BRO.");
-				}
-
-				if(errors.length) cb(errors);
-				else {
-					collection.insert({
-						id: MLPuserIndex,
-						lv: 0,
-						em: em,
-						pw: cr,
-						ip: ip,
-						ts: ts,
-						ss: s
-					}, function(err, results) {
-						console.log(results);
-						var doc = results[0];
-						cb(errors, doc, s); /// separate ss from rg/li?
-					});
-				}
-			});
-		});
-	}
-
-	function validate(em, pw, ip, cb) {
+	function getInputErrors(em, pw, ip, callback) { ///NAMING
 		var errors = [];
 
 		if(!em.length) { /// safe check?
@@ -174,16 +173,16 @@ module.exports = function(db, vl, bcrypt) {
 			errors.push("Please use a stronger password.");
 		}
 
-		if(cb) cb(errors);
+		if(callback) callback(errors);
 
-		if(errors.length) {
-			throw errors;
-		}
+		// if(errors.length) {
+		// 	throw errors;
+		// }
 
-		return true;
+		return errors;
 	}
 
-	function sl(em, ts) {
+	function createSalt(em, ts) {
 		// console.log('em: '+em);
 		// console.log('ts: '+ts);
 
@@ -288,7 +287,7 @@ module.exports = function(db, vl, bcrypt) {
 // }
 
 // private function cr(em, pw, $ts) {
-// 	$sl = $this->sl(em, $ts);
+// 	$sl = $this->createSalt(em, $ts);
 // 	$cr = crypt(pw, '$2a$09$'.$sl.'$');
 // 	return $cr;
 // }

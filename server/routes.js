@@ -119,44 +119,51 @@ function bookmarkStar(req, res) {
 
 function userCheck(req, res) {
 	if(!req.user) {
-		throw "Not logged in.";
+		throw ["Not logged in."];
 	}
 
+	res.json({ errors: [] });
 	return true;
-	// res.json({ error: err });
 }
 
 function ajaxErrorHandler(err, req, res, next) {
+	console.log('ajax error: ' + err);
+	// console.trace();
 	res.json({ errors: err });
 }
 
 function login(req, res, next) {
 	return usr.li(req.body.email, req.body.password, req.ip)
-		.then(sessionCode => {
-			res.cookie('usr_ss', sessionCode, {
+		.then(userDoc => {
+			res.cookie('usr_ss', userDoc.ss, {
 				// secure: true /// https only
 			});
 
-			return usr.in(sessionCode)
-				.then(user => {
-					req.user = user;
-				})
-				.then(next)
-				.catch(err => next(err));
+			return usr.in(userDoc.ss);
 		})
+		.then(user => {
+			if(user) {
+				req.user = user;
+			} else {
+				
+			}
+		})
+		.then(next)
 		.catch(errors => {
 			// res.render('login', { p: req.body, errors: err });
+			console.error(errors);
 			next(errors);
 			// throw err;
 		});
 }
 
 function register(req, res, next) {
-	if(!req.body['password'] != req.body['password-confirm']) {
-		return res;
+	if(req.body['password'] != req.body['password-confirm']) {
+		next(["Passwords don't match."]); ///ARCHITECTURE
+		return false;
 	}
 
-	usr.rg(
+	return usr.rg(
 		req.body.email,
 		req.body.password,
 		req.ip,
@@ -205,7 +212,7 @@ function actualizeStar(req, res) {
 					res.json({
 						error: 0,
 						creatorName: req.user.usrMeta.creatorName,
-						starMovements: ,
+						starMovements: result.starMovements,
 					});
 				})
 				.catch(err => {

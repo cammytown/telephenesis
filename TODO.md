@@ -59,6 +59,7 @@
 	| allow for user to select consistent color(s)
 
 - refactor code
+	- probably get rid of passing callbacks around now that everything is Promises
 	- split up routes.js probably
 	- rename Stars.js so not confused with Star.js
 	- rewrite Spc

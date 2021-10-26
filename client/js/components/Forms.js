@@ -45,7 +45,7 @@ function ClientForms() {
 		// var children = form.children;
 		var op = form.id; ///REVISIT bad architecture
 
-		if(result.errors) {
+		if(result.errors.length) {
 			// console.error(result.error);
 			// throw new Error(result.error);
 
@@ -55,6 +55,7 @@ function ClientForms() {
 				throw "No .errors wrapper available in <form> element.";
 			}
 
+			console.log(result.errors);
 			for(var error of result.errors) {
 				///REVISIT architecture:
 				var errorItemEle = document.createElement('li');

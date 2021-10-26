@@ -83,7 +83,7 @@ function TelepServer() {
 			console.log(req.method + " " + req.originalUrl);
 			// console.log(req.body);
 
-			me.usr.in(req.cookies.usr_ss)
+			Promise.resolve(me.usr.in(req.cookies.usr_ss))
 			.then(user => {
 				req.user = user;
 
