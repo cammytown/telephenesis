@@ -363,7 +363,7 @@ function main(req, res) {
 		return api.getStars(req.user)
 			.then(stars => { /// consolidate
 				res.render('main', {
-					pageTitle: 'telephenesis : ' + req.params.page, /// not if it is a number
+					pageTitle: 'telephenesis : ' + (req.params.page ? req.params.page : 'a game of musical echoes'), /// not if it is a number
 					className,
 					stars,
 					// popularitySort: JSON.stringify(),

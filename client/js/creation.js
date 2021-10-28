@@ -4,8 +4,9 @@ import Anm from './libs/minlab/anm';
 import Upl from './libs/minlab/upl';
 import ColorTool from './libs/minlab/colorTool.js';
 import ajx from './libs/minlab/ajx'; ///TODO get rid of in favor or Pijin
-import HistoryTime from './libs/history-time';
+// import HistoryTime from './libs/history-time';
 
+import navigation from './components/Navigation';
 import clientState from './components/ClientState.js';
 import ClientStar from './components/ClientStar.js';
 import Stars from './components/Stars.js';
@@ -113,7 +114,7 @@ function onCreateSubmit(event) {
 
 function initializeStarPlacement() {
 	// close the creation UI
-	HistoryTime.navigateTo('place'); ///REVISIT uris /create/place doesn't work with our thrown-together uri system
+	navigation.navigate('place'); ///REVISIT uris /create/place doesn't work with our thrown-together uri system
 	// close();
 
 	var genesis = workingStar.originStarID == -1; ///ARCHITECTURE
@@ -271,7 +272,7 @@ function uploadCreation() {
 	/// could use some attention
 
 	// state.updating = false;
-	HistoryTime.navigateTo('/');
+	navigation.navigate('/');
 	// document.body.className = null;
 	//spc.ctr(0, 0);
 
@@ -316,7 +317,7 @@ function uploadCreation() {
 }
 
 function actualizeCreation() {
-	HistoryTime.navigateTo('/');
+	navigation.navigate('/');
 
 	window.onbeforeunload = false;
 

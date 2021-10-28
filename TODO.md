@@ -1,30 +1,12 @@
 # TODO
 ## PHASE 1
 ### 3
-- draw constellation lines to new stars
-
 ### 2
-- better aesthetic for scrolling through list view
-
-- pressing escape on login when trying to get rid of autofill minimizes the login screen
-
-- future-proof large amounts of stars
-
 - consider drawing constellations during view transition; just don't cache line start and end
-
-- draw constellation line after placing
 
 - i think fade context menus in a little bit
 
-- improve star sorting UI
-
-- make bookmarks order link appear disabled if no bookmarks (or if guest)
-
-- give sorts their own URIs
-
 - if keeping gradient background, background of inputs is blocky
-
-- bug: lines sometimes not there when i come back after a while?
 
 - figure out how to sustain hosting costs
 	- maybe only subscribers can upload and if you cancel then at some point your track may be moved to archive.org hosting
@@ -40,14 +22,10 @@
 	also distinguish between total/guest plays and confirmed user plays
 	store play history of users; allow them to go back through it
 
-- zooming
-
 - clicking stars should open a menu near them
 	| maybe it's a radial menu
 
 - do we maybe not want to reveal exact time of star creation (for user privacy?)
-
-- make first stars appear slightly different
 
 - reimplement admin features
 

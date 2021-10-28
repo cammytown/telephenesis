@@ -224,9 +224,9 @@ function ClientStarsAPI() {
 					cor.rc(document.body, 'sorting'); ////
 
 					anime({
-						targets: starEle,
-						left: starEle.getAttribute('data-x') + 'px',
-						top: starEle.getAttribute('data-y') + 'px',
+						targets: clientStar.element,
+						left: clientStar.element.getAttribute('data-x') + 'px',
+						top: clientStar.element.getAttribute('data-y') + 'px',
 						duration: 500,
 						complete: function() {
 							me.generateConstellationLines();
@@ -427,12 +427,10 @@ function ClientStarsAPI() {
 
 			var progress;
 			if(line.isAnimating) {
-				////
-				// var delay = (line.tier * 1000) - (line.tier * 350);
+				// Slow down line drawing as it goes on:
 				var delay = ((line.tier) * 1000) - ((line.tier * 800));
-				// var delay = (line.tier * 1000) / (line.tier / 2);
-				// var delay = ((line.tier * line.tier / 2) * 1000) - (line.tier * line.tier * 475);
 
+				// var delay = (line.tier - 1) * 1000;
 
 				progress = (elapsedMS - delay) / 1000;
 				if(progress < 0) {

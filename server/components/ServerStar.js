@@ -28,7 +28,7 @@ function ServerStar(starData) {
 		///TODO maybe more value and type validation? log when bad values/props are used
 
 		// var filteredData = {};
-		var intProps = ['id', 'originStarID'];
+		var intProps = ['id', 'originStarID', 'tier'];
 
 		for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
 			var identityProp = me.identityProps[propIndex];

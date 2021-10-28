@@ -3,7 +3,8 @@
 import cor from '../libs/minlab/cor';
 // import ajx from '../libs/minlab/ajx';
 import spc from '../libs/minlab/spc';
-import HistoryTime from '../libs/history-time';
+// import HistoryTime from '../libs/history-time';
+import navigation from './Navigation';
 
 import clientState from './ClientState';
 import mediaPlayer from './MediaPlayer';
@@ -81,7 +82,7 @@ function Interface(Telep) {
 
 				case 27: { // escape key
 					// state.updating = true;
-					HistoryTime.navigateTo('/', "Telephenesis"); //// page title
+					navigation.navigate('/'); //// page title
 
 					if(Stars.view != "galaxy") { ///REVISIT this should probably just happen as a consequence of navigating to /
 						Stars.sort(null, "galaxy");

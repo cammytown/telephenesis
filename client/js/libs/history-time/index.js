@@ -33,7 +33,6 @@ class HistoryTime { //v0.1
 	// 	history.back();
 	// }
 
-	/** Test **/
 	popState(event) {
 		this.state = event.state;
 		// var pageTitle = this.state.url.split('/').pop();

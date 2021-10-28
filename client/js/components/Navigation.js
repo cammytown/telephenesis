@@ -8,6 +8,8 @@ import clientState from './ClientState';
 export default new ClientNavigation();
 
 function ClientNavigation() {
+	var me = this;
+
 	var starContextMenu;
 	var galaxyContextMenu;
 
@@ -16,7 +18,7 @@ function ClientNavigation() {
 		galaxyContextMenu = document.getElementById('galaxyContextMenu');
 
 		// Listen for URI changes
-		HistoryTime.bindPathToCallback('*', navigate);
+		HistoryTime.bindPathToCallback('*', onNavigate);
 
 		// Listen to internal navigation links
 		var navLinks = document.getElementsByClassName('nav'); ///REVISIT not really into this class name; something more descriptive?
@@ -30,7 +32,7 @@ function ClientNavigation() {
 
 			if(event.target.parentNode.id == 'spc' && HistoryTime.state.path != '/') { ///
 				// state.updating = true;
-				HistoryTime.navigateTo('/', "Telephenesis"); //// page title
+				me.navigate('/'); //// page title
 			}
 		});
 
@@ -44,7 +46,7 @@ function ClientNavigation() {
 		var path = event.target.pathname;
 		// state.updating = true;
 
-		HistoryTime.navigateTo(path, "Telephenesis"); ///// make page titles
+		me.navigate(path); ///// make page titles
 
 		// if(cor.cc(this.parentNode, 'star')) {
 		// 	navigate(path);
@@ -67,7 +69,6 @@ function ClientNavigation() {
 
 			//document.getElementById('download').href = '/f/'+sid+'.mp3';
 			clientState.actingStar = star;
-
 
 			var menu = starContextMenu;
 			menu.style.left = parseInt(star.style.left) + 12 + 'px';
@@ -95,7 +96,19 @@ function ClientNavigation() {
 		limbo.appendChild(galaxyContextMenu);
 	}
 
-	function navigate(path) {
+	me.navigate = function(path) {
+		var parts = path.split('/');
+		var operation = parts[1];
+
+		var pageTitle = "telephenesis";
+		if(operation) {
+			pageTitle += ' : ' + operation;
+		}
+
+		HistoryTime.navigateTo(path, pageTitle);
+	}
+
+	function onNavigate(path) {
 		var parts = path.split('/');
 		var operation = parts[1];
 
@@ -122,31 +135,22 @@ function ClientNavigation() {
 				open(operation);
 			} break;
 
-			// case '': {
-
-			// } break;
-
 			case 'bookmark': {
 				bookmarkStar(clientState.actingStar);
-				return true;
 			} break;
 
 			case 'moveStar': {
 				initializeMove();
-				return true;
 			} break;
 
 			case 'recolorStar': {
 				initializeRecolor();
-				return true;
 			} break;
 
 			case 'logout': {
 				close();
 				logout()
-					.then(() => HistoryTime.navigateTo('/'));
-
-				return true;
+					.then(() => me.navigate('/'));
 			} break;
 
 			default: {
@@ -162,50 +166,50 @@ function ClientNavigation() {
 		// 	state.path = path;
 		// 	history.pushState(state, 'telephenesis : ' + operation, path);
 		// }
+	}
 
-		function open(box) {
-			var box = document.getElementById(box);
-			clientState.activeWindow = box;
-			document.body.appendChild(box);
-			Anm.fadeIn(box);
-			// spc.flt(true);
-		}
+	function open(box) {
+		var box = document.getElementById(box);
+		clientState.activeWindow = box;
+		document.body.appendChild(box);
+		Anm.fadeIn(box);
+		// spc.flt(true);
+	}
+
+	///:
+	function close(box) {
+		box = (typeof box === "undefined") ? clientState.activeWindow : box;
+		clientState.activeWindow = false;
 
 		///:
-		function close(box) {
-			box = (typeof box === "undefined") ? clientState.activeWindow : box;
-			clientState.activeWindow = false;
+		// menuToggleElement.innerHTML = '|||';
+		// cor.rc(menuToggleElement, 'active');
+		// cor.rc(document.getElementById('menu'), 'active');
 
-			///:
-			// menuToggleElement.innerHTML = '|||';
-			// cor.rc(menuToggleElement, 'active');
-			// cor.rc(document.getElementById('menu'), 'active');
-
-			if(box) {
-				Anm.fadeOut(box, 250, function() {
-					limbo.appendChild(box);
-				});
-			}
-
-			// spc.flt(false);
+		if(box) {
+			Anm.fadeOut(box, 250, function() {
+				limbo.appendChild(box);
+			});
 		}
 
-		function logout() { ///REVISIT placement
-			return fetch('/ajax/logout', {
-				method: "POST",
-				body: {}
-			})
-				.then(response => response.json())
-				.then(result => {
-					if(result.error) {
-						console.error(result.error); ///
-					} else {
-						var login = document.getElementById('login');
-						login.children[1].value = "";
-						cor.rc(document.body, 'in');
-						cor.rc(document.body, 'creator');
-					}
-				});
-		}
+		// spc.flt(false);
+	}
+
+	function logout() { ///REVISIT placement
+		return fetch('/ajax/logout', {
+			method: "POST",
+			body: {}
+		})
+			.then(response => response.json())
+			.then(result => {
+				if(result.error) {
+					console.error(result.error); ///
+				} else {
+					var login = document.getElementById('login');
+					login.children[1].value = "";
+					cor.rc(document.body, 'in');
+					cor.rc(document.body, 'creator');
+				}
+			});
 	}
 }
