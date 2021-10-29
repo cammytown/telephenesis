@@ -1,6 +1,5 @@
 /**
  * Handles history state navigation in web browsers.
- * @external
  */
 class HistoryTime { //v0.1
 	/**

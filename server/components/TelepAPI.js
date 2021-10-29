@@ -2,47 +2,80 @@ const Lame = require('node-lame').Lame;
 const fs = require('fs');
 const Vector = require('../../abstract/Vector.js');
 
+const TelepUser = require('./TelepUser.js');
 const ServerStar = require('./ServerStar.js');
 
-module.exports = function TelepAPI(db, config) {
-	var constellations = db.collection('MLconstellations');
-	var stars = db.collection('MLstars');
-
+module.exports = function TelepAPI(server) {
 	var me = this;
-	var config = config;
 
-	var musicPath = __dirname + "/../public/music/";
+	/* PROPERTIES: */
+	/** Instance of Usr. **/
+	var usr;
 
-	me.grr = false;
+	/** Connection to the database. **/
+	var db;
 
-	///:
-	var MLMeta = db.collection('MLMeta'); /// do we need to filter MLMeta?
-	var usrMeta = db.collection('usrMeta'); /// do we need to filter MLMeta?
+	/** The loaded Telephenesis config file. **/
+	var config;
+
+	/** MongoCollection of constellations. **/
+	var constellations;
+
+	/** MongoCollection of stars. **/
+	var stars;
+
+	/** MongoCollection of system meta-information. **/
+	var MLMeta;
+
+	/** MongoCollection of user profile information. **/
+	var usrMeta;
+
+	/** Current number of constellations. **/
 	var constellationCount;
-	var planetCount;
-	MLMeta.find({ id: 'persistors' }).limit(1).next(function(err, persistorDoc) {
-		if(!persistorDoc) {
-			// persistorDoc = {}; /// quick-fix
 
-			////TODO refactor; move this into some kind of database initialization file/method
-			MLMeta.insertOne({
-				id: 'persistors',
-				userIndex: 1,
-				constellationCount: 0,
-				planetCount: 0
-			}, function() {
-				planetCount = 0;
-				constellationCount = 0;
-			});
-		} else {
-			// if(persistorDoc.hasOwnProperty("planetCount")) {
-				planetCount = persistorDoc.planetCount;
-				constellationCount = persistorDoc.constellationCount;
-			// } else {
-			// 	MLMeta.updateOne({ id: "persistors" }, { $set: { planetCount: 0 } });
-			// }
-		}
-	});
+	/** Current number of stars. **/
+	var starCount;
+
+	var musicPath = __dirname + "/../public/music/"; ///MOVE to config
+
+	init();
+
+	function init() {
+		usr = server.usr;
+		db = server.db;
+		config = server.config;
+		// me.grr = false;
+
+		constellations = db.collection('MLconstellations');
+		stars = db.collection('MLstars');
+		MLMeta = db.collection('MLMeta'); /// do we need to filter MLMeta?
+		usrMeta = db.collection('usrMeta'); /// do we need to filter MLMeta?
+
+		MLMeta.find({ id: 'persistors' }).limit(1).next(function(err, persistorDoc) {
+			if(!persistorDoc) {
+				// persistorDoc = {}; /// quick-fix
+
+				////TODO refactor; move this into some kind of database initialization file/method
+				MLMeta.insertOne({
+					id: 'persistors',
+					userIndex: 1,
+					constellationCount: 0,
+					starCount: 0
+				}, function() {
+					starCount = 0;
+					constellationCount = 0;
+				});
+			} else {
+				// if(persistorDoc.hasOwnProperty("starCount")) {
+					starCount = persistorDoc.starCount;
+					constellationCount = persistorDoc.constellationCount;
+				// } else {
+				// 	MLMeta.updateOne({ id: "persistors" }, { $set: { starCount: 0 } });
+				// }
+			}
+		});
+	}
+
 
 	me.syncWithClient = function(serverUpdates) {
 		return Promise.all([
@@ -90,16 +123,39 @@ module.exports = function TelepAPI(db, config) {
 			// return doc;
 	}
 
-	me.createProfile = function(profileData, callback) { /// post naming?
-		usrMeta.insertOne(profileData, function(err, result) {
-			if(err) {
-				////
-				callback(err);
-			}
+	me.register = function(email, password, creatorName, ip) {
+		return usr.rg(email, password, ip)
+			.then(usrDoc => {
+				var usrMetaObject = {
+					creatorName: creatorName
+				};
 
-			callback(err, result);
-		});
+				var newUser = new TelepUser(usrDoc, usrMetaObject);
+
+				return usrMeta.insertOne(newUser.export())
+					.then(result => {
+						return true;
+					})
+					.catch(err => {
+						throw err;
+					});
+			})
+			.catch(err => {
+				// o.render('register', { p: req.body, errors: err });
+				throw err;
+			});
 	}
+
+	// me.createProfile = function(profileData, callback) { /// post naming?
+	// 	usrMeta.insertOne(profileData, function(err, result) {
+	// 		if(err) {
+	// 			////
+	// 			callback(err);
+	// 		}
+
+	// 		callback(err, result);
+	// 	});
+	// }
 
 	me.updateProfile = function(userID, post, callback) { /// post naming?
 		//// if post.email is in use, error
@@ -191,9 +247,9 @@ module.exports = function TelepAPI(db, config) {
 		// };
 		// Object.assign();
 
-		var newStarID = planetCount + 1;
-		planetCount += 1;
-		MLMeta.updateOne({ id: "persistors" }, { $inc: {planetCount: 1} });
+		var newStarID = starCount + 1;
+		starCount += 1;
+		MLMeta.updateOne({ id: "persistors" }, { $inc: {starCount: 1} });
 
 		switch(serverStar.hostType) {
 			case 'external': {

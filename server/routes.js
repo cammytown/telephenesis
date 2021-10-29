@@ -164,31 +164,18 @@ function register(req, res, next) {
 		return false;
 	}
 
-	return usr.rg(
+	return api.register(
 		req.body.email,
 		req.body.password,
-		req.ip,
-		function(err, usrDoc, sessionCode) {
-			if(err.length) {
-				// o.render('register', { p: req.body, errors: err });
-				res.json({ error: err });
-			} else {
-				api.createProfile({
-					userID: usrDoc.id,
-					email: req.body.email,
-					creatorName: req.body.creatorName
-
-				}, function() {
-					// res.cookie('usr_ss', sessionCode, {
-					// 	// secure: true //// https only
-					// });
-
-					next();
-					// res.json({ error: 0 });
-				});
-			}
-		}
-	);
+		req.body.creatorName,
+		req.ip
+	)
+		.then(() => next())
+		.catch(err => next(err));
+		// .catch(err => {
+		// 	// res.json({ error: err });
+		// 	res.json({ error: err });
+		// });
 }
 
 function logout(req, res, next) {

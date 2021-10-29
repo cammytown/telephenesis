@@ -131,6 +131,9 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		}
 	}
 
+	/**
+	 * Play the media attached to the star.
+	 */
 	me.play = function() {
 		var starTitle = me.element.getAttribute('data-title');
 		cor._('#playingStarTitle').innerHTML = starTitle;
@@ -145,5 +148,38 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		cor.ac(document.body, 'playing')
 
 		mediaPlayer.playStar(me);
+	}
+
+	/**
+	 * Convert identity properties to exportable data structure.
+	 * @param dataType {string} - Type of data structure to return.
+	 */
+	me.export = function(dataType = "FormData") {
+		switch(dataType) {
+			case 'FormData': {
+				var formData = new FormData();
+
+				for (var propIndex = 0; propIndex < workingStar.identityProps.length; propIndex++) {
+					var identityProp = workingStar.identityProps[propIndex];
+
+					// If property is an object:
+					if(workingStar.objectProps.indexOf(identityProp) != -1) { ///probably keep array of which properties are objects in Star class
+						formData.append(identityProp, JSON.stringify(workingStar[identityProp]));
+
+					// Property is a literal value; no need to stringify:
+					} else {
+						formData.append(identityProp, workingStar[identityProp]);
+					}
+				}
+
+				return formData;
+			} break;
+
+			default: {
+				var error = "ClientStar.export(): Unhandled dataType '" + dataType + "'";
+				console.error(error);
+				throw new Error(error);
+			}
+		}
 	}
 }

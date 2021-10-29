@@ -8,10 +8,13 @@
  * @constructor
  */
 function Star() {
-	// PROPERTIES:
 	var me = this;
 
-	me.identityProps = [
+	/**
+	 * The properties relevant to import/export methods.
+	 * @type {Array}
+	 */
+	this.identityProps = [
 		'id',
 		'originStarID',
 		'title',
@@ -27,11 +30,11 @@ function Star() {
 		'timestamp'
 	];
 
-	me.serverProps = [
+	this.serverProps = [
 		'active',
 	];
 
-	me.objectProps = [
+	this.objectProps = [
 		'position'
 	];
 

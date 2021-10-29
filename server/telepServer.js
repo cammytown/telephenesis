@@ -66,7 +66,7 @@ function TelepServer() {
 
 	function initializeTelep() {
 		me.usr = new Usr(me.db, validator, bcrypt);
-		me.api = new TelepAPI(me.db, me.config);
+		me.api = new TelepAPI(me);
 
 		me.app.use(session({
 			secret: me.config.sessionSecret, ////
@@ -84,30 +84,30 @@ function TelepServer() {
 			// console.log(req.body);
 
 			Promise.resolve(me.usr.in(req.cookies.usr_ss))
-			.then(user => {
-				req.user = user;
+				.then(user => {
+					req.user = user;
 
-				if(user) {
+					if(user) {
 
-					me.api.getUsrMeta(req.user.id)
-						.then(usrMeta => {
-							req.user.usrMeta = usrMeta;
+						me.api.getUsrMeta(req.user.id)
+							.then(usrMeta => {
+								req.user.usrMeta = usrMeta;
 
-							next();
-						})
-						.catch(err => {
-							if(err) {
-								console.error(err);
-								res.status(404).send("There was a problem retrieving your account in our system. Please email us at contact@telephenesis.com"); ///
-							}
-						})
+								next();
+							})
+							.catch(err => {
+								if(err) {
+									console.error(err);
+									res.status(404).send("There was a problem retrieving your account in our system. Please email us at contact@telephenesis.com"); ///
+								}
+							})
 
-				} else {
-					// req.user.usrMeta = {}; ///
-					next();
-				}
-			})
-			.catch(err => next(err));
+					} else {
+						// req.user.usrMeta = {}; ///
+						next();
+					}
+				})
+				.catch(err => next(err));
 		});
 
 		routes.initializeRoutes(me);

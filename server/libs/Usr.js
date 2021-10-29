@@ -8,35 +8,46 @@ TODO
 	- remove bcrypt param somehow?
 */
 
-module.exports = function(db, vl, bcrypt) {
+module.exports = function Usr(db, vl, bcrypt) {
+	var me = this;
+
+	/* PROPERTIES: */
 	var collection;
-	// collection = db.collection('usr'); /// safe name?
-	collection = db.collection('MLusers'); /// safe name?
+	var userCount;
 
-	var MLPuserIndex;
+	var MLMeta; ////ARCHITECTURE
+	// me.grr = false;
 
-	this.grr = false;
+	init();
 
-	var MLMeta = db.collection('MLMeta'); /// do we need to filter MLMeta?
-	MLMeta.find({ id: 'persistors' }).limit(1).next(function(err, persistorDoc) {
-		// if(!persistorDoc) {
-		// 	// persistorDoc = {}; /// quick-fix
-		// 	MLMeta.insertOne({
-		// 		id: 'persistors',
-		// 		userIndex: 0,
-		// 		currentConstellationIndex: 0,
-		// 		currentPlanetIndex: 0
-		// 	}, function() {
-				
-		// 	});
-		// } else {
-			if(persistorDoc.hasOwnProperty("userIndex")) {
-				MLPuserIndex = persistorDoc.userIndex;
-			} else {
-				MLMeta.updateOne({ id: "persistors" }, { $set: { userIndex: 0 } });
-			}
-		// }
-	});
+	function init() {
+		collection = db.collection('MLusers');
+		MLMeta = db.collection('MLMeta');
+
+		MLMeta.findOne({ id: 'persistors' })
+			.then(persistorDoc => {
+				// if(!persistorDoc) {
+				// 	// persistorDoc = {}; /// quick-fix
+				// 	MLMeta.insertOne({
+				// 		id: 'persistors',
+				// 		userCount: 0,
+				// 		currentConstellationIndex: 0,
+				// 		currentPlanetIndex: 0
+				// 	}, function() {
+						
+				// 	});
+				// } else {
+					if(persistorDoc.hasOwnProperty("userCount")) {
+						userCount = persistorDoc.userCount;
+					} else {
+						MLMeta.updateOne({ id: "persistors" }, { $set: { userCount: 0 } });
+					}
+				// }
+			})
+			.catch(err => {
+				throw err;
+			});
+	}
 
 	this.in = function(sessionString, callback) {
 		if(!sessionString) {
@@ -132,24 +143,31 @@ module.exports = function(db, vl, bcrypt) {
 		var cr = bcrypt.hashSync(pw+salt, bcrypt.genSaltSync(12)); /// use async? ///// increase rounds?
 		var sessionCode = generateString(16);
 
-		collection.findOne({em: em})
-			.then(doc => {
-				if(doc) { /// safe check?
+		return collection.findOne({em: em})
+			.then(existingUser => {
+				if(existingUser) { /// safe check?
 					throw ["Email already in use."];
 				}
-			
-				return collection.insert({
-					id: MLPuserIndex,
+
+				var usrObject = {
+					id: userCount,
 					lv: 0,
 					em: em,
 					pw: cr,
 					ip: ip,
 					ts: ts,
 					ss: sessionCode
-				})
-					.then(results => {
-						var doc = results[0];
-						if(callback) callback(errors, doc, sessionCode); /// separate ss from rg/li?
+				};
+
+				userCount += 1;
+				MLMeta.updateOne({ id: "persistors" }, { $inc: { userCount: 1 } });
+
+				return collection.insertOne(usrObject)
+					.then(result => {
+						// var doc = result.ops[0];
+						if(callback) callback(errors, usrObject); /// separate ss from rg/li?
+
+						return usrObject;
 					});
 			})
 			.catch(errors => {

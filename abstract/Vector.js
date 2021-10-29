@@ -1,6 +1,6 @@
-/** Simple vector class. **/
-// TODO
-
+/**
+ * Simple vector class.
+ */
 class Vector {
 	/**
 	 * Create a new Vector.
@@ -8,10 +8,16 @@ class Vector {
 	 * @param [y=0] {float} - y coordinate
 	 */
 	constructor(x = 0, y = 0) {
-		/** X value. **/
+		/**
+		 * X value.
+		 * @type {float}
+		 */
 		this.x = parseFloat(x);
 
-		/** Y value. **/
+		/**
+		 * Y value.
+		 * @type {float}
+		 */
 		this.y = parseFloat(y);
 	}
 

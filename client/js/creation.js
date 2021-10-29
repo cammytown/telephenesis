@@ -326,20 +326,7 @@ function actualizeCreation() {
 		return false;
 	}
 
-	var formData = new FormData();
-	for (var propIndex = 0; propIndex < workingStar.identityProps.length; propIndex++) {
-		var identityProp = workingStar.identityProps[propIndex];
-
-		// If property is an object:
-		if(workingStar.objectProps.indexOf(identityProp) != -1) { ///probably keep array of which properties are objects in Star class
-			formData.append(identityProp, JSON.stringify(workingStar[identityProp]));
-
-		// Property is a literal value; no need to stringify:
-		} else {
-			formData.append(identityProp, workingStar[identityProp]);
-		}
-
-	}
+	var formData = workingStar.export('FormData');
 
 	var request = {
 		method: "POST",

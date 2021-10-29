@@ -1,7 +1,7 @@
 import cor from '../libs/minlab/cor';
 import Pijin from '../libs/pijin-js';
 // import HistoryTime from '../libs/history-time';
-import navigation from '../libs/history-time';
+import navigation from './Navigation';
 
 import clientState from './ClientState';
 

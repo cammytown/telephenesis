@@ -97,7 +97,7 @@ label.floatBeside {
   display: block;
   width: 200px;
   padding: 17px 0;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.82);
   text-align: right;
 }
 
@@ -399,7 +399,7 @@ body #menu .user a, body #menu .guest a {
   padding: 25px;
   color: #eee;
   font-size: 1em;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.82);
 }
 .uibox.wide {
   width: 600;
@@ -989,7 +989,7 @@ form#create label.rightsAgreement input.rights-confirmation {
 }
 
 #sortingUI {
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.82), transparent);
 }
 #sortingUI nav {
   display: inline-block;
@@ -1000,7 +1000,7 @@ form#create label.rightsAgreement input.rights-confirmation {
   color: #b9c;
 }
 #sortingUI nav ul {
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.82);
   position: absolute;
   display: none;
   padding: 10px 25px;
