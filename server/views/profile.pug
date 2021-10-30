@@ -1,0 +1,19 @@
+form#settings.ajax.uibox.wide(method="POST")
+	label.floatBeside(for="email") Email
+	input(name="email" value=user.em type="text" placeholder="email" disabled)
+
+	label.floatBeside(for="creatorName") Creator Name
+	input(
+		name="creatorName"
+		type="text"
+		placeholder="creator name"
+		value= user.usrMeta ? user.usrMeta.creatorName : ''
+	)
+
+	// label(for="password") Password
+	// input(name="password" placeholder="password")
+	// label(for="password-confirm") Confirm
+	// input(name="password-confirm" placeholder="password again")
+
+	button.btn.main(type="submit") Submit
+

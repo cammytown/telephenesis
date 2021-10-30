@@ -10,6 +10,9 @@ import navigation from './components/Navigation';
 import clientState from './components/ClientState.js';
 import ClientStar from './components/ClientStar.js';
 import Stars from './components/Stars.js';
+import Interface from './components/Interface.js';
+
+import * as CONSTS from '../../abstract/constants.js';
 
 export default { init };
 
@@ -317,8 +320,6 @@ function uploadCreation() {
 }
 
 function actualizeCreation() {
-	navigation.navigate('/');
-
 	window.onbeforeunload = false;
 
 	if(!workingStar.fileReady || !workingStar.isPlaced) {
@@ -336,6 +337,10 @@ function actualizeCreation() {
 	fetch('/ajax/actualize', request) ///REVISIT old browser compatability?
 		.then(response => response.json())
 		.then(result => {
+			if(result.errors) {
+				throw result.errors;
+			}
+
 			// Update star element attributes:
 			workingStar.id = result.newStarID;
 			workingStar.titleElement.className = 'text name';
@@ -357,21 +362,24 @@ function actualizeCreation() {
 				state.updating = true;
 				navigate('/' + workingStar.id);
 			});
+
+			// Back to homepage.
+			navigation.navigate('/');
+		})
+		.catch(errors => {
+			console.error(errors);
+			for(var errIndex = 0; errIndex < errors.length; errIndex++) {
+				var err = errors[errIndex];
+				switch(err) {
+					case CONSTS.ERROR.NO_CREATION_TICKETS:
+					case CONSTS.ERROR.NO_RECREATION_TICKETS: {
+						Interface.displayError(err);
+					} break;
+					
+					default: {
+						///REVISIT
+					}
+				}	
+			}
 		});
-
-	// ajx('/ajax/actualize', formData, function(responseData) {
-	// 	console.log(responseData);
-	// 	var response = JSON.parse(responseData);
-	// 	workingStar.element.className = 'star';
-	// 	workingStar.titleElement.className = 'text name';
-	// 	workingStar.titleElement.innerHTML = response.creator;
-
-	// 	workingStar.linkElement.href = '/' + workingStar.starID;
-
-	// 	cor.al(workingStar.linkElement, 'click', function(e) {
-	// 		e.preventDefault();
-	// 		state.updating = true;
-	// 		navigate('/' + workingStar.starID);
-	// 	});
-	// });
 }

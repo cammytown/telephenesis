@@ -1,8 +1,14 @@
 import cor from './cor';
 
-///REVISIT i can't stand es5/es6 classes. If Javascript doesn't give us a way to have class variables/properties
-/// accessible from submethods without dumb .bind on everything, go back to just function Aud()
-export default class Aud {
+
+/**
+ * Simple class that wraps around an HTML5 audio element to 
+ * provide a minimalistic interface for handling media.
+ * @param {string} [elementID="aud"]
+ * @param {Array} [callbacks]
+ * @param {Element} [seekbar]
+ **/
+class Aud {
 	constructor(options = {
 		elementID: "aud",
 		callbacks: [],
@@ -23,6 +29,7 @@ export default class Aud {
 		}
 	}
 
+	/** Initialize the player and setup media events. **/
 	init() {
 		//loa = (typeof loa === "function") ? false : loa;
 		//pla = (typeof pla === "undefined") ? "aud_pla" : pla;
@@ -45,21 +52,18 @@ export default class Aud {
 		this.minuteLength = null;
 		this.secondLength = null;
 
-		cor.al(this.element, 'canplay', function() {
+		cor.al(this.element, 'canplay', () => {
 			if(this.autoplaying) {
 				this.play();
 			}
 		});
 
-		cor.al(this.element, 'error', this.elementError);
+		cor.al(this.element, 'error', () => this.elementError);
 		// cor.rl(this.element, 'canplay', this.pl);
-
-		if(this.element.addEventListener) this.element.addEventListener('timeupdate', this.update);
-		else if(this.element.attachEvent) this.element.attachEvent('ontimeupdate', this.update);
+		cor.al(this.element, 'timeupdate', () => this.update);
 	}
 
-
-
+	/** Play the active media. **/
 	play() {
 		this.duration = this.element.duration | 0;
 		this.minuteLength = this.duration / 60 | 0;
@@ -69,11 +73,13 @@ export default class Aud {
 		return true;
 	}
 
+	/** Pause the active media. **/
 	pause() {
 		this.element.pause();
 		return true;
 	}
 
+	/** Stop the active media. **/
 	stop() {
 		this.element.pause();
 		this.element.currentTime = 0;
@@ -81,6 +87,7 @@ export default class Aud {
 		return true;
 	}
 
+	/** Load new media into the player. **/
 	load(src, autoplay = true) {
 		this.autoplaying = autoplay;
 
@@ -88,12 +95,14 @@ export default class Aud {
 		this.element.load();
 	}
 
+	/** Audio class-specific error event callback. **/
 	elementError() { /// naming
 		////
 		console.log("Audio Error:");
 		console.log(this.element.error);
 	}
 
+	/** Update the player interface as a callback for media playback time changing. **/
 	update() {
 		var currentTime = this.element.currentTime | 0;
 		var minutes = currentTime / 60 | 0;
@@ -111,6 +120,10 @@ export default class Aud {
 		this.playbackProgress = currentTime / this.duration;
 	}
 
+	/**
+	 * Seek to playback time based on position of click in the seekbar.
+	 * @param {Event} event - The click event.
+	 **/
 	onSeekbarClick(event) {
 		var mousePos = cor.relativeToElement(
 			this.options.seekbar,
@@ -126,4 +139,4 @@ export default class Aud {
 }
 
 // export default new Aud("aud");
-
+export default Aud;

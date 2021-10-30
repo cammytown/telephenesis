@@ -43,7 +43,7 @@ module.exports = function(db) {
 		}
 	});
 
-	me.getUsrMeta = function(userID, callback) {
+	me.getUserMeta = function(userID, callback) {
 		return usrMeta.findOne({ userID })
 			.then(doc => {
 				if(callback) callback(false, doc);
@@ -87,7 +87,7 @@ module.exports = function(db) {
 				return false;
 			}
 
-			// var usrMeta = me.getUsrMeta(doc.userID); /// probably cache in the star and update whenever profile changes
+			// var usrMeta = me.getUserMeta(doc.userID); /// probably cache in the star and update whenever profile changes
 			// doc.creatorName = usrMeta.creatorName;
 
 			var creationDate = new Date(doc._id.getTimestamp());
@@ -177,7 +177,7 @@ module.exports = function(db) {
 		}
 
 		// Get creator information:
-		return me.getUsrMeta(userID)
+		return me.getUserMeta(userID)
 		.then(usrMeta => {
 			starData.id = newStarID;
 

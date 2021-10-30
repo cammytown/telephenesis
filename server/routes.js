@@ -17,6 +17,7 @@ var app;
 var api;
 var usr;
 
+/** Setup routes; links URIs to the proper middlewares. **/
 function initializeRoutes(telepServer) {
 	///REVISIT architecture:
 	app = telepServer.app;
@@ -26,8 +27,12 @@ function initializeRoutes(telepServer) {
 	// Accept multipart form data (FormData):
 	app.use(upload.array()); ///REVISIT move into TelepServer somehow?
 
+	// Get user if logged in.
+	app.use(observeSessionCode);
+
 	// var ajaxRouter = require('./ajax')
 	var ajaxRouter = express.Router();
+
 	ajaxRouter.post('/sync', syncWithClient);
 	ajaxRouter.post('/bookmark', bookmarkStar);
 	ajaxRouter.post('/actualize', actualizeStar);
@@ -46,6 +51,41 @@ function initializeRoutes(telepServer) {
 	// app.post('/login', login);
 
 	app.get('/:page?', main);
+}
+
+/**
+ * Attempt to log user in using a session code, if they have one. 
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
+ **/
+function observeSessionCode(req, res, next) {
+	return usr.in(req.cookies.usr_ss)
+		.then(user => {
+			req.user = user;
+
+			if(user) {
+				// Successfully logged in using session code.
+
+				api.getUserMeta(req.user.id)
+					.then(usrMeta => {
+						Object.assign(req.user, usrMeta);
+						//req.user = usrMeta;
+						next();
+						return user;
+					})
+					.catch(err => {
+						if(err) {
+							throw err;
+						}
+					});
+			} else {
+				// req.user = {}; ///
+				next();
+				return false;
+			}
+		})
+		.catch(err => next(err));
 }
 
 /**
@@ -126,11 +166,11 @@ function userCheck(req, res) {
 	return true;
 }
 
+
 function ajaxErrorHandler(err, req, res, next) {
 	console.log(err.stack);
 	console.log('ajax error: ' + err);
-	// console.trace();
-	res.json({ errors: err });
+	res.json({ errors: err instanceof Error ? [err.message] : err }); ///TODO just always throw Error and get rid of this check
 }
 
 function login(req, res, next) {
@@ -184,10 +224,11 @@ function logout(req, res, next) {
 	res.json({ error: 0 });
 }
 
-function actualizeStar(req, res) {
+function actualizeStar(req, res, next) {
 	if(!req.user || req.user.lv != 7) {
-		res.json({ error: "not logged in" });
-		throw "not logged in"; ///
+		///REVISIT:
+		res.json({ error: "Not logged in" });
+		throw new Error("Not logged in");
 	}
 
 	switch(req.body.hostType) {
@@ -195,19 +236,22 @@ function actualizeStar(req, res) {
 			var newStar = new ServerStar(req.body);
 
 			// Create the star in the database:
-			return api.createStar(req.user.id, newStar)
-				.then(result => {
+			return api.createStar(req.user, newStar)
+				.then(newStarDoc => {
 					res.json({
 						error: 0,
-						creatorName: req.user.usrMeta.creatorName,
+						creatorName: req.user.creatorName,
 						newStarID: newStar.id,
-						starMovements: result.starMovements,
+						starMovements: newStarDoc.starMovements,
 					});
+
+					return true;
 				})
 				.catch(err => {
-					console.error(err); ///
-					res.json({ error: "could not create star" });
-					throw new Error(err);
+					//console.error(err); ///
+					//res.json({ error: "Could not create star." }); ///TODO improve error
+					//throw new Error(err);
+					next(err);
 				});
 
 			// api.actualize(starData, function(err, result) {
@@ -300,7 +344,7 @@ function uploadMedia(req, res) { /// could maybe just use .post('/create/:starid
 	///:
 	if(starId != -1) { ///
 		api.getStar(starId, function(err, originStar) {
-			api.createStar(req.user.id, {
+			api.createStar(req.user, {
 				originStar,
 				multerFile: req.file,
 				callback: function(star) {
@@ -309,7 +353,7 @@ function uploadMedia(req, res) { /// could maybe just use .post('/create/:starid
 			});
 		});
 	} else {
-		api.createStar(req.user.id, {
+		api.createStar(req.user, {
 			multerFile: req.file,
 			callback: function(star) {
 				res.json({ error: 0, sid: star.id });
@@ -350,7 +394,8 @@ function main(req, res) {
 		return api.getStars(req.user)
 			.then(stars => { /// consolidate
 				res.render('main', {
-					pageTitle: 'telephenesis : ' + (req.params.page ? req.params.page : 'a game of musical echoes'), /// not if it is a number
+					pageTitle: 'telephenesis : '
+						+ (req.params.page ? req.params.page : 'a game of musical echoes'),
 					className,
 					stars,
 					// popularitySort: JSON.stringify(),

@@ -5,6 +5,8 @@ const Vector = require('../../abstract/Vector.js');
 const TelepUser = require('./TelepUser.js');
 const ServerStar = require('./ServerStar.js');
 
+const CONSTS = require('../../abstract/constants.js');
+
 module.exports = function TelepAPI(server) {
 	var me = this;
 
@@ -107,7 +109,7 @@ module.exports = function TelepAPI(server) {
 		}
 	}
 
-	me.getUsrMeta = function(userID, callback) {
+	me.getUserMeta = function(userID, callback) {
 		return usrMeta.findOne({ userID })
 			.then(doc => {
 				if(callback) callback(false, doc);
@@ -126,11 +128,13 @@ module.exports = function TelepAPI(server) {
 	me.register = function(email, password, creatorName, ip) {
 		return usr.rg(email, password, ip)
 			.then(usrDoc => {
-				var usrMetaObject = {
-					creatorName: creatorName
+				var userMetaObject = {
+					creatorName: creatorName,
+					creationTickets: 1,
+					recreationTickets: 3,
 				};
 
-				var newUser = new TelepUser(usrDoc, usrMetaObject);
+				var newUser = new TelepUser(usrDoc, userMetaObject);
 
 				return usrMeta.insertOne(newUser.export())
 					.then(result => {
@@ -239,7 +243,28 @@ module.exports = function TelepAPI(server) {
 		);
 	}
 
-	me.createStar = function(userID, serverStar, callback) {
+	/**
+	 * Creates a new constellation and returns its ID.
+	 * @returns {number} - The ID of the constellation.
+	 */
+	function createConstellation(originStarID) {
+		///REVISIT we just assume this function successfully interacts with the datase.
+		/// We probably need to take some measures to ensure the constellation has in fact
+		/// been created.
+		var newConstellationID = constellationCount + 1;
+
+		constellationCount += 1;
+		MLMeta.updateOne({ id: "persistors" }, { $inc: { constellationCount: 1 } });
+
+		var newConstellation = {
+			id: newConstellationID,
+			starIDs: [originStarID],
+		};
+
+		return constellations.insertOne(newConstellation);
+	}
+
+	me.createStar = function(user, serverStar) {
 		// var defaultObject = {
 		// 	originStar: false,
 		// 	fileURL: false,
@@ -247,6 +272,40 @@ module.exports = function TelepAPI(server) {
 		// };
 		// Object.assign();
 
+		if(serverStar.originStarID == -1) {
+			if(user.creationTickets <= 0) {
+				throw new Error(CONSTS.ERROR.NO_CREATION_TICKETS);
+			} else {
+				///REVISIT:
+				//Users.update(user, {
+				usrMeta.updateOne(
+					{ userID: user.id },
+					{
+						$inc: { creationTickets: -1 }
+					}
+				);
+
+				user.creationTickets -= 1;
+			}
+		} else {
+			if(user.recreationTickets <= 0) {
+				throw new Error(CONSTS.ERROR.NO_RECREATION_TICKETS);
+			} else {
+				///REVISIT:
+				//Users.update(user, {
+				usrMeta.updateOne(
+					{ userID: user.id },
+					{
+						$inc: { recreationTickets: -1 }
+					}
+				);
+
+				user.recreationTickets -= 1;
+			}
+		}
+
+
+		///TODO future-proof:
 		var newStarID = starCount + 1;
 		starCount += 1;
 		MLMeta.updateOne({ id: "persistors" }, { $inc: {starCount: 1} });
@@ -309,64 +368,37 @@ module.exports = function TelepAPI(server) {
 			} break;
 		}
 
-		// Get creator information:
-		return me.getUsrMeta(userID)
-			.then(usrMeta => {
-				serverStar.id = newStarID;
+		serverStar.id = newStarID;
 
-				serverStar.creator = { ///REVISIT architecture?
-					id: usrMeta._id,
-					creatorName: usrMeta.creatorName,
-					creatorLink: usrMeta.creatorLink
-				}
+		serverStar.creator = { ///REVISIT architecture?
+			_id: user._id,
+			creatorName: user.creatorName,
+			creatorLink: user.creatorLink,
+		};
 
-				return true;
-			})
-			.then(success => me.attemptPlacement(serverStar))
+		var returnObject = {
+			starMovements: null,
+			newStar: null,
+		};
+
+		return me.attemptPlacement(serverStar)
 			.then(starMovements => {
+				returnObject.starMovements = starMovements;
+
 				serverStar.active = true;
 				serverStar.position = starMovements[serverStar.id];
 
-				// Load data into ServerStar:
-				// var newStar = new ServerStar(serverStar);
-
-				// If this is an origin star; first in a constellation.
+				// If this is an origin star (first in a constellation).
 				if(serverStar.originStarID == -1) { /// is this the check we want??
 					// Create a new constellation:
-					var newConstellationID = constellationCount + 1;
-					constellationCount += 1;
-					MLMeta.updateOne({ id: "persistors" }, { $inc: { constellationCount: 1 } });
-
-					var newConstellation = {
-						id: newConstellationID,
-						starIDs: [newStarID]
-					}
-
-					constellations.insertOne(newConstellation, function(err, result) {
-						////TODO refactoring; what if there's an err?
-						if(err) {
-							console.error(err);
-						}
-					});
-
-					// Update star data to reflect new constellation:
-					serverStar.constellationID = newConstellationID;
-					serverStar.tier = 0;
-
-					return stars.insertOne(serverStar)
-						.then(result => {
-							if(callback) callback(false, result.ops[0]);
-
-							return {
-								newStar: result.ops[0],
-								starMovements
-							}
-						})
-						.catch(err => {
-							if(callback) callback(err);
-							console.error(err);
-							throw err; ///
+					return createConstellation(newStarID)
+						.then(newConstellationID => {
+							// Update star data to reflect new constellation:
+							serverStar.constellationID = newConstellationID;
+							serverStar.tier = 0;
+							return true;
 						});
+
 
 				// Else this is a recreation of a star:
 				} else {
@@ -377,24 +409,21 @@ module.exports = function TelepAPI(server) {
 							serverStar.originStarID = originStar.id;
 							serverStar.constellationID = originStar.constellationID;
 							serverStar.tier = originStar.tier + 1;
-
-							return stars.insertOne(serverStar);
-						})
-						.then(result => {
-							if(callback) callback(false, result.ops[0]); ///
-
-							return {
-								newStar: result.ops[0],
-								starMovements
-							}
-						})
-						.catch(err => {
-							if(callback) callback(err);
-							throw err;
+							return true;
 						});
 				}
 			})
+			.then(success => stars.insertOne(serverStar))
+			.then(result => {
+				///TODO my understanding is that result having the document is to be deprecated; must use insertId
+				returnObject.newStar = result.ops[0];
+
+				// Return the new star and any star movements that need to occur on the client:
+				return returnObject;
+			})
 			.catch(err => {
+				///REVISIT:
+				console.error(err);
 				throw err;
 			});
 	}

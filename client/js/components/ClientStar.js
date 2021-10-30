@@ -100,8 +100,8 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 	/**
 	 * Moves the star to a 2D coordinate.
-	 * @param x {int}
-	 * @param y {int}
+	 * @param x {number}
+	 * @param y {number}
 	 * @param animate {bool}
 	 */
 	this.moveToXY = function(x, y, animate = true) {
@@ -159,16 +159,16 @@ function ClientStar(element) { ///REVISIT element not in use atm
 			case 'FormData': {
 				var formData = new FormData();
 
-				for (var propIndex = 0; propIndex < workingStar.identityProps.length; propIndex++) {
-					var identityProp = workingStar.identityProps[propIndex];
+				for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
+					var identityProp = me.identityProps[propIndex];
 
 					// If property is an object:
-					if(workingStar.objectProps.indexOf(identityProp) != -1) { ///probably keep array of which properties are objects in Star class
-						formData.append(identityProp, JSON.stringify(workingStar[identityProp]));
+					if(me.objectProps.indexOf(identityProp) != -1) { ///probably keep array of which properties are objects in Star class
+						formData.append(identityProp, JSON.stringify(me[identityProp]));
 
 					// Property is a literal value; no need to stringify:
 					} else {
-						formData.append(identityProp, workingStar[identityProp]);
+						formData.append(identityProp, me[identityProp]);
 					}
 				}
 

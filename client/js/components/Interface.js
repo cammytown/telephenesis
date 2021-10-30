@@ -10,14 +10,23 @@ import clientState from './ClientState';
 import mediaPlayer from './MediaPlayer';
 import Stars from './Stars';
 
-function Interface(Telep) {
+/**
+ * Telephenesis class for user interface methods.
+ * @constructor
+ **/
+function Interface() {
 	// var currentOrderLink;
 	var me = this;
 
 	me.order = "galaxy";
 	me.view = "galaxy";
 
+	/** Element which holds messages shown to user. **/
+	var messageElement;
+
 	this.init = function() {
+		messageElement = document.getElementById('notification');
+
 
 		// var closes = document.getElementsByClassName('close');
 		// if(closes.length) for(var i=0, j=closes.length; i<j; i++) {
@@ -104,6 +113,41 @@ function Interface(Telep) {
 		// 	cor.al(sortRecentLinks, 'click', () => sort(null, 'galaxy'));
 		// }
 
+	}
+
+	/**
+	 * Displays a message to the user.
+	 * @param {string} message - The message to display.
+	 * @param {string} [type="notification"] - The type of message.
+	 * @param {number} [duration=5000] - How long to display the message for.
+	 */
+	this.displayMessage = function(message, type = "notification", duration = 5000) { ///REVISIT naming
+		messageElement.innerText = message;
+		messageElement.className = type;
+		document.body.appendChild(messageElement);
+		///TODO fade out
+		window.setTimeout(() => limbo.appendChild(messageElement), duration);
+	}
+
+	/**
+	 * Displays an error to the user.
+	 * @param {string} errorCode - The error code from {@link Constants.ERROR to display.
+	 */
+	this.displayError = function(errorCode) {
+		var errorMessages = { ///TODO probably to be moved when we start localization work
+			NO_CREATION_TICKETS: "Sorry, you have no creation tickets left. Please wait a while!",
+			NO_RECREATION_TICKETS: "Sorry, you have no recreation tickets left. Please wait a while!",
+		};
+
+		var errorMessage;
+
+		if(errorMessages.hasOwnProperty(errorCode)) {
+			errorMessage = errorMessages[errorCode];
+		} else {
+			errorMessage = "Sorry, something went wrong. Please try again.";
+		}
+
+		me.displayMessage(errorMessage, "error");
 	}
 
 	function onSortClick(event) {

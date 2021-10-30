@@ -3,7 +3,7 @@
  * @param [usrDoc] {Object} - Entry in Usr collection which represents this user.
  * @constructor
  */
-function TelepUser(usrDoc = false, usrMeta = false) { ///REVISIT usrMeta architecture
+function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta architecture
 	var me = this;
 
 	/* PROPERTIES: */
@@ -13,24 +13,34 @@ function TelepUser(usrDoc = false, usrMeta = false) { ///REVISIT usrMeta archite
 		"usrID",
 		"email",
 		"creatorName",
+		"creationTickets",
+		"recreationTickets",
 	];
 
-	init(usrDoc);
+	init(usrDoc, userMeta);
 
-	function init(usrDoc = false, usrMeta = false) {
-		for (var propIndex = 0; propIndex < identityProps.length; propIndex++) {
-			var identityProp = identityProps[propIndex];
-			me[identityProp] = null;
-		}
+	function init(usrDoc = false, userMeta = false) {
+		var userObject = {};
 
 		if(usrDoc) {
-			me["usrID"] = usrDoc.id;
-			me["email"] = usrDoc.em;
+			userObject["usrID"] = usrDoc.id;
+			userObject["email"] = usrDoc.em;
 		}
 
-		if(usrMeta) {
-			me["creatorName"] = usrMeta.creatorName;
+		if(userMeta) {
+			Object.assign(userObject, userMeta);
 		}
+
+		for (var propIndex = 0; propIndex < identityProps.length; propIndex++) {
+			var identityProp = identityProps[propIndex];
+
+			if(userObject.hasOwnProperty(identityProp)) {
+				me[identityProp] = userObject[identityProp];
+			} else {
+				me[identityProp] = null;
+			}
+		}
+
 	}
 
 	/**

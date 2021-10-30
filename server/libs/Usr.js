@@ -53,7 +53,7 @@ module.exports = function Usr(db, vl, bcrypt) {
 		if(!sessionString) {
 			///REVISIT should this throw an error?
 			if(callback) callback(false, false);
-			return false;
+			return Promise.resolve(false);
 			// throw "No session string provided."; ///
 		} else {
 			return collection.findOne({ ss: sessionString })
