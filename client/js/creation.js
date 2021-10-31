@@ -57,6 +57,13 @@ function init(Telep) {
 function onCreateStarClick(event) {
 	event.preventDefault();
 
+	// Check if user has creation tickets:
+	if(!clientState.creationTickets) {
+		Interface.displayError(CONSTS.ERROR.NO_CREATION_TICKETS);
+		return false;
+	}
+
+	navigation.navigate(event.target.pathname);
 	workingStar = new ClientStar();
 	workingStar.id = "placeholder"; ///REVISIT architecture
 	workingStar.originStarID = -1;
@@ -65,6 +72,13 @@ function onCreateStarClick(event) {
 function onRecreateStarClick(event) {
 	event.preventDefault();
 
+	// Check if user has recreation tickets:
+	if(!clientState.recreationTickets) {
+		Interface.displayError(CONSTS.ERROR.NO_RECREATION_TICKETS);
+		return false;
+	}
+
+	navigation.navigate(event.target.pathname);
 	workingStar = new ClientStar();
 	workingStar.id = "placeholder"; ///REVISIT architecture
 	workingStar.originStarID = parseInt(clientState.actingStar.id.split('s')[1]);

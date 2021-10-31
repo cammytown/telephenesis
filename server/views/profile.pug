@@ -12,8 +12,10 @@ form#settings.ajax.uibox.wide(method="POST")
 
 	.ticketCount.floatBeside Tickets [?]
 	.ticketCount.creationTickets Tickets:
+		input#creation-tickets(type="hidden" value=user.creationTickets)
 		.count= user.creationTickets
 	.ticketCount.recreationTickets Recreation Tickets:
+		input#recreation-tickets(type="hidden" value=user.recreationTickets)
 		.count= user.recreationTickets
 
 	// label(for="password") Password

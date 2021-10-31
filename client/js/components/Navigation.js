@@ -7,6 +7,11 @@ import clientState from './ClientState';
 
 export default new ClientNavigation();
 
+///TODO consider combining with Interface
+/**
+ * Handles page transitions and navigation links.
+ * @constructor
+ */
 function ClientNavigation() {
 	var me = this;
 

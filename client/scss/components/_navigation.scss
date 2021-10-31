@@ -138,6 +138,11 @@ body {
 				&:hover {
 					background-color: rgba(0, 150, 0, 0.3);
 				}
+
+				&.ticketless {
+					background: $ticketlessBackground;
+					color: $ticketlessText;
+				}
 			}
 
 			&.admin {

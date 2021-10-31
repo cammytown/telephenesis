@@ -131,7 +131,7 @@ function Interface() {
 
 	/**
 	 * Displays an error to the user.
-	 * @param {string} errorCode - The error code from {@link Constants.ERROR to display.
+	 * @param {string} errorCode - The error code from {@link Constants.ERROR} to display a message for.
 	 */
 	this.displayError = function(errorCode) {
 		var errorMessages = { ///TODO probably to be moved when we start localization work

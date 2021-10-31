@@ -375,6 +375,10 @@ body .menu a.create {
 body .menu a.create:hover {
   background-color: rgba(0, 150, 0, 0.3);
 }
+body .menu a.create.ticketless {
+  background: rgba(132, 63, 29, 0.6);
+  color: #c8693a;
+}
 body .menu a.admin {
   color: #e7e;
 }
