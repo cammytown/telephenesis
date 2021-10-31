@@ -7,8 +7,14 @@ form#settings.ajax.uibox.wide(method="POST")
 		name="creatorName"
 		type="text"
 		placeholder="creator name"
-		value= user.usrMeta ? user.usrMeta.creatorName : ''
+		value= user.creatorName
 	)
+
+	.ticketCount.floatBeside Tickets [?]
+	.ticketCount.creationTickets Tickets:
+		.count= user.creationTickets
+	.ticketCount.recreationTickets Recreation Tickets:
+		.count= user.recreationTickets
 
 	// label(for="password") Password
 	// input(name="password" placeholder="password")

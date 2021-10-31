@@ -1,0 +1,19 @@
+form#settings {
+	.ticketCount {
+		//display: block;
+		padding: 25px 0; ///REVISIT placement; maybe make some generic "block" class
+
+		&.creationTickets, &.recreationTickets {
+			float: left;
+			width: 50%;
+			background: $creationBackground;
+			text-align: center;
+
+			.count {
+				font-size: 2em;
+			}
+		}
+
+	}
+}
+

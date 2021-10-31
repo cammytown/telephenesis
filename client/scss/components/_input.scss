@@ -31,10 +31,15 @@ textarea {
 	}
 
 	&.init { color: #777; }
+
+	&:disabled {
+		background: #beb5be;
+	}
 }
 
-label {
-	&.floatBeside {
+//label {
+	//&.floatBeside {
+	.floatBeside {
 		$labelWidth: 200px;
 
 		position: absolute;
@@ -45,7 +50,7 @@ label {
 		background: $uiBackground;
 		text-align: right;
 	}
-}
+//}
 
 // form {
 // 	.btn[type=submit] {

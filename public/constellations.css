@@ -90,8 +90,13 @@ input[type=password].init,
 textarea.init {
   color: #777;
 }
+input[type=text]:disabled,
+input[type=password]:disabled,
+textarea:disabled {
+  background: #beb5be;
+}
 
-label.floatBeside {
+.floatBeside {
   position: absolute;
   left: -200px;
   display: block;
@@ -767,104 +772,17 @@ body.playing header#playingStarInfo {
   color: #ecb;
   text-transform: uppercase;
 }
-.tutorial {
-  position: absolute;
-  /*left: 30%;*/
-  /*top: 30%;*/
-  z-index: 3;
-  width: 450px;
-  margin: 0 auto;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.75);
-  color: #ddd;
-  font-family: "Strait", sans-serif;
-  transition: color 0.3s, background-color 0.5s;
+form#settings .ticketCount {
+  padding: 25px 0;
 }
-
-.tutorial.small {
-  width: 250px;
-  font-size: 2em;
-}
-
-.tutorial.large {
-  width: 500px;
-  font-size: 2.6em;
-}
-
-.tutorial small {
-  font-size: 0.6em;
-}
-
-.tutorial .meta {
-  margin-top: 15px;
-}
-
-.tutorial .btn {
-  width: 205px;
-  margin: 0;
-  padding: 10px;
-  background: none;
-  font-size: 0.6em;
-  text-align: left;
-}
-
-.tutorial .next {
-  float: right;
-  text-align: left;
-}
-
-.tutorial .prev {
+form#settings .ticketCount.creationTickets, form#settings .ticketCount.recreationTickets {
   float: left;
-  text-align: right;
-}
-
-.tutorial .close {
-  margin: 0 auto;
-  clear: both;
+  width: 50%;
+  background: rgba(31, 75, 30, 0.6);
   text-align: center;
 }
-
-.inverse .tutorial {
-  background: rgba(255, 255, 255, 0.75);
-  color: #333;
-}
-
-.inverse .tutorial.invite {
-  background: none;
-}
-
-/* more of this?: */
-.tutorial.invite .btn {
-  width: 250px;
-  font-size: 0.85em;
-}
-
-.inverse .tutorial .btn {
-  color: #23239b;
-  transition: color 0.15s;
-}
-
-.inverse .tutorial .btn:hover {
-  color: #9191ff;
-  background: #0a0a4b;
-}
-
-.inverse .tutorial .btn.g {
-  color: #237823;
-}
-
-.inverse .tutorial .btn.g:hover {
-  color: #91d291;
-  background: #0a4b0a;
-}
-
-.inverse .tutorial .btn.r {
-  color: #af1919;
-}
-
-.inverse .tutorial .btn.r:hover {
-  color: #d29191;
-  background: #4b0a0a;
+form#settings .ticketCount.creationTickets .count, form#settings .ticketCount.recreationTickets .count {
+  font-size: 2em;
 }
 
 form#create #timeSettings {
