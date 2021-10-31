@@ -17,7 +17,7 @@ html, body {
 }
 
 body {
-  background: linear-gradient(to bottom, #111 0%, #000 30%);
+  background: #000 linear-gradient(to bottom, #111 0%, #000 30%) no-repeat;
   color: #e7e7e7;
   font-size: 16px;
   font-family: "Monda", sans-serif;
@@ -51,6 +51,7 @@ header#galaxy-ui {
   left: 0;
   z-index: 1;
   width: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.82), transparent);
 }
 
 /* forms */
@@ -279,10 +280,10 @@ body nav.site-nav {
   width: 300px;
   text-align: right;
   transition: top 250ms;
+  z-index: 1;
 }
 body nav.site-nav a#logo {
   display: block;
-  z-index: 4;
   font-family: "Strait";
   font-size: 2em;
   text-decoration: none;
@@ -295,7 +296,6 @@ body nav.site-nav a.menuToggle {
   position: absolute;
   top: 1px;
   right: -35px;
-  z-index: 3;
   width: 15px;
   height: 15px;
   padding: 5px;
@@ -910,9 +910,6 @@ form#create label.rightsAgreement input.rights-confirmation {
   border-right: 650px solid transparent;
 }
 
-#sortingUI {
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.82), transparent);
-}
 #sortingUI nav {
   display: inline-block;
   padding: 2px 10px;

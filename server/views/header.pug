@@ -1,19 +1,20 @@
-nav.site-nav
-	a#logo Telephenesis
-	a.menuToggle |||
-
-	#menu
-		.user
-			a.create.nav(href="/settings") profile
-			a.nav(href="/logout") logout
-
-		.guest
-			a.nav(href="/login") login
-			a.nav(href="/register") register
-
-		a.nav(href="/help") help
 
 header#galaxy-ui
+	nav.site-nav
+		a#logo Telephenesis
+		a.menuToggle |||
+
+		#menu
+			.user
+				a.create.nav(href="/settings") profile
+				a.nav(href="/logout") logout
+
+			.guest
+				a.nav(href="/login") login
+				a.nav(href="/register") register
+
+			a.nav(href="/help") help
+
 	#sortingUI
 		//-///REVISIT not sure about use of nav in terms of best semantics
 		nav.order-nav

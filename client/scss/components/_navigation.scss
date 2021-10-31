@@ -32,11 +32,12 @@ body {
 		width: 300px;
 		text-align: right;
 		transition: top 250ms;
+		z-index: 1;
 
 		a#logo {
 			display: block;
 			// position: absolute;
-			z-index: 4;
+			//z-index: 4;
 			font-family: 'Strait';
 			font-size: 2em;
 			text-decoration: none;
@@ -51,7 +52,7 @@ body {
 			position: absolute;
 			top: 1px;
 			right: -35px;
-			z-index: 3;
+			//z-index: 3;
 			width: 15px;
 			height: 15px;
 			padding: 5px;
