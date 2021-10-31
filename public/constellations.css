@@ -411,7 +411,7 @@ body #menu .user a, body #menu .guest a {
   background: rgba(0, 0, 0, 0.82);
 }
 .uibox.wide {
-  width: 600;
+  width: 600px;
 }
 .uibox h2 {
   margin: 0 0 15px;
@@ -776,16 +776,16 @@ body.playing header#playingStarInfo {
   color: #ecb;
   text-transform: uppercase;
 }
-form#settings .ticketCount {
+form#settings-page .ticketCount {
   padding: 25px 0;
 }
-form#settings .ticketCount.creationTickets, form#settings .ticketCount.recreationTickets {
+form#settings-page .ticketCount.creationTickets, form#settings-page .ticketCount.recreationTickets {
   float: left;
   width: 50%;
   background: rgba(31, 75, 30, 0.6);
   text-align: center;
 }
-form#settings .ticketCount.creationTickets .count, form#settings .ticketCount.recreationTickets .count {
+form#settings-page .ticketCount.creationTickets .count, form#settings-page .ticketCount.recreationTickets .count {
   font-size: 2em;
 }
 

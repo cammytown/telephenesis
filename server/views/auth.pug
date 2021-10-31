@@ -1,4 +1,4 @@
-form#login.uibox.ajax(action="/login" method="POST" data-ajax-action="/ajax/login")
+form#login-page.uibox.ajax(action="/login" method="POST" data-ajax-action="/ajax/login")
 	label.floatBeside(for="email") Email
 	input(type="text" name="email" placeholder="email")
 
@@ -10,7 +10,7 @@ form#login.uibox.ajax(action="/login" method="POST" data-ajax-action="/ajax/logi
 	ul.errors
 
 
-form#register.uibox.ajax(action="/register" method="POST" data-ajax-action="/ajax/register")
+form#register-page.uibox.ajax(action="/register" method="POST" data-ajax-action="/ajax/register")
 	label.floatBeside(for="email") Email
 	input(name="email" value=user.em type="text" placeholder="email")
 

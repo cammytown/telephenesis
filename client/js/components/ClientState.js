@@ -19,6 +19,10 @@ function ClientState() {
 	 **/
 	this.playingStar = null;
 
+	/**
+	 * The element of the page currently open on the client.
+	 * @type {Element}
+	 **/
 	this.activeWindow = false;
 
 	/**

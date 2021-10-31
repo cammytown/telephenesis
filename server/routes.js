@@ -396,7 +396,7 @@ function main(req, res) {
 		return api.getStars(req.user)
 			.then(stars => { /// consolidate
 				app.render('main', {
-					//page: req.params.page,
+					page: req.params.page,
 					user: req.user,
 					pageTitle: 'telephenesis : '
 						+ (req.params.page ? req.params.page : 'a game of musical echoes'),
@@ -405,20 +405,37 @@ function main(req, res) {
 					// popularitySort: JSON.stringify(),
 				}, (err, html) => {
 					if(err) {
+						// There was a problem rendering the template:
 						throw new Error(err);
 					}
 
-					// Parse the rendered template:
-					var domRoot = HTMLParser.parse(html);
+					// If URI goes to a particular page:
+					if(req.params.page) {
+						// Parse the rendered template:
+						var domRoot = HTMLParser.parse(html);
 
-					// Manipulate DOM according to page:
-					var bodyEle = domRoot.getElementsByTagName('body')[0];
+						// Manipulate DOM according to page:
+						var bodyEle = domRoot.getElementsByTagName('body')[0];
+						var pageElement = domRoot.querySelector('#' + req.params.page + '-page');
 
-					//var testElement = domRoot.querySelector('#register');
-					//bodyEle.appendChild(testElement);
+						///REVISIT:
+						if(!pageElement) {
+							console.error("Telep: Found no page element for '" + req.params.page + '"');
+						} else {
+							// Remove page element from #limbo:
+							pageElement.remove();
 
-					// Send the new HTML to client:
-					res.send(domRoot.toString());
+							// Move the page element from #limbo to body:
+							bodyEle.appendChild(pageElement);
+						}
+
+						// Send the new HTML to client:
+						res.send(domRoot.toString());
+
+					// Else if no page, just send unaltered template:
+					} else {
+						res.send(html);
+					}
 				});
 			})
 			.catch(err => {

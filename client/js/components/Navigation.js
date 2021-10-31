@@ -19,30 +19,37 @@ function ClientNavigation() {
 	var galaxyContextMenu;
 
 	this.init = function() {
+		// Setup element references:
 		starContextMenu = document.getElementById('starContextMenu');
 		galaxyContextMenu = document.getElementById('galaxyContextMenu');
 
-		// Listen for URI changes
+		// Set activeWindow if path calls for it:
+		///REVISIT architecture:
+		var page = location.pathname.split('/')[1];
+		var initialPage = document.getElementById(page + '-page');
+		clientState.activeWindow = initialPage;
+
+		// Add listener for URI changes:
 		HistoryTime.bindPathToCallback('*', onNavigate);
 
-		// Listen to internal navigation links
+		// Add listeners to internal navigation links:
 		var navLinks = document.getElementsByClassName('nav'); ///REVISIT not really into this class name; something more descriptive?
 		for (var navLinkIndex = 0; navLinkIndex < navLinks.length; navLinkIndex++) {
 			navLinks[navLinkIndex].addEventListener('click', onNavLinkClick);
 		}
 
-		// Close context menus when outer space is clicked
+		// Close context menus when outer space is clicked:
 		cor.al(spc.element, 'click', function(event) {
 			closeContextMenu();
 
-			if(event.target.parentNode.id == 'spc' && HistoryTime.state.path != '/') { ///
-				// state.updating = true;
-				me.navigate('/'); //// page title
-			}
+			//if(event.target.parentNode.id == 'spc' && HistoryTime.state.path != '/') { ///
+			//        // state.updating = true;
+			//        me.navigate('/'); //// page title
+			//}
 		});
 
 		// Open context menu on right click
-		cor.al(spc.element, 'contextmenu', contextMenu);
+		cor.al(spc.element, 'contextmenu', onContextMenu);
 	}
 
 	function onNavLinkClick(event) {
@@ -61,15 +68,19 @@ function ClientNavigation() {
 		// }
 	}
 
-	function contextMenu(e) {
-		e.preventDefault();
-		e.stopPropagation();
+	/**
+	 * Callback for when user opens the context menu (i.e. right-clicking).
+	 * @param {Event} event
+	 **/
+	function onContextMenu(event) {
+		event.preventDefault();
+		event.stopPropagation();
 
 		closeContextMenu();
 
-		var isStarClick = cor.cc(e.target.parentNode, 'star'); ///REVISIT weird architecture?
+		var isStarClick = cor.cc(event.target.parentNode, 'star'); ///REVISIT weird architecture?
 		if(isStarClick) {
-			var star = e.target.parentNode;
+			var star = event.target.parentNode;
 			var sid = star.id.split('s')[1];
 
 			//document.getElementById('download').href = '/f/'+sid+'.mp3';
@@ -87,13 +98,15 @@ function ClientNavigation() {
 			clientState.actingStar = false;
 
 			var menu = galaxyContextMenu;
-			menu.style.left = e.clientX + 'px';
-			menu.style.top = e.clientY + 'px';
+			menu.style.left = event.clientX + 'px';
+			menu.style.top = event.clientY + 'px';
 			document.body.appendChild(menu);
 		}
 	}
 
-	// VISUAL FUNCTIONS
+	/**
+	 * Close any open context menu.
+	 **/
 	function closeContextMenu() {
 		// var menus = document.getElementsByClassName('star menu');
 		// if(menus.length) menus[0].className = 'star';
@@ -101,7 +114,11 @@ function ClientNavigation() {
 		limbo.appendChild(galaxyContextMenu);
 	}
 
-	me.navigate = function(path) {
+	/**
+	 * Navigate to a URI path.
+	 * @param {string} path - The path to navigate to.
+	 **/
+	this.navigate = function(path) {
 		var parts = path.split('/');
 		var operation = parts[1];
 
@@ -113,9 +130,14 @@ function ClientNavigation() {
 		HistoryTime.navigateTo(path, pageTitle);
 	}
 
+	/**
+	 * Callback for history state changes.
+	 * @param {string} path - The path that the client navigated to.
+	 **/
 	function onNavigate(path) {
 		var parts = path.split('/');
 		var operation = parts[1];
+		console.log(operation);
 
 		// if(operation.length && !isNaN(operation)) {
 		// 	var star = document.getElementById('s'+operation)
@@ -173,31 +195,35 @@ function ClientNavigation() {
 		// }
 	}
 
-	function open(box) {
-		var box = document.getElementById(box);
-		clientState.activeWindow = box;
-		document.body.appendChild(box);
-		Anm.fadeIn(box);
-		// spc.flt(true);
+	function open(page) {
+		var pageElement = document.getElementById(page + '-page');
+		if(pageElement) {
+			clientState.activeWindow = pageElement;
+			document.body.appendChild(pageElement);
+			Anm.fadeIn(pageElement);
+		} else {
+			///REVISIT
+			console.error("No element for page '" + page + "'");
+		}
 	}
 
 	///:
-	function close(box) {
-		box = (typeof box === "undefined") ? clientState.activeWindow : box;
-		clientState.activeWindow = false;
+	function close(page) {
+		page = (typeof page === "undefined") ? clientState.activeWindow : page;
 
 		///:
 		// menuToggleElement.innerHTML = '|||';
 		// cor.rc(menuToggleElement, 'active');
 		// cor.rc(document.getElementById('menu'), 'active');
 
-		if(box) {
-			Anm.fadeOut(box, 250, function() {
-				limbo.appendChild(box);
+		console.log(page);
+		if(page) {
+			Anm.fadeOut(page, 250, function() {
+				limbo.appendChild(page);
 			});
 		}
 
-		// spc.flt(false);
+		clientState.activeWindow = false;
 	}
 
 	function logout() { ///REVISIT placement

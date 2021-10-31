@@ -11,8 +11,8 @@ class HistoryTime { //v0.1
 
 		this.state = {
 			title: document.title,
-			path: '/',
-			url: location.href,
+			//path: '/',
+			url: location.pathname, ///location.href,
 			updating: false
 		};
 
