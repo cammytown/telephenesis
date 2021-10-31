@@ -688,7 +688,7 @@ body.playing header#playingStarInfo {
   cursor: url("/images/grab.png"), auto;
 }
 #spc .lyr {
-  position: absolute;
+  position: fixed;
   width: 100%;
   height: 100%;
 }

@@ -1,4 +1,6 @@
 const express = require('express');
+//const htmlparser2 = require('htmlparser2');
+const HTMLParser = require('node-html-parser');
 const multer = require('multer');
 const upload = multer({ dest: __dirname + '/../uploads/' });
 
@@ -393,16 +395,34 @@ function main(req, res) {
 	} else {
 		return api.getStars(req.user)
 			.then(stars => { /// consolidate
-				res.render('main', {
+				app.render('main', {
+					//page: req.params.page,
+					user: req.user,
 					pageTitle: 'telephenesis : '
 						+ (req.params.page ? req.params.page : 'a game of musical echoes'),
 					className,
 					stars,
 					// popularitySort: JSON.stringify(),
-					user: req.user
+				}, (err, html) => {
+					if(err) {
+						throw new Error(err);
+					}
+
+					// Parse the rendered template:
+					var domRoot = HTMLParser.parse(html);
+
+					// Manipulate DOM according to page:
+					var bodyEle = domRoot.getElementsByTagName('body')[0];
+
+					//var testElement = domRoot.querySelector('#register');
+					//bodyEle.appendChild(testElement);
+
+					// Send the new HTML to client:
+					res.send(domRoot.toString());
 				});
 			})
 			.catch(err => {
+				console.error(err);
 				res.status(404).send("Our website appears to be down. Sorry about that.");
 			});
 	}

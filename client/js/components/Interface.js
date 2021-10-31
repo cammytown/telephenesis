@@ -4,7 +4,7 @@ import cor from '../libs/minlab/cor';
 // import ajx from '../libs/minlab/ajx';
 import spc from '../libs/minlab/spc';
 // import HistoryTime from '../libs/history-time';
-import navigation from './Navigation';
+import Navigation from './Navigation';
 
 import clientState from './ClientState';
 import mediaPlayer from './MediaPlayer';
@@ -98,7 +98,7 @@ function Interface() {
 
 				case 27: { // escape key
 					// state.updating = true;
-					navigation.navigate('/'); //// page title
+					Navigation.navigate('/'); //// page title
 
 					if(Stars.view != "galaxy") { ///REVISIT this should probably just happen as a consequence of navigating to /
 						Stars.sort(null, "galaxy");
@@ -173,20 +173,27 @@ function Interface() {
 	function sort(order, view, clickedEle = false) {
 		///TODO probably move some of this into Interface.js:
 		if(order) {
+			// If there's an order already, remove its class from document.body:
 			if(me.order) {
 				cor.rc(document.body, me.order + '-order'); ////
 			}
 
+			// Add the new order's class to document.body:
 			cor.ac(document.body, order + '-order'); ////
 
+			// If the order is 'galaxy', so is the view:
 			if(order == 'galaxy') {
 				view = 'galaxy'; ///REVISIT this solution; not sure it's best architecture
-			} else {
-				// If view is not galaxy:
 
+			// If view is not galaxy:
+			} else {
+				// If no view was provided to sort():
 				if(!view) {
+					// If we're already in a non-galaxy view (i.e. list/grid):
 					if(me.view != 'galaxy') {
-						// Keep current view.
+						// Do nothing; keep current view.
+
+					// If we're in galaxy view, default to 'list' so that new order can be shown:
 					} else {
 						// There's no current table view; default to list:
 						view = 'list';
@@ -194,6 +201,7 @@ function Interface() {
 				}
 			}
 
+			// If the order link we clicked specifies the order, update the UI:
 			if(clickedEle.getAttribute('data-order')) {
 				for(var orderLabelEle of document.getElementsByClassName('current-order')) {
 					///REVISIT should we prefer just a data-menu-label attribute or something instead?:
@@ -205,13 +213,17 @@ function Interface() {
 			me.order = order;
 		}
 
+		// If a view was supplied to sort() and it is different from the current one:
 		if(view && view != me.view) {
+			// If there's already a view, remove its class from document.body:
 			if(me.view) {
 				cor.rc(document.body, me.view + '-view'); ////
 			}
 
+			// Add the new view's class to document.body:
 			cor.ac(document.body, view + '-view'); ////
 
+			// Update any labels that display the current view:
 			for(var viewLabelEle of document.getElementsByClassName('current-view')) {
 				viewLabelEle.innerText = view;
 				// viewLabelEle.innerText = clickedEle.getAttribute('data-view').replace('-', ' ');
@@ -220,15 +232,18 @@ function Interface() {
 			me.view = view;
 		}
 
+		// If the sort link we clicked specifies header text:
 		if(clickedEle.getAttribute('data-header')) {
 			for(var viewHeaderEle of document.getElementsByClassName('view-header')) {
 				viewHeaderEle.innerText = clickedEle.getAttribute('data-header');
 			}
 		}
 
-		console.log([me.order, me.view]);
-
+		// Actually sort and position the stars:
 		Stars.sort(me.order, me.view);
+
+		// Update the URI:
+		Navigation.navigate('/?view=' + me.view + '&order=' + me.order);
 	}
 
 	// me.invite = function(event) {

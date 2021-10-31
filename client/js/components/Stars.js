@@ -186,7 +186,10 @@ function ClientStarsAPI() {
 					// If B is more recent than A, return true
 					return parseInt(b.element.getAttribute('data-timestamp'))
 						- parseInt(a.element.getAttribute('data-timestamp'));
-				}).map(star => star.element);
+				}).map(star => star.element)
+				.filter(starEle => starEle); ///REVISIT is this readable? removes starEle if falsey
+
+				console.log(me.cachedSorts['most-recent']);
 
 				return me.cachedSorts['most-recent'];
 			} break;
