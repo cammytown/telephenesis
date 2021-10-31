@@ -24,6 +24,13 @@ function Interface() {
 	/** Element which holds messages shown to user. **/
 	var messageElement;
 
+	/**
+	 * The ID of the setTimeout timer being used to display 
+	 * the current message.
+	 * @type {number}
+	 **/
+	var messageTimerID = null;
+
 	this.init = function() {
 		messageElement = document.getElementById('notification');
 
@@ -122,11 +129,16 @@ function Interface() {
 	 * @param {number} [duration=5000] - How long to display the message for.
 	 */
 	this.displayMessage = function(message, type = "notification", duration = 5000) { ///REVISIT naming
+		if(messageTimerID !== null) {
+			clearTimeout(messageTimerID);
+			messageTimerID = null;
+		}
+
 		messageElement.innerText = message;
 		messageElement.className = type;
 		document.body.appendChild(messageElement);
 		///TODO fade out
-		window.setTimeout(() => limbo.appendChild(messageElement), duration);
+		messageTimerID = setTimeout(() => limbo.appendChild(messageElement), duration);
 	}
 
 	/**

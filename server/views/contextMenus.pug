@@ -1,7 +1,12 @@
 #starContextMenu.menu
 	.user
 		a.nav(href="/bookmark") Bookmark
-		a.create.recreateStar(href="/create") Recreate
+
+		a.create.recreateStar(
+			href="/create"
+			class = (user.recreationTickets > 0 ? '' : 'ticketless')
+		) Recreate
+
 		a.nav.admin(href="/moveStar") Move
 		a.nav.admin(href="/recolorStar") Recolor
 		a.nav.admin(href="/renameStar") Change Creator
