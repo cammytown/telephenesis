@@ -1,8 +1,8 @@
 {
-	"MOST-POPULAR": "Most Popular",
-	"SORT-BY-MOST-POPULAR": "Sorting by most popular",
-	"MOST-RECENT": "Most Recent",
-	"SORT-BY-MOST-RECENT": "Sorting by most recent",
+	"MOST_POPULAR": "Most Popular",
+	"SORT-BY-MOST_POPULAR": "Sorting by most popular",
+	"MOST_RECENT": "Most Recent",
+	"SORT-BY-MOST_RECENT": "Sorting by most recent",
 	"LIST": "List",
 	"GRID": "Grid",
 	"BOOKMARKS": "Bookmarks",

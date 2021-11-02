@@ -4,6 +4,7 @@ const multer = require('multer');
 const upload = multer({ dest: __dirname + '/../uploads/' });
 
 const ServerStar = require('./components/ServerStar.js');
+const CONSTS = require('../abstract/constants.js');
 // const stars = require('./components/StarMapper.js');
 
 // var telepServer = require('./components/TelepServer.js');
@@ -398,6 +399,7 @@ function main(req, res) {
 		return api.getStars(req.user)
 			.then(stars => { /// consolidate
 				app.render('main', {
+					CONSTS: CONSTS,
 					page: req.params.page,
 					user: req.user,
 					pageTitle: 'telephenesis : '

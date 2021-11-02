@@ -22,13 +22,13 @@ header#galaxy-ui
 
 			ul
 				li
-					a.sort(data-order="galaxy") galaxy
+					a.sort(data-order=CONSTS.ORDER.GALAXY) galaxy
 				li
-					a.sort(data-order="most-recent" data-header="Sorting by Most Recent") by date
+					a.sort(data-order=CONSTS.ORDER.MOST_RECENT) by date
 				li
-					a.sort(data-order="most-popular" data-header="Sorting by Most Popular") by popularity
+					a.sort(data-order=CONSTS.ORDER.MOST_POPULAR) by popularity
 				li
-					a.sort(data-order="bookmarks" data-header="Your Bookmarks") bookmarks
+					a.sort(data-order=CONSTS.ORDER.BOOKMARKS) bookmarks
 				//- li recently played
 
 		nav.view-nav
@@ -37,9 +37,9 @@ header#galaxy-ui
 
 			ul
 				li
-					a.sort(data-view="list") list
+					a.sort(data-view=CONSTS.VIEW.LIST) list
 				li
-					a.sort(data-view="grid") grid
+					a.sort(data-view=CONSTS.VIEW.GRID) grid
 
 		header
 			h2.view-header Sorting by Most Recent

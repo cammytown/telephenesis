@@ -8,6 +8,7 @@ import styleVars from '../../scss/abstracts/_variables.scss';
 import clientState from './ClientState';
 import effects from './ClientEffects';
 import ClientStar from './ClientStar';
+import CONSTS from '../../../abstract/constants.js';
 
 export default new ClientStarsAPI();
 
@@ -35,7 +36,7 @@ function ClientStarsAPI() {
 	// var isAnimating = false;
 
 	me.cachedSorts = {
-		'most-recent': null
+		'MOST_RECENT': null
 	}
 
 	this.init = function() {
@@ -180,25 +181,25 @@ function ClientStarsAPI() {
 
 		// Rank stars according to order
 		switch(order) {
-			case 'most-recent': {
+			case CONSTS.ORDER.MOST_RECENT: {
 				// me.cachedSorts['most-recent'] = [];
-				me.cachedSorts['most-recent'] = me.clientStars.sort((a, b) => {
+				me.cachedSorts[order] = me.clientStars.sort((a, b) => {
 					// If B is more recent than A, return true
 					return parseInt(b.element.getAttribute('data-timestamp'))
 						- parseInt(a.element.getAttribute('data-timestamp'));
 				}).map(star => star.element)
 				.filter(starEle => starEle); ///REVISIT is this readable? removes starEle if falsey
 
-				console.log(me.cachedSorts['most-recent']);
-
-				return me.cachedSorts['most-recent'];
+				return me.cachedSorts[order];
 			} break;
 
-			case 'most-popular': {
+			case CONSTS.ORDER.MOST_POPULAR: {
+				///REVISIT we rely on the server to have output the stars in popularity order.
+				/// we should at the very least make this semantically clearer... or just leave a comment
 				return document.getElementsByClassName('star');
 			} break;
 
-			case 'bookmarks': {
+			case CONSTS.ORDER.BOOKMARKS: {
 				return document.getElementsByClassName('star bookmarked'); ///REVISIT optimize?
 			} break;
 
@@ -208,6 +209,11 @@ function ClientStarsAPI() {
 		}
 	}
 
+	/**
+	 * Sort the stars by `order` and display them according to `view`.
+	 * @param order {CONSTANTS.ORDER}
+	 * @param view {CONSTANTS.VIEW}
+	 **/
 	this.sort = function(order, view) { ///REVISIT maybe separate into its own component? probably rename when we better understand how we will architect things
 		// if(!view) view = "list"; // Explicit because we pass in the value of getAttribute('data-view')
 
@@ -218,7 +224,7 @@ function ClientStarsAPI() {
 
 		// Reposition each star
 		switch(view) {
-			case 'galaxy': {
+			case CONSTS.VIEW.GALAXY: {
 				spc.s = true;
 
 				// for (var starIndex = 0; starIndex < me.clientStars.length; starIndex++) {
@@ -238,8 +244,8 @@ function ClientStarsAPI() {
 				});
 			} break;
 
-			case 'grid':
-			case 'list': {
+			case CONSTS.VIEW.GRID:
+			case CONSTS.VIEW.LIST: {
 				spc.s = false;
 
 				var sortedElements = this.getSortedStars(order);
@@ -259,10 +265,10 @@ function ClientStarsAPI() {
 					// Calculate target position of the star
 					var newX;
 					var newY;
-					if(view == 'grid') {
+					if(view == CONSTS.VIEW.GRID) {
 						newX = styleVars.starGridSquareSize * (starEleIndex % columnCount);
 						newY = styleVars.starGridSquareSize * currentRow;
-					} else if(view == 'list') {
+					} else if(view == CONSTS.VIEW.LIST) {
 						newX = 0;
 						newY = (styleVars.starGridSquareSize + styleVars.starGridMargin) * starEleIndex;
 					}
@@ -280,7 +286,7 @@ function ClientStarsAPI() {
 						}
 					});
 
-					if(view == 'grid') {
+					if(view == CONSTS.VIEW.GRID) {
 						// Wrap grid if row filled
 						if(newX >= styleVars.starGridWidth - styleVars.starGridSquareSize) {
 							currentRow += 1;

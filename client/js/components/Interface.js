@@ -9,6 +9,7 @@ import Navigation from './Navigation';
 import clientState from './ClientState';
 import mediaPlayer from './MediaPlayer';
 import Stars from './Stars';
+import CONSTS from '../../../abstract/constants.js';
 import locale from '../../../locale/en_us.json'; ///REVISIT
 
 /**
@@ -19,10 +20,8 @@ function Interface() {
 	// var currentOrderLink;
 	var me = this;
 
-	console.log(locale);
-
-	me.order = "galaxy";
-	me.view = "galaxy";
+	me.order = CONSTS.ORDER.GALAXY;
+	me.view = CONSTS.VIEW.GALAXY;
 
 	/** Element which holds messages shown to user. **/
 	var messageElement;
@@ -103,8 +102,8 @@ function Interface() {
 					// state.updating = true;
 					Navigation.navigate('/'); //// page title
 
-					if(Stars.view != "galaxy") { ///REVISIT this should probably just happen as a consequence of navigating to /
-						Stars.sort(null, "galaxy");
+					if(Interface.view != CONSTS.VIEW.GALAXY) { ///REVISIT this should probably just happen as a consequence of navigating to /
+						Interface.sort(CONSTS.VIEW.GALAXY);
 					}
 				} break;
 			}
@@ -132,7 +131,7 @@ function Interface() {
 			// If there's a view or order in the query string:
 			if(initialOrder || initialView) {
 				// Display the view and/or order:
-				sort(initialOrder, initialView);
+				me.sort(initialOrder, initialView);
 			}
 		}
 	}
@@ -158,7 +157,7 @@ function Interface() {
 
 	/**
 	 * Displays an error to the user.
-	 * @param {string} errorCode - The error code from {@link Constants.ERROR} to display a message for.
+	 * @param {string} errorCode - The error code from {@link CONSTANTS.ERROR} to display a message for.
 	 */
 	this.displayError = function(errorCode) {
 		var errorMessages = { ///TODO probably to be moved when we start localization work
@@ -178,91 +177,94 @@ function Interface() {
 	}
 
 	function onSortClick(event) {
-		sort(
+		me.sort(
 			event.currentTarget.getAttribute('data-order'),
 			event.currentTarget.getAttribute('data-view'),
 			event.currentTarget
 		);
 	}
 
-	function sort(order, view, clickedEle = false) {
-		///TODO probably move some of this into Interface.js:
+	/**
+	 * Sort the stars in the interface and display them in {@link view}.
+	 * @param {CONSTANTS.ORDER} order - The nature of the ordering of the stars.
+	 * @param {CONSTANTS.VIEW} view - The view by which to show the stars.
+	 * @param {Element} [clickedEle = false] - The sort link that was clicked to run this method.
+	 **/
+	this.sort = function(order, view, clickedEle = false) {
+		///REVISIT not into all this .toLowerCase() business... better design?
+
 		if(order) {
 			// If there's an order already, remove its class from document.body:
 			if(me.order) {
-				cor.rc(document.body, me.order + '-order'); ////
+				cor.rc(document.body, me.order.toLowerCase() + '-order'); ////
 			}
 
 			// Add the new order's class to document.body:
-			cor.ac(document.body, order + '-order'); ////
+			cor.ac(document.body, order.toLowerCase() + '-order'); ////
 
 			// If the order is 'galaxy', so is the view:
-			if(order == 'galaxy') {
-				view = 'galaxy'; ///REVISIT this solution; not sure it's best architecture
+			if(order == CONSTS.ORDER.GALAXY) {
+				view = CONSTS.VIEW.GALAXY; ///REVISIT this solution; not sure it's best architecture
 
 			// If view is not galaxy:
 			} else {
 				// If no view was provided to sort():
 				if(!view) {
 					// If we're already in a non-galaxy view (i.e. list/grid):
-					if(me.view != 'galaxy') {
+					if(me.view != CONSTS.VIEW.GALAXY) {
 						// Do nothing; keep current view.
 
 					// If we're in galaxy view, default to 'list' so that new order can be shown:
 					} else {
 						// There's no current table view; default to list:
-						view = 'list';
+						view = CONSTS.VIEW.LIST;
 					}
 				}
 			}
 
 
-			me.order = order;
+			me.order = order.toUpperCase();
 		}
 
 		// If a view was supplied to sort() and it is different from the current one:
 		if(view && view != me.view) {
 			// If there's already a view, remove its class from document.body:
 			if(me.view) {
-				cor.rc(document.body, me.view + '-view'); ////
+				cor.rc(document.body, me.view.toLowerCase() + '-view'); ////
 			}
 
 			// Add the new view's class to document.body:
-			cor.ac(document.body, view + '-view'); ////
+			cor.ac(document.body, view.toLowerCase() + '-view'); ////
 
 
-			me.view = view;
+			me.view = view.toUpperCase();
 		}
 
-		// // If the order link we clicked specifies the order, update the UI:
-		//if(clickedEle.getAttribute('data-order')) {
+		///TODO only do this stuff if the value has changed:
+
+		// Update labels that display the current order:
 		for(var orderLabelEle of document.getElementsByClassName('current-order')) {
-			///REVISIT should we prefer just a data-menu-label attribute or something instead?:
-			orderLabelEle.innerText = locale[me.order.toUpperCase()];
-			//orderLabelEle.innerText = clickedEle.innerText;
-			// orderLabelEle.innerText = clickedEle.getAttribute('data-order').replace('-', ' ');
+			orderLabelEle.innerText = locale[me.order].toLowerCase();
 		}
-		//}
 
 		// Update any labels that display the current view:
 		for(var viewLabelEle of document.getElementsByClassName('current-view')) {
-			viewLabelEle.innerText = locale[me.view.toUpperCase()];
-			// viewLabelEle.innerText = clickedEle.getAttribute('data-view').replace('-', ' ');
+			viewLabelEle.innerText = locale[me.view].toLowerCase();
 		}
 
-		// If the sort link we clicked specifies header text:
-		//if(clickedEle.getAttribute('data-header')) {
-			for(var viewHeaderEle of document.getElementsByClassName('view-header')) {
-				viewHeaderEle.innerText = locale['SORT-BY-' + me.order.toUpperCase()];
-				//viewHeaderEle.innerText = clickedEle.getAttribute('data-header');
-			}
-		//}
+		// Update the header of the view (to reflect the order):
+		for(var viewHeaderEle of document.getElementsByClassName('view-header')) {
+			viewHeaderEle.innerText = locale['SORT-BY-' + me.order];
+		}
 
 		// Actually sort and position the stars:
 		Stars.sort(me.order, me.view);
 
 		// Update the URI:
-		Navigation.navigate('/?view=' + me.view + '&order=' + me.order);
+		Navigation.navigate(
+			'/?view=' + me.view.toLowerCase()
+			+ '&order=' + me.order.toLowerCase()
+		);
 	}
 
 	// me.invite = function(event) {
