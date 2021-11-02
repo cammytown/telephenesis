@@ -1,5 +1,4 @@
 const express = require('express');
-//const htmlparser2 = require('htmlparser2');
 const HTMLParser = require('node-html-parser');
 const multer = require('multer');
 const upload = multer({ dest: __dirname + '/../uploads/' });
@@ -25,6 +24,7 @@ function initializeRoutes(telepServer) {
 	app = telepServer.app;
 	api = telepServer.api;
 	usr = telepServer.usr;
+
 
 	// Accept multipart form data (FormData):
 	app.use(upload.array()); ///REVISIT move into TelepServer somehow?
@@ -195,6 +195,7 @@ function login(req, res, next) {
 		.catch(errors => {
 			// res.render('login', { p: req.body, errors: err });
 			console.error(errors);
+//const htmlparser2 = require('htmlparser2');
 			next(errors);
 			// throw err;
 		});
@@ -375,6 +376,7 @@ function uploadMedia(req, res) { /// could maybe just use .post('/create/:starid
 function main(req, res) {
 	var realPages = ['help', 'login', 'register', 'settings', 'create'];
 
+
 	var className = "";
 	if(req.user) {
 		className += " in";
@@ -430,6 +432,8 @@ function main(req, res) {
 						}
 
 						// Send the new HTML to client:
+	res.send("Test");
+	return false;
 						res.send(domRoot.toString());
 
 					// Else if no page, just send unaltered template:

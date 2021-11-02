@@ -9,6 +9,7 @@ import Navigation from './Navigation';
 import clientState from './ClientState';
 import mediaPlayer from './MediaPlayer';
 import Stars from './Stars';
+import locale from '../../../locale/en_us.json'; ///REVISIT
 
 /**
  * Telephenesis class for user interface methods.
@@ -17,6 +18,8 @@ import Stars from './Stars';
 function Interface() {
 	// var currentOrderLink;
 	var me = this;
+
+	console.log(locale);
 
 	me.order = "galaxy";
 	me.view = "galaxy";
@@ -108,18 +111,30 @@ function Interface() {
 		});
 
 		/* SORTING */
-		for(var sortRecentLinks of cor._('.sort')) {
-			cor.al(sortRecentLinks, 'click', onSortClick);
+		for(var sortLinks of cor._('.sort')) {
+			cor.al(sortLinks, 'click', onSortClick);
 		}
+	}
 
-		// for(var sortRecentLinks of cor._('.sort-most-recent')) {
-		// 	cor.al(sortRecentLinks, 'click', () => sort('most-recent'));
-		// }
+	/**
+	 * Called when all components have loaded.
+	 * @see ClientState#addComponent
+	 **/
+	this.ready = function() {
+		///TODO revisit implementation; probably render on the server:
+		// If loaded URL contains a query string:
+		if(location.search.length) {
+			// Check for view and/or order in query string:
+			var params = new URLSearchParams(location.search);
+			var initialOrder = params.get('order');
+			var initialView = params.get('view');
 
-		// for(var sortRecentLinks of cor._('.sort-galaxy')) {
-		// 	cor.al(sortRecentLinks, 'click', () => sort(null, 'galaxy'));
-		// }
-
+			// If there's a view or order in the query string:
+			if(initialOrder || initialView) {
+				// Display the view and/or order:
+				sort(initialOrder, initialView);
+			}
+		}
 	}
 
 	/**
@@ -201,14 +216,6 @@ function Interface() {
 				}
 			}
 
-			// If the order link we clicked specifies the order, update the UI:
-			if(clickedEle.getAttribute('data-order')) {
-				for(var orderLabelEle of document.getElementsByClassName('current-order')) {
-					///REVISIT should we prefer just a data-menu-label attribute or something instead?:
-					orderLabelEle.innerText = clickedEle.innerText;
-					// orderLabelEle.innerText = clickedEle.getAttribute('data-order').replace('-', ' ');
-				}
-			}
 
 			me.order = order;
 		}
@@ -223,21 +230,33 @@ function Interface() {
 			// Add the new view's class to document.body:
 			cor.ac(document.body, view + '-view'); ////
 
-			// Update any labels that display the current view:
-			for(var viewLabelEle of document.getElementsByClassName('current-view')) {
-				viewLabelEle.innerText = view;
-				// viewLabelEle.innerText = clickedEle.getAttribute('data-view').replace('-', ' ');
-			}
 
 			me.view = view;
 		}
 
-		// If the sort link we clicked specifies header text:
-		if(clickedEle.getAttribute('data-header')) {
-			for(var viewHeaderEle of document.getElementsByClassName('view-header')) {
-				viewHeaderEle.innerText = clickedEle.getAttribute('data-header');
-			}
+		// // If the order link we clicked specifies the order, update the UI:
+		//if(clickedEle.getAttribute('data-order')) {
+		for(var orderLabelEle of document.getElementsByClassName('current-order')) {
+			///REVISIT should we prefer just a data-menu-label attribute or something instead?:
+			orderLabelEle.innerText = locale[me.order.toUpperCase()];
+			//orderLabelEle.innerText = clickedEle.innerText;
+			// orderLabelEle.innerText = clickedEle.getAttribute('data-order').replace('-', ' ');
 		}
+		//}
+
+		// Update any labels that display the current view:
+		for(var viewLabelEle of document.getElementsByClassName('current-view')) {
+			viewLabelEle.innerText = locale[me.view.toUpperCase()];
+			// viewLabelEle.innerText = clickedEle.getAttribute('data-view').replace('-', ' ');
+		}
+
+		// If the sort link we clicked specifies header text:
+		//if(clickedEle.getAttribute('data-header')) {
+			for(var viewHeaderEle of document.getElementsByClassName('view-header')) {
+				viewHeaderEle.innerText = locale['SORT-BY-' + me.order.toUpperCase()];
+				//viewHeaderEle.innerText = clickedEle.getAttribute('data-header');
+			}
+		//}
 
 		// Actually sort and position the stars:
 		Stars.sort(me.order, me.view);

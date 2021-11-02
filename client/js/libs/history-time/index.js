@@ -12,7 +12,7 @@ class HistoryTime { //v0.1
 		this.state = {
 			title: document.title,
 			//path: '/',
-			url: location.pathname, ///location.href,
+			url: location.pathname + location.search, ///REVISIT; should we prefer location.href?
 			updating: false
 		};
 
@@ -22,6 +22,9 @@ class HistoryTime { //v0.1
 		this.popState = this.popState.bind(this);
 
 		window.addEventListener('popstate', this.popState, false);
+
+		///REVISIT; I think this is so we have a customized state object; but feels weird-- make sure we need it:
+		/// I think one thing this does is makes sure state.url does not contain the domain?
 		history.replaceState(this.state, this.state.title, this.state.url);
 
 		this.activePathBinds = [];

@@ -710,17 +710,17 @@ body.playing header#playingStarInfo {
 
 /* help */
 /*/// naming could use attention*/
-#help .control {
+#help-page .control {
   float: left;
   width: 50%;
   padding: 10px 0;
 }
-#help .control .key, #help .control .mouse {
+#help-page .control .key, #help-page .control .mouse {
   display: block;
   float: left;
   margin-right: 10px;
 }
-#help .control .key {
+#help-page .control .key {
   display: inline-block;
   width: 20px;
   height: 20px;
@@ -730,15 +730,15 @@ body.playing header#playingStarInfo {
   border-radius: 2px;
   color: #111;
 }
-#help .control.space {
+#help-page .control.space {
   float: none;
   clear: both;
   width: 100%;
 }
-#help .control.space .key {
+#help-page .control.space .key {
   width: 128px;
 }
-#help .control .mouse span {
+#help-page .control .mouse span {
   display: block;
   float: left;
   width: 15px;
@@ -747,30 +747,30 @@ body.playing header#playingStarInfo {
   /*border: 1px solid #111;*/
   box-sizing: border-box;
 }
-#help .control .mouse span:nth-child(1) {
+#help-page .control .mouse span:nth-child(1) {
   margin: 0 1px 1px 0;
   border-radius: 4px 0 0 0;
 }
-#help .control .mouse span:nth-child(2) {
+#help-page .control .mouse span:nth-child(2) {
   margin: 0 0 1px 1px;
   border-radius: 0 4px 0 0;
 }
-#help .control .mouse span:nth-child(3) {
+#help-page .control .mouse span:nth-child(3) {
   float: none;
   clear: both;
   width: 32px;
   height: 26px;
   border-radius: 0 0 4px 4px;
 }
-#help .control .mouse.left span:nth-child(1),
-#help .control .mouse.right span:nth-child(2) {
+#help-page .control .mouse.left span:nth-child(1),
+#help-page .control .mouse.right span:nth-child(2) {
   background: #bae;
 }
-#help .credits {
+#help-page .credits {
   margin-top: 10px;
   text-align: right;
 }
-#help .credits h3 {
+#help-page .credits h3 {
   margin-bottom: 4px;
   font-size: 1em;
   color: #ecb;

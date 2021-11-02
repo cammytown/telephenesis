@@ -37,7 +37,7 @@ function ClientState() {
 	 **/
 	this.recreationTickets = null;
 
-	var uninitializedComponents = []; ///REVISIT perhaps unnecessary
+	var components = []; ///REVISIT perhaps unnecessary
 	// var readyCallbacks = [];
 
 	this.init = function() {
@@ -52,19 +52,40 @@ function ClientState() {
 		}
 	}
 
+
 	// function onReady() { ///REVISIT naming/architecture
 	// 	mediaPlayer.audio.element.addEventListener('timeupdate', onMediaTimeUpdate);
 	// }
 
-	me.addComponent = function(component) {
-		uninitializedComponents.push(component);
+	/**
+	 * Adds a new components to the client.
+	 * @param {Object} component - The component to be added. Requires an .init function.
+	 */
+	this.addComponent = function(component) {
+		components.push(component);
+		//uninitializedComponents.push(component);
 	};
 
+	/**
+	 * Calls .init method on each component, and then calls .ready() on each component.
+	 **/
 	function initializeComponents() {
-		// for (var componentIndex = 0; componentIndex < uninitializedComponents.length; componentIndex++) {
-		while(uninitializedComponents.length) {
-			uninitializedComponents.shift().init();
+		// Call init() on each component:
+		for(var component of components) {
+			component.init();
 		}
+
+		// If component has a ready function, call it.
+		for(var component of components) {
+			if(typeof component.ready === 'function') {
+				component.ready();
+			}
+		}
+
+		// for (var componentIndex = 0; componentIndex < uninitializedComponents.length; componentIndex++) {
+		//while(uninitializedComponents.length) {
+			//uninitializedComponents.shift().init();
+		//}
 
 		// for (var callbackIndex = 0; callbackIndex < readyCallbacks.length; callbackIndex++) {
 		// 	var readyCallback = readyCallbacks[callbackIndex];

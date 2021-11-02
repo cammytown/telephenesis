@@ -24,16 +24,17 @@ function TelepServer() {
 	me.api;
 
 	me.initialize = function() {
+		///REVISIT why not just require/import it wherever we need it? this might be semantically better?:
 		me.config = require('./telepServer.config.js');
 
 		initializeDatabase()
-			.then(initializeExpress)
-			.then(initializeTelep)
-			.then(exposeServer)
-			.catch(err => {
-				console.error(err); ///
-				throw new Error(err);
-			});
+		.then(initializeExpress)
+		.then(initializeTelep)
+		.then(exposeServer)
+		.catch(err => {
+			console.error(err); ///
+			throw new Error(err);
+		});
 	}
 
 	function initializeDatabase() {
@@ -53,6 +54,15 @@ function TelepServer() {
 
 		app.set('views', './views');
 		app.set('view engine', 'pug');
+
+
+		// Debug purposes:
+		////TODO add a flag:
+		app.use((req, res, next) => {
+			console.log("client visited: " + req.url);
+			next();
+		});
+
 		app.use(express.static(__dirname + '/../public'));
 
 		app.use(bodyParser.json({ limit: "2400mb" }));
@@ -90,7 +100,10 @@ function TelepServer() {
 			me.app.set('trust proxy', 'loopback');
 		}
 
-		me.app.listen(me.config.port, () => console.log('telephenesis: listening on port ' + me.config.port));
+		me.app.listen(
+			me.config.port,
+			() => console.log('telephenesis: listening on port ' + me.config.port)
+		);
 	}
 }
 

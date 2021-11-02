@@ -216,7 +216,6 @@ function ClientNavigation() {
 		// cor.rc(menuToggleElement, 'active');
 		// cor.rc(document.getElementById('menu'), 'active');
 
-		console.log(page);
 		if(page) {
 			Anm.fadeOut(page, 250, function() {
 				limbo.appendChild(page);
