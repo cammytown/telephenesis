@@ -103,7 +103,7 @@ function Interface() {
 					Navigation.navigate('/'); //// page title
 
 					if(Interface.view != CONSTS.VIEW.GALAXY) { ///REVISIT this should probably just happen as a consequence of navigating to /
-						Interface.sort(CONSTS.VIEW.GALAXY);
+						me.sort(CONSTS.VIEW.GALAXY);
 					}
 				} break;
 			}
@@ -202,11 +202,11 @@ function Interface() {
 			// Add the new order's class to document.body:
 			cor.ac(document.body, order.toLowerCase() + '-order'); ////
 
-			// If the order is 'galaxy', so is the view:
+			// If the order is GALAXY, so is the view:
 			if(order == CONSTS.ORDER.GALAXY) {
 				view = CONSTS.VIEW.GALAXY; ///REVISIT this solution; not sure it's best architecture
 
-			// If view is not galaxy:
+			// If view is not GALAXY:
 			} else {
 				// If no view was provided to sort():
 				if(!view) {
@@ -261,10 +261,13 @@ function Interface() {
 		Stars.sort(me.order, me.view);
 
 		// Update the URI:
-		Navigation.navigate(
-			'/?view=' + me.view.toLowerCase()
-			+ '&order=' + me.order.toLowerCase()
-		);
+		var newURI = "/";
+		if(me.view != CONSTS.VIEW.GALAXY) {
+			newURI += '?view=' + me.view.toLowerCase()
+				+ '&order=' + me.order.toLowerCase();
+		}
+
+		Navigation.navigate(newURI);
 	}
 
 	// me.invite = function(event) {

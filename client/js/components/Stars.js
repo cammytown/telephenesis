@@ -210,7 +210,7 @@ function ClientStarsAPI() {
 	}
 
 	/**
-	 * Sort the stars by `order` and display them according to `view`.
+	 * Sort the stars by order and display them according to view.
 	 * @param order {CONSTANTS.ORDER}
 	 * @param view {CONSTANTS.VIEW}
 	 **/
