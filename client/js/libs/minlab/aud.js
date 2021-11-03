@@ -58,9 +58,9 @@ class Aud {
 			}
 		});
 
-		cor.al(this.element, 'error', () => this.elementError);
+		cor.al(this.element, 'error', () => this.elementError());
 		// cor.rl(this.element, 'canplay', this.pl);
-		cor.al(this.element, 'timeupdate', () => this.update);
+		cor.al(this.element, 'timeupdate', () => this.update());
 	}
 
 	/** Play the active media. **/

@@ -84,6 +84,7 @@ function MediaPlayer() {
 	}
 
 	function onMediaTimeUpdate(event) {
+
 		// Update playback time label:
 		clientState.playingStar.element.getElementsByClassName('playbackTime')[0].innerHTML = me.audio.timeString;
 

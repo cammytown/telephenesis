@@ -69,7 +69,7 @@ form#create {
 	background-color: #334;
 }
 
-/* create /// naming / specificity */
+/* create /// naming / specificity / move to _star.scss ? */
 .placementSymbol.star {
 	z-index: 2;
 
@@ -79,6 +79,10 @@ form#create {
 		border-color: transparent;
 		border-radius: 12px;
 		cursor: none;
+	}
+
+	.meta {
+		display: none;
 	}
 }
 
@@ -105,8 +109,8 @@ form#create {
 
 #colorShiftSelect {
 	position: absolute;
-	left: -64px;
-	top: -64px;
+	//left: -64px;
+	//top: -64px;
 	z-index: -1; /* /// */
 	width: 128px;
 	height: 128px;
@@ -130,8 +134,8 @@ form#create {
 
 .star #colorwheelSelect {
 	position: absolute;
-	left: -31px;
-	top: -31px;
+	//left: -31px;
+	//top: -31px;
 	width: 64px;
 	height: 64px;
 	background: url('/images/6colordesat.png') center center;

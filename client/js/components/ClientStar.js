@@ -30,6 +30,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	me.linkElement;
 	me.titleElement;
 
+	//this.state = ;
 	me.fileReady = false;
 	me.isPlaced = false;
 
@@ -95,7 +96,14 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 	function onClick(event) {
 		event.preventDefault();
-		me.play();
+
+		///REVISIT me.isPlaced feels kinda hacky:
+		if(me.isPlaced) {
+			console.log(me.fileURL);
+			me.play();
+		} else {
+			return false;
+		}
 	}
 
 	/**

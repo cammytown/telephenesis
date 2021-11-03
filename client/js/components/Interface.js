@@ -3,7 +3,7 @@
 import cor from '../libs/minlab/cor';
 // import ajx from '../libs/minlab/ajx';
 import spc from '../libs/minlab/spc';
-// import HistoryTime from '../libs/history-time';
+import HistoryTime from '../libs/history-time';
 import Navigation from './Navigation';
 
 import clientState from './ClientState';
@@ -69,28 +69,45 @@ function Interface() {
 
 		/* SHORTCUTS */
 		cor.al(window, 'keydown', function(e) {
+			if(e.target.tagName.toUpperCase() == "INPUT") { // .toUpperCase() out of paranoia
+				return true;
+			}
+
 			switch(e.keyCode) {
-				case 39: { // right arrow
+				// Left arrow:
+				case 37: {
 					e.preventDefault();
+
+					// If a star is currently active in the media player:
 					if(clientState.playingStar) {
-						var nsid = clientState.playingStar.getAttribute('data-next');
+						// If there's a previous star:
+						if(clientState.playingStar.originStarID != -1) {
+							var previousStar = Stars.clientStars[clientState.playingStar.originStarID];
+							mediaPlayer.playStar(previousStar);
+						}
+					}
+				} break;
+
+				// Right arrow:
+				case 39: {
+					e.preventDefault();
+
+					if(clientState.playingStar) {
+						///TODO better solution:
+						var nsid = parseInt(clientState.playingStar.element.getAttribute('data-next'));
 						/// if next star isn't loaded? if there is no next star?
-						var nstar = document.getElementById('s'+nsid);
-						playStar(nstar);
+						var nextStar = Stars.clientStars[nsid];
+						if(!nextStar) {
+							///REVISIT
+							return false;
+						}
+
+						mediaPlayer.playStar(nextStar);
 					}
 				} break;
 
-				case 37: { // left arrow
-					e.preventDefault();
-					if(clientState.playingStar) {
-						var previousStarID = clientState.playingStar.getAttribute('data-prev');
-						/// if prev star isn't loaded?
-						var previousStar = document.getElementById('s'+previousStarID);
-						playStar(previousStar);
-					}
-				} break;
-
-				case 32: { // spacebar
+				// Spacebar:
+				case 32: {
 					if(!clientState.activeWindow) {
 						e.preventDefault();
 
@@ -98,12 +115,14 @@ function Interface() {
 					}
 				} break;
 
-				case 27: { // escape key
-					// state.updating = true;
-					Navigation.navigate('/'); //// page title
+				// ESC / Escape:
+				case 27: {
+					if(HistoryTime.state.url != '/') {
+						Navigation.navigate('/'); //// page title
 
-					if(Interface.view != CONSTS.VIEW.GALAXY) { ///REVISIT this should probably just happen as a consequence of navigating to /
-						me.sort(CONSTS.VIEW.GALAXY);
+						//if(Interface.view != CONSTS.VIEW.GALAXY) {
+							me.sort(CONSTS.VIEW.GALAXY);
+						//}
 					}
 				} break;
 			}
@@ -150,9 +169,14 @@ function Interface() {
 
 		messageElement.innerText = message;
 		messageElement.className = type;
+
+		///REVISIT might already be appended to body.. should we check?
 		document.body.appendChild(messageElement);
-		///TODO fade out
-		messageTimerID = setTimeout(() => limbo.appendChild(messageElement), duration);
+
+		if(duration) { ///REVISIT more explicit check?
+			///TODO fade out
+			messageTimerID = setTimeout(() => limbo.appendChild(messageElement), duration);
+		}
 	}
 
 	/**

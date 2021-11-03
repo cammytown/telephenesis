@@ -13,7 +13,6 @@ Listeners can browse through a growing constellation of the progression of music
 - `webpack --watch`
 
 ## Planned Features
-- Reorder the layout of the universe and filter stars to quickly see bookmarked or most popular stars.
 - Community features like discussion.
 
 ## Built using

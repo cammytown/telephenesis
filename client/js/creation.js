@@ -12,11 +12,12 @@ import ClientStar from './components/ClientStar.js';
 import Stars from './components/Stars.js';
 import Interface from './components/Interface.js';
 
+import Vector from '../../abstract/Vector.js';
 import * as CONSTS from '../../abstract/constants.js';
 
 export default { init };
 
-// document.addEventListener("DOMContentLoaded", init); ///
+///TODO this file should probably be refactored into something that feels more self-contained
 
 var client;
 var validPlacementZone;
@@ -26,6 +27,9 @@ var workingStar;
 var accessSettingInput;
 var publicGameButton;
 var privateGameButton;
+
+/** @type {Vector2} **/
+var mouseDownPos;
 
 function init(Telep) {
 	client = Telep;
@@ -37,7 +41,8 @@ function init(Telep) {
 	// publicGameButton.addEventListener('click', onPublicGameButtonClick);
 	// privateGameButton.addEventListener('click', onPrivateGameButtonClick);
 
-	cor._('#create').addEventListener('submit', onCreateSubmit);
+	cor._('#create-page').addEventListener('submit', onCreateSubmit);
+	cor._('#recreate-page').addEventListener('submit', onCreateSubmit);
 	///REVISIT removed because we're only doing links atm:
 	// cor._('#submission').addEventListener('change', uploadCreation);
 
@@ -89,9 +94,13 @@ function onCreateSubmit(event) {
 
 	event.preventDefault();
 
+	var formEle = event.target;
+
 	workingStar.hostType = 'external'; ////
-	workingStar.title = cor._('#genesis-star-title').value;
-	workingStar.fileURL = cor._('#genesis-file-url').value;
+	workingStar.title = formEle.getElementsByClassName('star-title')[0].value;
+	workingStar.fileURL = formEle.getElementsByClassName('file-url')[0].value;
+	//workingStar.title = cor._('#genesis-star-title').value;
+	//workingStar.fileURL = cor._('#genesis-file-url').value;
 
 	if(workingStar.hostType == 'upload') {
 		////REVISIT
@@ -136,13 +145,21 @@ function initializeStarPlacement() {
 
 	var genesis = workingStar.originStarID == -1; ///ARCHITECTURE
 
+	///TODO probably replace 'notification' message type with something like 'createInstruction'
+	/// or something and have it appear differently (more prominently)
 	if(genesis) {
+		Interface.displayMessage("Choose a spot for your star!", 'notification', 0);
+
 		// anywhere is valid
 
 		spc.element.addEventListener('mousemove', moveWorkingStarToMouse);
-		spc.element.addEventListener('click', workingStarClick);
+		//spc.element.addEventListener('click', workingStarClick);
+		spc.element.addEventListener('mousedown', onPlacementMouseDown);
+		spc.element.addEventListener('mouseup', onPlacementMouseUp);
 
 	} else {
+		Interface.displayMessage("Choose a spot for your star near the one you recreated!", 'notification', 0);
+
 		// create valid placement zone around the area of the origin star
 
 		var current_x = parseInt(clientState.actingStar.style.left);
@@ -156,7 +173,9 @@ function initializeStarPlacement() {
 		validPlacementZone.style.display = 'block';
 
 		cor.al(validPlacementZone, 'mousemove', moveWorkingStarToMouse);
-		cor.al(validPlacementZone, 'click', workingStarClick);
+		validPlacementZone.addEventListener('mousedown', onPlacementMouseDown);
+		validPlacementZone.addEventListener('mouseup', onPlacementMouseUp);
+		//cor.al(validPlacementZone, 'click', workingStarClick);
 	}
 
 	function moveWorkingStarToMouse(event) {
@@ -164,6 +183,30 @@ function initializeStarPlacement() {
 			event.clientX - spc.map.offsetLeft,
 			event.clientY - spc.map.offsetTop
 		);
+
+		return true;
+	}
+
+	function onPlacementMouseDown(event) {
+		//event.preventDefault();
+		mouseDownPos = new Vector(event.clientX, event.clientY);
+
+		return true;
+	}
+
+	function onPlacementMouseUp(event) {
+		var mouseUpPos = new Vector(event.clientX, event.clientY);
+		var differenceVector = mouseDownPos.subtract(mouseUpPos);
+
+		// Calculate how far the mouse has been dragged:
+		var distance = differenceVector.getMagnitude();
+
+		// If the drag distance is negligible, treat as a click:
+		if(distance < 5) {
+			workingStarClick(event);
+		}
+
+		return true;
 	}
 
 	function workingStarClick(event) {
@@ -192,8 +235,10 @@ function initializeStarPlacement() {
 
 function initializeStarColoring(genesis) {
 	///TODO prevent movement??
-
+	
 	if(genesis) {
+		Interface.displayMessage("Choose a color for your star.", 'notification', 0);
+
 		// coloring a genesis star; any color is allowed
 
 		var colorwheelSelect = document.getElementById('colorwheelSelect');
@@ -235,17 +280,16 @@ function initializeStarColoring(genesis) {
 			workingStar.linkElement.style.backgroundColor = 'hsl('+selectedhue+', 45%, 80%)';
 		}
 	} else {
-		// coloring a constellation star; only hues adjacent to origin star are allowed
+		Interface.displayMessage("Choose a color for your star. You can only shift the color slightly "
+			+ "from the star you recreated!", 'notification', 0);
+
+		// Coloring a constellation star; only hues adjacent to origin star are allowed.
 
 		Anm.fadeOut(validPlacementZone);
 
 		var colorShiftSelect = document.getElementById('colorShiftSelect');
 		var rgb = clientState.actingStar.getElementsByTagName('a')[0].style.backgroundColor.substr(4).split(',');
 		var hsl = ColorTool.rgb(rgb[0], rgb[1], parseInt(rgb[2]));
-		// console.log(clientState.actingStar.getElementsByTagName('a')[0].style.backgroundColor)
-		// console.log(clientState.actingStar.getElementsByTagName('a')[0])
-		// console.log(rgb);
-		// console.log(hsl);
 		colorShiftSelect.children[0].style.background = 'hsl('+(hsl[0]-17)+', 45%, 80%)';
 		colorShiftSelect.children[1].style.background = 'hsl('+(hsl[0]+17)+', 45%, 80%)';
 		workingStar.element.appendChild(colorShiftSelect);

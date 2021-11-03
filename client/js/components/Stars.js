@@ -31,11 +31,11 @@ function ClientStarsAPI() {
 	/** Array of indices in constellationLines[] for lines which are not finished drawing. **/
 	var animatingLines = [];
 
-	var lineDrawStartMS; // When the constellation drawing animation began.
+	/** When the constellation drawing animation began. **/
+	var lineDrawStartMS;
 
-	// var isAnimating = false;
-
-	me.cachedSorts = {
+	/** Cached sort results of stars. **/
+	this.cachedSorts = {
 		'MOST_RECENT': null
 	}
 
@@ -173,7 +173,11 @@ function ClientStarsAPI() {
 		// }
 	}
 
-	me.getSortedStars = function(order) {
+	/**
+	 * Retrieve sorted stars; either from cached results or a method.
+	 * @param {CONSTANTS.ORDER} order
+	 **/
+	this.getSortedStars = function(order) {
 		// if(me.cachedSorts[order] != null) {
 		// 	////CHECK if there have been changes to the loaded stars, we cannot use cache
 		// 	return true;
@@ -352,7 +356,7 @@ function ClientStarsAPI() {
 	// 	mediaPlayer.playStar(starElement);
 	// }
 
-	function remove(starElement) { /// revisit architecture
+	function deleteStar(starElement) { ///REVISIT architecture; can't use delete name unless maybe this.delete because reserved word
 		var sid = clientState.actingStar.id.split('s')[1];
 		var p = "sid="+sid;
 		ajx('/ajax/deleteStar', p, function(d) {
@@ -365,6 +369,10 @@ function ClientStarsAPI() {
 		return false;
 	}
 
+	/**
+	 * Bookmark a star for the current user.
+	 * @param {ClientStar} starElement - The star to bookmark.
+	 **/
 	function bookmark(starElement) {
 		var sid = starElement.id.split('s')[1];
 		var p = "sid="+sid;
@@ -380,9 +388,9 @@ function ClientStarsAPI() {
 	}
 
 	/**
-	 * Draws constellation lines between stars.
-	 */
-	me.generateConstellationLines = function() {
+	 * Prepare constellation lines for drawing.
+	 **/
+	this.generateConstellationLines = function() {
 		lineDrawStartMS = performance.now();
 		constellationLines = [];
 		animatingLines = [];
@@ -400,15 +408,16 @@ function ClientStarsAPI() {
 
 				if(parseInt(originStarID) != -1) { // If this is not an origin star
 					var rootStar = document.getElementById('s' + originStarID);
-					rootStar.setAttribute('data-next', starElement.id.split('s')[1]); ///TODO figure out what "next" means when there are multiple child stars; also this shouldn't be here if it were being used
+					rootStar.setAttribute('data-next', clientStar.id); ///TODO figure out what "next" means when there are multiple child stars; also this shouldn't be here if it were being used
 
+					// We use the star's style.left and .top in case we're in list/grid view:
 					constellationLines.push({
 						startX: parseInt(rootStar.style.left),
 						startY: parseInt(rootStar.style.top),
-						endX: clientStar.position.x,
-						endY: clientStar.position.y,
-						// endX: parseInt(starElement.style.left),
-						// endY: parseInt(starElement.style.top),
+						//endX: clientStar.position.x,
+						//endY: clientStar.position.y,
+						endX: parseInt(starElement.style.left),
+						endY: parseInt(starElement.style.top),
 						startColor: rootStar.getElementsByTagName('a')[0].style.backgroundColor, ///
 						endColor: starElement.getElementsByTagName('a')[0].style.backgroundColor, ///
 						tier: parseInt(starElement.getAttribute('data-tier')),
@@ -423,7 +432,11 @@ function ClientStarsAPI() {
 		window.requestAnimationFrame(me.drawLineStep);
 	}
 
-	me.drawLineStep = function(currentMS) {
+	/**
+	 * Draw a frame of the branching constellations.
+	 * @param {number} currentMS
+	 **/
+	this.drawLineStep = function(currentMS) {
 		console.log("drawLineStep");
 
 		effects.context.clearRect(0, 0, effects.canvas.width, effects.canvas.height);
@@ -491,7 +504,11 @@ function ClientStarsAPI() {
 		}
 	}
 
-	me.clearConstellationLines = function() {
+	/**
+	 * Clear the canvas of the constellation lines.
+	 * @todo /// make it not just clear the whole canvas or rename this method
+	 **/
+	this.clearConstellationLines = function() {
 		effects.context.clearRect(0, 0, effects.canvas.width, effects.canvas.height);
 		constellationLines = [];
 		animatingLines = [];

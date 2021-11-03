@@ -434,8 +434,6 @@ function main(req, res) {
 						}
 
 						// Send the new HTML to client:
-	res.send("Test");
-	return false;
 						res.send(domRoot.toString());
 
 					// Else if no page, just send unaltered template:

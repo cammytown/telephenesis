@@ -1,50 +1,9 @@
-form#create.uibox(method="POST" action="/create")
+form#create-page.uibox(method="POST" action="/create")
 	h2 Start a New Constellation
 
-	div#typeSettings.double
-		div What type of art is this?
+	include _creationForm.pug
 
-		#musicTypeButton.btn.blue.text-left.active Music
-		#visualTypeButton.btn.red.text-left Visual
-		//- #videoTypeButton.btn.purple.text-left Video
-		//- #anythingTypeButton.btn.orange.text-left Anything
-
-		input#typeSetting(type="hidden" name="art-type" value="music")
-
-
-	//- div.double
-	//- 	.btn.green
-	//- 		| File URL
-
-	//- 	.btn.green.upload
-	//- 		input#submission(name="submission" type="file")
-	//- 		| Upload <small>(mp3)</small>
-
-	section.starTitle
-		h3 Star Title 
-			small (optional)
-
-		input(type="text" id="genesis-star-title" name="star-title" placeholder="Star #0028")
-
-	section.fileUpload
-		h3 MP3 File URL
-		em We recommend 
-			a(href="https://archive.org/" target="_blank") archive.org
-
-		input(type="text" id="genesis-file-url" name="file-url" class="file-url" placeholder="Enter the URL of an MP3 file.")
-
-	label.rightsAgreement
-		input(type="checkbox" name="rights-confirmation" class="rights-confirmation")
-		| I have the rights to post this and permit others to use it in their recreations.
-
-	div.double
-		button.btn.green(type="submit")
-			| Finish
-			//- | Finish and Place Star
-
-		a.btn.red.close cancel
-
-form#recreate.uibox(method="POST")
+form#recreate-page.uibox(method="POST" action="/recreate")
 	h2 Recreate
 
 	p.
@@ -52,16 +11,7 @@ form#recreate.uibox(method="POST")
 		the goal is to transform and the challenge is to maintain a 
 		perceivable thread.
 
-	//- This constellation is set to public. All recreations follow the same license.
-
-	//- .btn.green.upload
-	//- 	input#submission(name="submission" type="file")
-	//- 	| Upload <small>(mp3)</small>
-
-	//- .btn.green Public
-	//- .btn.blue Private
-
-	a.btn.red.close cancel
+	include _creationForm.pug
 
 
 form#renameStar.uibox(action="/renameStar" method="POST")

@@ -828,7 +828,7 @@ form#create label.rightsAgreement input.rights-confirmation {
   background-color: #334;
 }
 
-/* create /// naming / specificity */
+/* create /// naming / specificity / move to _star.scss ? */
 .placementSymbol.star {
   z-index: 2;
 }
@@ -838,6 +838,9 @@ form#create label.rightsAgreement input.rights-confirmation {
   border-color: transparent;
   border-radius: 12px;
   cursor: none;
+}
+.placementSymbol.star .meta {
+  display: none;
 }
 
 .placement {
@@ -864,8 +867,6 @@ form#create label.rightsAgreement input.rights-confirmation {
 
 #colorShiftSelect {
   position: absolute;
-  left: -64px;
-  top: -64px;
   z-index: -1;
   /* /// */
   width: 128px;
@@ -888,8 +889,6 @@ form#create label.rightsAgreement input.rights-confirmation {
 
 .star #colorwheelSelect {
   position: absolute;
-  left: -31px;
-  top: -31px;
   width: 64px;
   height: 64px;
   background: url("/images/6colordesat.png") center center;

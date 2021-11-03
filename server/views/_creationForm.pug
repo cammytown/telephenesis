@@ -1,0 +1,51 @@
+div#typeSettings.double
+	div What type of art is this?
+
+	#musicTypeButton.btn.blue.text-left.active Music
+	#visualTypeButton.btn.red.text-left Visual
+	//- #videoTypeButton.btn.purple.text-left Video
+	//- #anythingTypeButton.btn.orange.text-left Anything
+
+	input#typeSetting(type="hidden" name="art-type" value="music")
+
+
+//- div.double
+//- 	.btn.green
+//- 		| File URL
+
+//- 	.btn.green.upload
+//- 		input#submission(name="submission" type="file")
+//- 		| Upload <small>(mp3)</small>
+
+section.starTitle
+	h3 Star Title 
+		small (optional)
+
+	input(type="text" class="star-title" name="star-title" placeholder="Star #0028")
+
+section.fileUpload
+	h3 MP3 File URL
+	em We recommend 
+		a(href="https://archive.org/" target="_blank") archive.org
+
+	input(type="text" class="file-url" name="file-url" class="file-url" placeholder="Enter the URL of an MP3 file.")
+
+label.rightsAgreement
+	input(type="checkbox" name="rights-confirmation" class="rights-confirmation")
+	| I have the rights to post this and permit others to use it in their recreations.
+
+//- This constellation is set to public. All recreations follow the same license.
+
+//- .btn.green.upload
+//- 	input#submission(name="submission" type="file")
+//- 	| Upload <small>(mp3)</small>
+
+//- .btn.green Public
+//- .btn.blue Private
+
+div.double
+	button.btn.green(type="submit")
+		| Finish
+		//- | Finish and Place Star
+
+	a.btn.red.close cancel
