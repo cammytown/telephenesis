@@ -162,10 +162,7 @@ function Interface() {
 	 * @param {number} [duration=5000] - How long to display the message for.
 	 */
 	this.displayMessage = function(message, type = "notification", duration = 5000) { ///REVISIT naming
-		if(messageTimerID !== null) {
-			clearTimeout(messageTimerID);
-			messageTimerID = null;
-		}
+		clearMessageTimer();
 
 		messageElement.innerText = message;
 		messageElement.className = type;
@@ -175,7 +172,23 @@ function Interface() {
 
 		if(duration) { ///REVISIT more explicit check?
 			///TODO fade out
-			messageTimerID = setTimeout(() => limbo.appendChild(messageElement), duration);
+			messageTimerID = setTimeout(() => me.hideMessage(), duration);
+		}
+	}
+
+	/**
+	 * Hide the message displayed to the user, if any.
+	 **/
+	this.hideMessage = function() {
+		clearMessageTimer();
+
+		limbo.appendChild(messageElement);
+	}
+
+	function clearMessageTimer() {
+		if(messageTimerID !== null) {
+			clearTimeout(messageTimerID);
+			messageTimerID = null;
 		}
 	}
 

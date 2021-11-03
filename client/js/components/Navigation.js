@@ -4,6 +4,7 @@ import Anm from '../libs/minlab/anm';
 import HistoryTime from '../libs/history-time';
 
 import clientState from './ClientState';
+import Stars from './Stars.js';
 
 export default new ClientNavigation();
 
@@ -80,15 +81,15 @@ function ClientNavigation() {
 
 		var isStarClick = cor.cc(event.target.parentNode, 'star'); ///REVISIT weird architecture?
 		if(isStarClick) {
-			var star = event.target.parentNode;
-			var sid = star.id.split('s')[1];
+			var starEle = event.target.parentNode;
+			var sid = starEle.id.split('s')[1];
 
 			//document.getElementById('download').href = '/f/'+sid+'.mp3';
-			clientState.actingStar = star;
+			clientState.actingStar = Stars.clientStars[sid];
 
 			var menu = starContextMenu;
-			menu.style.left = parseInt(star.style.left) + 12 + 'px';
-			menu.style.top = parseInt(star.style.top) - 5 + 'px';
+			menu.style.left = parseInt(starEle.style.left) + 12 + 'px';
+			menu.style.top = parseInt(starEle.style.top) - 5 + 'px';
 
 			menu.children[1].href = sid+'/recreate';
 

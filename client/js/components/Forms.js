@@ -32,7 +32,7 @@ function ClientForms() {
 			var activeStarIdInputs = document.getElementsByClassName('activeStarIdInput');
 			for (var inputIndex = 0; inputIndex < activeStarIdInputs.length; inputIndex++) {
 				var input = activeStarIdInputs[inputIndex];
-				input.value = clientState.actingStar.id.split('s')[1];
+				input.value = clientState.actingStar.id;
 			}
 		}
 

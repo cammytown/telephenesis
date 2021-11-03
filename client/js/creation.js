@@ -72,6 +72,7 @@ function onCreateStarClick(event) {
 	workingStar = new ClientStar();
 	workingStar.id = "placeholder"; ///REVISIT architecture
 	workingStar.originStarID = -1;
+	workingStar.tier = 0;
 }
 
 function onRecreateStarClick(event) {
@@ -86,7 +87,9 @@ function onRecreateStarClick(event) {
 	navigation.navigate(event.target.pathname);
 	workingStar = new ClientStar();
 	workingStar.id = "placeholder"; ///REVISIT architecture
-	workingStar.originStarID = parseInt(clientState.actingStar.id.split('s')[1]);
+	workingStar.originStarID = clientState.actingStar.id;
+	workingStar.tier = clientState.actingStar.tier + 1;
+	console.log(clientState.actingStar.tier);
 }
 
 function onCreateSubmit(event) {
@@ -162,8 +165,8 @@ function initializeStarPlacement() {
 
 		// create valid placement zone around the area of the origin star
 
-		var current_x = parseInt(clientState.actingStar.style.left);
-		var current_y = parseInt(clientState.actingStar.style.top);
+		var current_x = clientState.actingStar.position.x;
+		var current_y = clientState.actingStar.position.y;
 
 		// center camera around origin star
 		spc.ctr(current_x, current_y);
@@ -288,7 +291,7 @@ function initializeStarColoring(genesis) {
 		Anm.fadeOut(validPlacementZone);
 
 		var colorShiftSelect = document.getElementById('colorShiftSelect');
-		var rgb = clientState.actingStar.getElementsByTagName('a')[0].style.backgroundColor.substr(4).split(',');
+		var rgb = clientState.actingStar.element.getElementsByTagName('a')[0].style.backgroundColor.substr(4).split(',');
 		var hsl = ColorTool.rgb(rgb[0], rgb[1], parseInt(rgb[2]));
 		colorShiftSelect.children[0].style.background = 'hsl('+(hsl[0]-17)+', 45%, 80%)';
 		colorShiftSelect.children[1].style.background = 'hsl('+(hsl[0]+17)+', 45%, 80%)';
@@ -337,7 +340,7 @@ function uploadCreation() {
 	// document.body.className = null;
 	//spc.ctr(0, 0);
 
-	var originStarID = clientState.actingStar ? parseInt(clientState.actingStar.id.split('s')[1]) : -1;
+	var originStarID = clientState.actingStar ? clientState.actingStar.id : -1;
 	var file = document.getElementById('submission');
 	var upl = new Upl('/ajax/upload/'+originStarID, file, onUploadProgress, onUploadComplete);
 
@@ -385,6 +388,8 @@ function actualizeCreation() {
 		return false;
 	}
 
+	Interface.hideMessage();
+
 	var formData = workingStar.export('FormData');
 
 	var request = {
@@ -403,7 +408,9 @@ function actualizeCreation() {
 			workingStar.id = result.newStarID;
 			workingStar.titleElement.className = 'text name';
 			workingStar.titleElement.innerText = workingStar.title;
-			workingStar.linkElement.href = '/' + result.newStarID;
+			//workingStar.linkElement.href = '/' + result.newStarID;
+			workingStar.element.classList.remove('placementSymbol');
+			//workingStar.setAttribute('data-prev', 
 
 			Stars.addStar(workingStar);
 
@@ -411,15 +418,17 @@ function actualizeCreation() {
 			for(var starID in result.starMovements) {
 				var newPosition = result.starMovements[starID];
 				Promise.resolve(Stars.clientStars[starID].moveToXY(newPosition.x, newPosition.y))
+					///REVISIT architecture... should we prefer just a ClientStar.actualize() method?:
+					.then(() => workingStar.observeProperties()) 
 					.then(() => Stars.generateConstellationLines());
 			}
 
 			// Add normal star click listener:
-			cor.al(workingStar.linkElement, 'click', function(e) {
-				e.preventDefault();
-				state.updating = true;
-				navigate('/' + workingStar.id);
-			});
+			//cor.al(workingStar.linkElement, 'click', function(e) {
+				//e.preventDefault();
+				//state.updating = true;
+				//navigate('/' + workingStar.id);
+			//});
 
 			// Back to homepage.
 			navigation.navigate('/');

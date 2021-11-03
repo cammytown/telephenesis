@@ -34,13 +34,17 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	me.fileReady = false;
 	me.isPlaced = false;
 
-	init(element);
 
 	function init(element = false) {
 		Star.call(me);
 
 		if(element) {
 			me.element = element;
+
+			///TODO I think we should have a more semantically-clear way of expressing that setting these to true is safe:
+			/// for now, we just assume that if we're passing in an element, it's a completed star...
+			me.fileReady = true;
+			me.isPlaced = true;
 		} else {
 			///REVISIT cleaner solution?:
 			me.element = document.getElementById('placementSymbol').cloneNode(true); /// deep parameter in IE8??
@@ -52,43 +56,8 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		// Attach event listeners:
 		me.linkElement.addEventListener('click', onClick);
 
-		// Function-scoped variable so we can use getter/setter with same name.
-		var positionValue;
-
 		// Create identity properties:
-		for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
-			var property = me.identityProps[propIndex];
-
-			switch(property) {
-				case 'position': {
-					Object.defineProperty(me, 'position', { ///REVISIT architecture
-						get: function() {
-							return positionValue;
-						},
-						set: function(newPos) {
-							positionValue = newPos;
-							me.element.style.left = newPos.x + 'px';
-							me.element.style.top = newPos.y + 'px';
-						},
-						// configurable: true,
-					});
-
-					me.position = new Vector(
-						parseInt(me.element.getAttribute('data-x')),
-						parseInt(me.element.getAttribute('data-y')),
-					);
-					// console.log(me.position);
-				} break;
-
-				case 'id': {
-					me.id = parseInt(me.element.id.split('s')[1]); ///ARCHITECTURE
-				} break;
-
-				default: {
-					me[property] = me.element.getAttribute('data-' + property);
-				}
-			}
-		}
+		me.observeAttributes();
 
 		// Add to DOM:
 		spc.map.appendChild(me.element);
@@ -142,7 +111,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	/**
 	 * Play the media attached to the star.
 	 */
-	me.play = function() {
+	this.play = function() {
 		var starTitle = me.element.getAttribute('data-title');
 		cor._('#playingStarTitle').innerHTML = starTitle;
 
@@ -159,10 +128,96 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	}
 
 	/**
+	 * Set properties according to HTML element attribute values.
+	 **/
+	this.observeAttributes = function() {
+		// Function-scoped variable so we can use getter/setter with same name.
+		var positionValue;
+
+		for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
+			var property = me.identityProps[propIndex];
+
+			switch(property) {
+				case 'position': {
+					Object.defineProperty(me, 'position', { ///REVISIT architecture
+						get: function() {
+							return positionValue;
+						},
+						set: function(newPos) {
+							positionValue = newPos;
+							me.element.style.left = newPos.x + 'px';
+							me.element.style.top = newPos.y + 'px';
+						},
+						// configurable: true,
+					});
+
+					me.position = new Vector(
+						parseInt(me.element.getAttribute('data-x')),
+						parseInt(me.element.getAttribute('data-y')),
+					);
+					// console.log(me.position);
+				} break;
+
+				case 'id': {
+					me.id = parseInt(me.element.id.split('s')[1]); ///ARCHITECTURE
+				} break;
+
+				case 'originStarID':
+				case 'constellationID':
+				case 'tier': {
+					me[property] = parseInt(me.element.getAttribute('data-' + property));
+				} break;
+
+				default: {
+					me[property] = me.element.getAttribute('data-' + property);
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Set HTML element attributes according to property values.
+	 **/
+	this.observeProperties = function() {
+		for(var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
+			var property = me.identityProps[propIndex];
+
+			switch(property) {
+				case 'id': {
+					me.element.id = 's' + me.id;
+				} break;
+
+				case 'position': {
+					me.element.setAttribute('data-x', me.position.x);
+					me.element.setAttribute('data-y', me.position.y);
+				} break;
+
+				case 'originStarID': {
+					me.element.setAttribute('data-originStarID', me.originStarID);
+					me.element.setAttribute('data-prev', me.originStarID);
+				}
+
+				case 'fileURL': {
+					me.element.setAttribute('data-fileURL', me.fileURL);
+					me.linkElement.href = me.fileURL;
+				} break;
+
+				default: {
+					me.element.setAttribute('data-' + property, me[property]);
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Convert identity properties to exportable data structure.
 	 * @param dataType {string} - Type of data structure to return.
 	 */
-	me.export = function(dataType = "FormData") {
+	this.export = function(dataType = "FormData") {
 		switch(dataType) {
 			case 'FormData': {
 				var formData = new FormData();
@@ -190,4 +245,6 @@ function ClientStar(element) { ///REVISIT element not in use atm
 			}
 		}
 	}
+
+	init(element);
 }

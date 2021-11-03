@@ -357,12 +357,12 @@ function ClientStarsAPI() {
 	// }
 
 	function deleteStar(starElement) { ///REVISIT architecture; can't use delete name unless maybe this.delete because reserved word
-		var sid = clientState.actingStar.id.split('s')[1];
-		var p = "sid="+sid;
+		var starID = clientState.actingStar.id;
+		var p = "starID="+starID;
 		ajx('/ajax/deleteStar', p, function(d) {
 			var r = JSON.parse(d);
 			if(!r.error) {
-				clientState.actingStar.fadeOut();
+				clientState.actingStar.element.fadeOut();
 			}
 		});
 
@@ -374,8 +374,8 @@ function ClientStarsAPI() {
 	 * @param {ClientStar} starElement - The star to bookmark.
 	 **/
 	function bookmark(starElement) {
-		var sid = starElement.id.split('s')[1];
-		var p = "sid="+sid;
+		var starID = starElement.id;
+		var p = "starID="+starID;
 		ajx('/ajax/bookmark', p, function(d) {
 			var r = JSON.parse(d);
 			if(!r.error) {
@@ -403,29 +403,25 @@ function ClientStarsAPI() {
 		me.clientStars.forEach((clientStar, starIndex) => {
 			var starElement = clientStar.element;
 
-			if(starElement.getAttribute('data-prev')) {
-				var originStarID = starElement.getAttribute('data-prev');
+			if(clientStar.originStarID != -1) { // If this is not an origin star
+				var rootStar = document.getElementById('s' + clientStar.originStarID);
+				rootStar.setAttribute('data-next', clientStar.id); ///TODO figure out what "next" means when there are multiple child stars; also this shouldn't be here if it were being used
 
-				if(parseInt(originStarID) != -1) { // If this is not an origin star
-					var rootStar = document.getElementById('s' + originStarID);
-					rootStar.setAttribute('data-next', clientStar.id); ///TODO figure out what "next" means when there are multiple child stars; also this shouldn't be here if it were being used
+				// We use the star's style.left and .top in case we're in list/grid view:
+				constellationLines.push({
+					startX: parseInt(rootStar.style.left),
+					startY: parseInt(rootStar.style.top),
+					//endX: clientStar.position.x,
+					//endY: clientStar.position.y,
+					endX: parseInt(starElement.style.left),
+					endY: parseInt(starElement.style.top),
+					startColor: rootStar.getElementsByTagName('a')[0].style.backgroundColor, ///
+					endColor: starElement.getElementsByTagName('a')[0].style.backgroundColor, ///
+					tier: parseInt(starElement.getAttribute('data-tier')),
+					isAnimating: true /// OPTIMIZATION?
+				});
 
-					// We use the star's style.left and .top in case we're in list/grid view:
-					constellationLines.push({
-						startX: parseInt(rootStar.style.left),
-						startY: parseInt(rootStar.style.top),
-						//endX: clientStar.position.x,
-						//endY: clientStar.position.y,
-						endX: parseInt(starElement.style.left),
-						endY: parseInt(starElement.style.top),
-						startColor: rootStar.getElementsByTagName('a')[0].style.backgroundColor, ///
-						endColor: starElement.getElementsByTagName('a')[0].style.backgroundColor, ///
-						tier: parseInt(starElement.getAttribute('data-tier')),
-						isAnimating: true /// OPTIMIZATION?
-					});
-
-					animatingLines.push(lineIndex++);
-				}
+				animatingLines.push(lineIndex++);
 			}
 		});
 
@@ -480,6 +476,11 @@ function ClientStarsAPI() {
 			// var lineGradient = effects.context.createLinearGradient(0,0,170,0);
 			// var lineGradient = effects.context.createLinearGradient(line.startX,line.startY,line.endX,line.endY);
 			// var lineGradient = effects.context.createLinearGradient(0, 0, line.endX + line.startX, line.endY + line.startY);
+			if(!drawVec.x) {
+				console.log(line);
+				console.log(drawVec);
+			}
+
 			var lineGradient = effects.context.createLinearGradient( ///TODO maybe save this with the line? or the data involved?
 				line.startX + spc.x,
 				line.startY + spc.y,
