@@ -27,8 +27,10 @@ header#galaxy-ui
 					a.sort(data-order=CONSTS.ORDER.MOST_RECENT) by date
 				li
 					a.sort(data-order=CONSTS.ORDER.MOST_POPULAR) by popularity
-				- console.log(user);
-				li(style = { display: user ? "block" : "none" })
+				li(
+					style = { display: user ? "block" : "none" }
+					class = !user || user.bookmarks.length == 0 ? 'disabled' : ''
+				)
 					a.sort(data-order=CONSTS.ORDER.BOOKMARKS) bookmarks
 				//- li recently played
 

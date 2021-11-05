@@ -1,8 +1,3 @@
-// v0.045
-// CHANGELOG
-// 0.045
-// - added _()
-
 // var EXPORTED_SYMBOLS = ['al', 'rl', 'ac', 'rc', 'cc'];
 
 export default {
@@ -13,7 +8,8 @@ export default {
 	rl,
 	ac,
 	rc,
-	cc
+	cc,
+	POST,
 };
 
 function _(selector) {
@@ -83,4 +79,27 @@ function rc(ele, cls) {
 function cc(ele, cls) {
 	if((' '+ele.className+' ').indexOf(' '+cls+' ') !== -1) return true;
 	else return;
+}
+
+// AJAX Methods:
+/**
+ * Sends a POST request; attempts to automatically format body.
+ * @param {string|FormData|Object} body
+ **/
+function POST(url, body) {
+	var request = {
+		method: "POST",
+		headers: {},
+		body: null,
+	};
+
+	if(typeof body == 'object') {
+		request.body = JSON.stringify(body);
+		request.headers['Content-Type'] = 'application/json';
+	//} else if(body instanceof FormData) {
+	} else {
+		throw new Error("COR.POST(): unhandled body type '" + typeof body + '"');
+	}
+
+	return fetch(url, request);
 }

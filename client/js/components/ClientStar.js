@@ -33,6 +33,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	//this.state = ;
 	me.fileReady = false;
 	me.isPlaced = false;
+	me.isBookmarked = false;
 
 
 	function init(element = false) {
@@ -45,6 +46,10 @@ function ClientStar(element) { ///REVISIT element not in use atm
 			/// for now, we just assume that if we're passing in an element, it's a completed star...
 			me.fileReady = true;
 			me.isPlaced = true;
+
+			if(me.element.classList.contains('bookmarked')) { ///REVISIT improve architecture?
+				me.isBookmarked = true;
+			}
 		} else {
 			///REVISIT cleaner solution?:
 			me.element = document.getElementById('placementSymbol').cloneNode(true); /// deep parameter in IE8??
@@ -125,6 +130,46 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		cor.ac(document.body, 'playing')
 
 		mediaPlayer.playStar(me);
+	}
+
+	/**
+	 * Bookmarks the star for the client's user account.
+	 **/
+	this.bookmark = function() {
+		return cor.POST('/ajax/bookmark', { starID: this.id })
+			.then(response => response.json())
+			.then(result => {
+				if(result.errors) {
+					throw result.errors;
+				}
+
+				cor.ac(this.element, 'bookmarked');
+				me.isBookmarked = true;
+			})
+			.catch(err => {
+				console.error(err);
+				///TODO
+			});
+	}
+
+	/**
+	 * Removes bookmark from star for client's user account.
+	 **/
+	this.removeBookmark = function() {
+		return cor.POST('/ajax/removeBookmark', { starID: this.id })
+			.then(response => response.json())
+			.then(result => {
+				if(result.errors) {
+					throw result.errors;
+				}
+
+				this.element.classList.remove('bookmarked');
+				me.isBookmarked = false;
+			})
+			.catch(err => {
+				console.error(err);
+				///TODO
+			});
 	}
 
 	/**

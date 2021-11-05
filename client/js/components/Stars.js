@@ -258,6 +258,8 @@ function ClientStarsAPI() {
 				var currentRow = 0;
 				var columnCount = Math.floor(styleVars.starGridWidth / styleVars.starGridSquareSize);
 
+				cor.ac(document.body, 'sorting'); ////
+
 				for (var starEleIndex = 0; starEleIndex < sortedElements.length; starEleIndex++) {
 					var starEle = sortedElements[starEleIndex];
 
@@ -277,7 +279,6 @@ function ClientStarsAPI() {
 						newY = (styleVars.starGridSquareSize + styleVars.starGridMargin) * starEleIndex;
 					}
 
-					cor.ac(document.body, 'sorting'); ////
 
 					// Animate the star to its target position
 					anime({
@@ -369,23 +370,12 @@ function ClientStarsAPI() {
 		return false;
 	}
 
-	/**
-	 * Bookmark a star for the current user.
-	 * @param {ClientStar} starElement - The star to bookmark.
-	 **/
-	function bookmark(starElement) {
-		var starID = starElement.id;
-		var p = "starID="+starID;
-		ajx('/ajax/bookmark', p, function(d) {
-			var r = JSON.parse(d);
-			if(!r.error) {
-				cor.ac(starElement, 'bookmarked');
-				limbo.appendChild(starContextMenu);
-			}
-		});
-
-		return false;
-	}
+//	/**
+//	 * Bookmark a star for the current user.
+//	 * @param {ClientStar} starElement - The star to bookmark.
+//	 **/
+//	function bookmark(starElement) {
+//	}
 
 	/**
 	 * Prepare constellation lines for drawing.

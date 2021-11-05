@@ -13,6 +13,7 @@ import Navigation from './components/Navigation';
 import Forms from './components/Forms';
 import ClientEffects from './components/ClientEffects';
 import mediaPlayer from './components/MediaPlayer';
+import Admin from './components/Admin';
 
 // import "./constellations.scss";
 
@@ -32,9 +33,8 @@ function TelepClient() {
 		clientState.addComponent(Navigation);
 		clientState.addComponent(Forms);
 		clientState.addComponent(mediaPlayer);
+		clientState.addComponent(Admin);
 		clientState.init();
-
-		Stars.generateConstellationLines();
 
 		creation.init(me);
 	}

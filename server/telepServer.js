@@ -13,6 +13,11 @@ const TelepAPI = require('./components/TelepAPI.js');
 const routes = require('./routes');
 // const config = require('./telepServer.config.js');
 
+///TODO move to components/ probably
+/**
+ * Central component of the server which initializes the database connection, API, and networking.
+ * @constructor
+ **/
 function TelepServer() {
 	var me = this;
 
@@ -54,14 +59,6 @@ function TelepServer() {
 
 		app.set('views', './views');
 		app.set('view engine', 'pug');
-
-
-		// Debug purposes:
-		////TODO add a flag:
-		app.use((req, res, next) => {
-			console.log("client visited: " + req.url);
-			next();
-		});
 
 		app.use(express.static(__dirname + '/../public'));
 

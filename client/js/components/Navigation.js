@@ -4,7 +4,9 @@ import Anm from '../libs/minlab/anm';
 import HistoryTime from '../libs/history-time';
 
 import clientState from './ClientState';
+import Interface from './Interface';
 import Stars from './Stars.js';
+import CONSTS from '../../../abstract/constants';
 
 export default new ClientNavigation();
 
@@ -31,12 +33,19 @@ function ClientNavigation() {
 		clientState.activeWindow = initialPage;
 
 		// Add listener for URI changes:
-		HistoryTime.bindPathToCallback('*', onNavigate);
+		HistoryTime.bindPathToCallback('*', observePath);
 
 		// Add listeners to internal navigation links:
 		var navLinks = document.getElementsByClassName('nav'); ///REVISIT not really into this class name; something more descriptive?
-		for (var navLinkIndex = 0; navLinkIndex < navLinks.length; navLinkIndex++) {
-			navLinks[navLinkIndex].addEventListener('click', onNavLinkClick);
+		for(var navLinkIndex = 0; navLinkIndex < navLinks.length; navLinkIndex++) {
+			var navLink = navLinks[navLinkIndex];
+			navLink.addEventListener('click', onNavLinkClick);
+		}
+
+		var ajaxLinks = document.getElementsByClassName('ajax'); ///REVISIT architecture
+		for(var ajaxLinkIndex = 0; ajaxLinkIndex < ajaxLinks.length; ajaxLinkIndex++) {
+			var ajaxLink = ajaxLinks[ajaxLinkIndex];
+			ajaxLink.addEventListener('click', onAjaxLinkClick);
 		}
 
 		// Close context menus when outer space is clicked:
@@ -56,10 +65,9 @@ function ClientNavigation() {
 	function onNavLinkClick(event) {
 		event.preventDefault();
 
-		var path = event.target.pathname;
 		// state.updating = true;
 
-		me.navigate(path); ///// make page titles
+		me.navigate(event.target.pathname); ///// make page titles
 
 		// if(cor.cc(this.parentNode, 'star')) {
 		// 	navigate(path);
@@ -67,6 +75,13 @@ function ClientNavigation() {
 		// 	if(state.path == path) navigate('/');
 		// 	else navigate(path);
 		// }
+	}
+
+	function onAjaxLinkClick(event) {
+		event.preventDefault();
+
+		// Observe path without actually changing it:
+		observePath(event.target.pathname);
 	}
 
 	/**
@@ -82,26 +97,39 @@ function ClientNavigation() {
 		var isStarClick = cor.cc(event.target.parentNode, 'star'); ///REVISIT weird architecture?
 		if(isStarClick) {
 			var starEle = event.target.parentNode;
-			var sid = starEle.id.split('s')[1];
+			var starID = starEle.id.split('s')[1];
+			var clientStar = Stars.clientStars[starID];
 
-			//document.getElementById('download').href = '/f/'+sid+'.mp3';
-			clientState.actingStar = Stars.clientStars[sid];
+			//document.getElementById('download').href = '/f/'+starID+'.mp3';
+			clientState.actingStar = clientStar;
 
-			var menu = starContextMenu;
-			menu.style.left = parseInt(starEle.style.left) + 12 + 'px';
-			menu.style.top = parseInt(starEle.style.top) - 5 + 'px';
+			var bookmarkLink = starContextMenu.getElementsByClassName('bookmarkToggle')[0];
+			///TODO i think add starIDs to the URIs? but actually,
+			//then people can send users to that link to force them
+			//to bookmark; so let's not / or at least have a
+			//confirmation box if that happens.
 
-			menu.children[1].href = sid+'/recreate';
+			if(clientStar.isBookmarked) {
+				bookmarkLink.innerText = "Remove Bookmark";
+				bookmarkLink.href = "/removeBookmark";
+			} else {
+				bookmarkLink.innerText = "Bookmark";
+				bookmarkLink.href = "/bookmark";
+			}
 
-			spc.map.appendChild(menu);
+			starContextMenu.style.left = clientStar.position.x + 12 + 'px';
+			starContextMenu.style.top = clientStar.position.y - 5 + 'px';
+
+			//starContextMenu.children[1].href = starID+'/recreate';
+
+			spc.map.appendChild(starContextMenu);
 		} else {
 			closeContextMenu();
 			clientState.actingStar = false;
 
-			var menu = galaxyContextMenu;
-			menu.style.left = event.clientX + 'px';
-			menu.style.top = event.clientY + 'px';
-			document.body.appendChild(menu);
+			galaxyContextMenu.style.left = event.clientX + 'px';
+			galaxyContextMenu.style.top = event.clientY + 'px';
+			document.body.appendChild(galaxyContextMenu);
 		}
 	}
 
@@ -128,14 +156,15 @@ function ClientNavigation() {
 			pageTitle += ' : ' + operation;
 		}
 
+		// Pass state handling to HistoryTime:
 		HistoryTime.navigateTo(path, pageTitle);
 	}
 
 	/**
-	 * Callback for history state changes.
+	 * Manipulates the page state according to the path.
 	 * @param {string} path - The path that the client navigated to.
 	 **/
-	function onNavigate(path) {
+	function observePath(path) {
 		var parts = path.split('/');
 		var operation = parts[1];
 		console.log(operation);
@@ -164,16 +193,15 @@ function ClientNavigation() {
 			} break;
 
 			case 'bookmark': {
-				bookmarkStar(clientState.actingStar);
+				limbo.appendChild(starContextMenu); ///REVISIT
+				clientState.actingStar.bookmark();
 			} break;
 
-			case 'moveStar': {
-				initializeMove();
+			case 'removeBookmark': {
+				limbo.appendChild(starContextMenu);
+				clientState.actingStar.removeBookmark();
 			} break;
 
-			case 'recolorStar': {
-				initializeRecolor();
-			} break;
 
 			case 'logout': {
 				close();
@@ -181,7 +209,16 @@ function ClientNavigation() {
 					.then(() => me.navigate('/'));
 			} break;
 
+			case '': { ///REVISIT architecture; should operation be false for this?
+				if(Interface.order != CONSTS.ORDER.GALAXY) {
+					Interface.sort(CONSTS.ORDER.GALAXY);
+				}
+
+				close();
+			} break;
+
 			default: {
+				console.error("Unhandled path: " + path);
 				///TODO some kind of 404?
 				close();
 
@@ -233,8 +270,8 @@ function ClientNavigation() {
 		})
 			.then(response => response.json())
 			.then(result => {
-				if(result.error) {
-					console.error(result.error); ///
+				if(result.errors) {
+					console.error(result.errors); ///
 				} else {
 					var login = document.getElementById('login');
 					login.children[1].value = "";

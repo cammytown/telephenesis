@@ -1,16 +1,16 @@
 #starContextMenu.menu
 	.user
-		a.nav(href="/bookmark") Bookmark
+		a.ajax.bookmarkToggle(href="/bookmark") Bookmark
 
 		a.create.recreateStar(
 			href="/recreate"
-			class = (user.recreationTickets > 0 ? '' : 'ticketless')
+			class = (user.recreationTickets > 0 ? '' : 'disabled')
 		) Recreate
 
-		a.nav.admin(href="/moveStar") Move
-		a.nav.admin(href="/recolorStar") Recolor
-		a.nav.admin(href="/renameStar") Change Creator
-		a.nav.admin.danger(href="/deleteStar") Delete
+		a.admin(href="/moveStar") Move
+		a.admin(href="/recolorStar") Recolor
+		a.admin(href="/renameStar") Change Creator
+		a.admin.danger(href="/deleteStar") Delete
 
 	.guest
 		a.nav(href="/login") login
@@ -20,7 +20,7 @@
 	.user
 		a.create.createStar(
 			href="/create"
-			class = (user.creationTickets > 0 ? '' : 'ticketless')
+			class = (user.creationTickets > 0 ? '' : 'disabled')
 		) Create Constellation
 
 	.guest

@@ -24,6 +24,23 @@ body {
 
 	}
 
+	nav {
+		ul {
+			li {
+				padding: 5px 10px;
+
+				&.disabled {
+					background: $disabledBackground;
+					color: $disabledText;
+
+					a { ///REVISIT
+						color: $disabledText;
+					}
+				}
+			}
+		}
+	}
+
 	nav.site-nav {
 		display: block;
 		position: absolute;
@@ -35,7 +52,7 @@ body {
 		z-index: 1;
 
 		a#logo {
-			display: block;
+			display: inline;
 			// position: absolute;
 			//z-index: 4;
 			font-family: 'Strait';
@@ -140,9 +157,9 @@ body {
 					background-color: rgba(0, 150, 0, 0.3);
 				}
 
-				&.ticketless {
-					background: $ticketlessBackground;
-					color: $ticketlessText;
+				&.disabled {
+					background: $disabledBackground;
+					color: $disabledText;
 				}
 			}
 

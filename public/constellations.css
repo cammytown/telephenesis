@@ -272,6 +272,16 @@ body.in #navigation {
 body.in.creator .create {
   display: block;
 }
+body nav ul li {
+  padding: 5px 10px;
+}
+body nav ul li.disabled {
+  background: rgba(134, 74, 46, 0.6);
+  color: #b07254;
+}
+body nav ul li.disabled a {
+  color: #b07254;
+}
 body nav.site-nav {
   display: block;
   position: absolute;
@@ -283,7 +293,7 @@ body nav.site-nav {
   z-index: 1;
 }
 body nav.site-nav a#logo {
-  display: block;
+  display: inline;
   font-family: "Strait";
   font-size: 2em;
   text-decoration: none;
@@ -375,9 +385,9 @@ body .menu a.create {
 body .menu a.create:hover {
   background-color: rgba(0, 150, 0, 0.3);
 }
-body .menu a.create.ticketless {
-  background: rgba(132, 63, 29, 0.6);
-  color: #c8693a;
+body .menu a.create.disabled {
+  background: rgba(134, 74, 46, 0.6);
+  color: #b07254;
 }
 body .menu a.admin {
   color: #e7e;

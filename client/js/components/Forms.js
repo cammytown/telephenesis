@@ -47,8 +47,8 @@ function ClientForms() {
 		var op = form.id; ///REVISIT bad architecture
 
 		if(result.errors.length) {
-			// console.error(result.error);
-			// throw new Error(result.error);
+			// console.error(result.errors);
+			// throw new Error(result.errors);
 
 			var errorsWrapper = form.getElementsByClassName('errors')[0]; ///REVISIT architecture
 

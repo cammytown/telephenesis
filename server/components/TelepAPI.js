@@ -10,7 +10,6 @@ const CONSTS = require('../../abstract/constants.js');
 module.exports = function TelepAPI(server) {
 	var me = this;
 
-	/* PROPERTIES: */
 	/** Instance of Usr. **/
 	var usr;
 
@@ -38,6 +37,7 @@ module.exports = function TelepAPI(server) {
 	/** Current number of stars. **/
 	var starCount;
 
+	/** A path to where uploaded art will be stored on the server. **/
 	var musicPath = __dirname + "/../public/music/"; ///MOVE to config
 
 	init();
@@ -205,26 +205,43 @@ module.exports = function TelepAPI(server) {
 			});
 	}
 
-	me.getStar = function(starId, callback) {
+	me.getStar = function(starId) {
 		return stars.findOne({ id: starId })
 			.then(doc => {
+				if(!doc) {
+					throw "Couldn't get star with ID: " + starId;
+				}
+
 				var creationDate = new Date(doc._id.getTimestamp());
 				doc.timestamp = creationDate.getTime(); // Convert Date to unix timestamp
 				return doc;
 			})
 			.catch(err => {
-				if(callback) callback(err);
+				///REVISIT throwing new Error every time means we might be doing new Error(Error); not sure how to architect:
 				throw new Error(err);
 			});
 	}
 
-	me.bookmark = function(star, userID, callback) {
-		usrMeta.updateOne(
+	me.bookmark = function(starID, userID) {
+		//return api.getStar(req.body.starID) ///REVISIT do we need to do this validation? do we care?
+		//        .then(star => {
+				return usrMeta.updateOne(
+					{ userID },
+					{ $addToSet: { bookmarks: starID } },
+					{ upsert: true }, /// remove?
+				);
+			//})
+			//.catch(err => {
+			//        throw err;
+			//});
+	}
+
+	me.removeBookmark = function(starID, userID) {
+		return usrMeta.updateOne(
 			{ userID },
-			{ $addToSet: { bookmarks: star.id } },
-			{ upsert: true },
-			callback
+			{ $pull: { bookmarks: starID } },
 		);
+
 	}
 
 	me.recolor = function(starId, rgb, callback) {

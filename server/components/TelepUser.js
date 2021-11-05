@@ -10,7 +10,7 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 
 	/** Properties relevant to import/export. **/
 	var identityProps = [
-		"usrID",
+		"userID",
 		"email",
 		"creatorName",
 		"creationTickets",
@@ -23,7 +23,7 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 		var userObject = {};
 
 		if(usrDoc) {
-			userObject["usrID"] = usrDoc.id;
+			userObject["userID"] = usrDoc.id;
 			userObject["email"] = usrDoc.em;
 		}
 

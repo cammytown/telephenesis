@@ -36,7 +36,6 @@ function Interface() {
 	this.init = function() {
 		messageElement = document.getElementById('notification');
 
-
 		// var closes = document.getElementsByClassName('close');
 		// if(closes.length) for(var i=0, j=closes.length; i<j; i++) {
 		// 	cor.al(closes[i], 'click', function(event) {
@@ -120,9 +119,9 @@ function Interface() {
 					if(HistoryTime.state.url != '/') {
 						Navigation.navigate('/'); //// page title
 
-						//if(Interface.view != CONSTS.VIEW.GALAXY) {
+						if(me.view != CONSTS.VIEW.GALAXY) {
 							me.sort(CONSTS.VIEW.GALAXY);
-						//}
+						}
 					}
 				} break;
 			}
@@ -139,6 +138,8 @@ function Interface() {
 	 * @see ClientState#addComponent
 	 **/
 	this.ready = function() {
+		Stars.generateConstellationLines();
+
 		///TODO revisit implementation; probably render on the server:
 		// If loaded URL contains a query string:
 		if(location.search.length) {
@@ -219,6 +220,15 @@ function Interface() {
 			event.currentTarget.getAttribute('data-view'),
 			event.currentTarget
 		);
+
+		// Update the URI:
+		var newURI = "/";
+		if(me.view != CONSTS.VIEW.GALAXY) {
+			newURI += '?view=' + me.view.toLowerCase()
+				+ '&order=' + me.order.toLowerCase();
+		}
+
+		Navigation.navigate(newURI);
 	}
 
 	/**
@@ -296,15 +306,6 @@ function Interface() {
 
 		// Actually sort and position the stars:
 		Stars.sort(me.order, me.view);
-
-		// Update the URI:
-		var newURI = "/";
-		if(me.view != CONSTS.VIEW.GALAXY) {
-			newURI += '?view=' + me.view.toLowerCase()
-				+ '&order=' + me.order.toLowerCase();
-		}
-
-		Navigation.navigate(newURI);
 	}
 
 	// me.invite = function(event) {
