@@ -132,6 +132,7 @@ module.exports = function TelepAPI(server) {
 					creatorName: creatorName,
 					creationTickets: 1,
 					recreationTickets: 3,
+					bookmarks: [],
 				};
 
 				var newUser = new TelepUser(usrDoc, userMetaObject);

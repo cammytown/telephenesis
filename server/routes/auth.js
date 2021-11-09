@@ -1,7 +1,18 @@
 const express = require('express');
+//const Telep = require('../components/TelepServer');
 
-var authRouter = express.Router();
-//authRouter.post('/moveStar', moveStar);
+///REVISIT weird architecture so we can access api without circular reference:
+var api;
+var usr;
+function generate(telepServer) { 
+	api = telepServer.api;
+	usr = telepServer.usr;
+
+	var authRouter = express.Router();
+	//authRouter.post('/moveStar', moveStar);
+	return authRouter;
+
+}
 
 function login(req, res, next) {
 	return usr.li(req.body.email, req.body.password, req.ip)
@@ -52,10 +63,19 @@ function register(req, res, next) {
 function logout(req, res, next) {
 	res.clearCookie('usr_ss', {});
 
+	///TODO confine json responses to ./ajax.js i think
 	res.json({ errors: false });
+
+	next();
 }
 
 
+///TODO improve architecture:
 module.exports = {
-	authRouter,
+	generate,
+	//authRouter,
+	login,
+	register,
+	logout,
 }
+

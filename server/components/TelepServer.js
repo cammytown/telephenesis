@@ -7,13 +7,12 @@ const MongoStore = require('connect-mongo')(session);
 const bcrypt = require('bcrypt-nodejs'); /// best?
 const validator = require('validator'); /// best?
 
-const Usr = require('./libs/Usr.js');
+const Usr = require('../libs/Usr.js');
 
-const TelepAPI = require('./components/TelepAPI.js');
-const routes = require('./routes');
+const TelepAPI = require('./TelepAPI.js');
+const routes = require('../routes');
 // const config = require('./telepServer.config.js');
 
-///TODO move to components/ probably
 /**
  * Central component of the server which initializes the database connection, API, and networking.
  * @constructor
@@ -30,14 +29,16 @@ function TelepServer() {
 
 	me.initialize = function() {
 		///REVISIT why not just require/import it wherever we need it? this might be semantically better?:
-		me.config = require('./telepServer.config.js');
+		me.config = require('../telepServer.config.js');
+
+		console.log("initializing telephenesis...");
 
 		initializeDatabase()
 		.then(initializeExpress)
 		.then(initializeTelep)
 		.then(exposeServer)
 		.catch(err => {
-			console.error(err); ///
+			//console.error(err); ///
 			throw new Error(err);
 		});
 	}
@@ -60,7 +61,8 @@ function TelepServer() {
 		app.set('views', './views');
 		app.set('view engine', 'pug');
 
-		app.use(express.static(__dirname + '/../public'));
+		///REVISIT i've heard we should use something other than express to serve static files:
+		app.use(express.static(__dirname + '/../../public'));
 
 		app.use(bodyParser.json({ limit: "2400mb" }));
 		app.use(bodyParser.urlencoded({ limit: "2400mb", extended: true }));
@@ -73,7 +75,10 @@ function TelepServer() {
 
 	function initializeTelep() {
 		me.usr = new Usr(me.db, validator, bcrypt);
+		console.log("usr initialized");
+
 		me.api = new TelepAPI(me);
+		console.log("api initialized");
 
 		me.app.use(session({
 			secret: me.config.sessionSecret, ////
@@ -86,8 +91,8 @@ function TelepServer() {
 			//cookie: { secure: true } /// HTTPS only
 		}));
 
-
 		routes.initializeRoutes(me);
+		console.log("routes initialized");
 
 		return true;
 	}

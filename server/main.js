@@ -1,4 +1,4 @@
 // const fs = require('fs');
 
-const telepServer = require('./TelepServer.js');
+const telepServer = require('./components/TelepServer.js');
 telepServer.initialize();

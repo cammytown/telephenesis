@@ -225,11 +225,13 @@ function initializeStarPlacement() {
 		// spc.ctr(workingStar.position.x, workingStar.position.y); /// create callback function for ctr? currently using validPlacementZone fadeOut delay
 
 		if(genesis) {
-			cor.rl(spc.element, 'mousemove', moveWorkingStarToMouse);
-			cor.rl(spc.element, 'click', workingStarClick);
+			spc.element.removeEventListener('mousemove', moveWorkingStarToMouse);
+			//cor.rl(spc.element, 'click', workingStarClick);
+			spc.element.removeEventListener('mouseup', onPlacementMouseUp);
 		} else {
-			cor.rl(validPlacementZone, 'mousemove', moveWorkingStarToMouse);
-			cor.rl(validPlacementZone, 'click', workingStarClick);
+			validPlacementZone.removeEventListener('mousemove', moveWorkingStarToMouse);
+			//cor.rl(validPlacementZone, 'click', workingStarClick);
+			validPlacementZone.removeEventListener('mouseup', onPlacementMouseUp);
 		}
 
 		initializeStarColoring(genesis);
@@ -266,7 +268,7 @@ function initializeStarColoring(genesis) {
 		});
 
 		function getColorFromWheelPosition(e) {
-			var cx = -(workingStar.position.x + (spc.map.offsetLeft - e.clientX));
+			var cx = -(workingStar.position.x + (spc.map.offsetLeft - e.clientX)); ///TODO + half star width, I think? same for below with height?
 			var cy = (workingStar.position.y + (spc.map.offsetTop - e.clientY));
 
 			var angle = -Math.atan2(cy, cx) * 180 / Math.PI + 180;

@@ -473,7 +473,7 @@ body #menu .user a, body #menu .guest a {
   justify-content: center;
   position: absolute;
   z-index: 1;
-  translate: -50% -50%;
+  transform: translate(-50%, -50%);
   width: 20px;
   height: 20px;
   padding: 1px 0 0;

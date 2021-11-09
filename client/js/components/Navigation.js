@@ -42,7 +42,7 @@ function ClientNavigation() {
 			navLink.addEventListener('click', onNavLinkClick);
 		}
 
-		var ajaxLinks = document.getElementsByClassName('ajax'); ///REVISIT architecture
+		var ajaxLinks = document.querySelectorAll('a.ajax'); ///REVISIT architecture
 		for(var ajaxLinkIndex = 0; ajaxLinkIndex < ajaxLinks.length; ajaxLinkIndex++) {
 			var ajaxLink = ajaxLinks[ajaxLinkIndex];
 			ajaxLink.addEventListener('click', onAjaxLinkClick);

@@ -26,23 +26,21 @@ module.exports = function Usr(db, vl, bcrypt) {
 
 		MLMeta.findOne({ id: 'persistors' })
 			.then(persistorDoc => {
-				// if(!persistorDoc) {
-				// 	// persistorDoc = {}; /// quick-fix
-				// 	MLMeta.insertOne({
-				// 		id: 'persistors',
-				// 		userCount: 0,
-				// 		currentConstellationIndex: 0,
-				// 		currentPlanetIndex: 0
-				// 	}, function() {
-						
-				// 	});
-				// } else {
+				 if(!persistorDoc) { ///REVISIT how we do initial server setup
+					 // persistorDoc = {}; /// quick-fix
+					 return MLMeta.insertOne({
+						 id: 'persistors',
+						 userCount: 0,
+						 currentConstellationIndex: 0,
+						 currentPlanetIndex: 0
+					 });
+				 } else {
 					if(persistorDoc.hasOwnProperty("userCount")) {
 						userCount = persistorDoc.userCount;
 					} else {
-						MLMeta.updateOne({ id: "persistors" }, { $set: { userCount: 0 } });
+						return MLMeta.updateOne({ id: "persistors" }, { $set: { userCount: 0 } });
 					}
-				// }
+				 }
 			})
 			.catch(err => {
 				throw err;

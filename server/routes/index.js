@@ -6,8 +6,9 @@ const upload = multer({ dest: __dirname + '/../uploads/' });
 const ServerStar = require('../components/ServerStar.js');
 const CONSTS = require('../../abstract/constants.js');
 
-const ajaxRoutes = require('./ajax');
-const adminRoutes = require('./admin');
+const authRouter = require('./auth');
+const ajaxRouter = require('./ajax');
+const adminRouter = require('./admin');
 // const stars = require('./components/StarMapper.js');
 
 // var telepServer = require('./components/TelepServer.js');
@@ -44,8 +45,13 @@ function initializeRoutes(telepServer) {
 	// Get user if logged in.
 	app.use(observeSessionCode);
 
-	app.use('/ajax', ajaxRouter);
-	app.use('/admin', adminRouter);
+	///REVISIT because ajaxRouter references authRouter, auth.generate()
+	//must be called first so that api is available. The
+	//semantics/architecture of this feels really bad to me. Improve;
+	//probably just refactor how we do routing?
+	app.use('/auth', authRouter.generate(telepServer));
+	app.use('/ajax', ajaxRouter.generate(telepServer));
+	app.use('/admin', adminRouter.generate(telepServer));
 
 	// app.post('/register', register);
 	// app.post('/login', login);
@@ -86,114 +92,6 @@ function observeSessionCode(req, res, next) {
 			}
 		})
 		.catch(err => next(err));
-}
-
-function actualizeStar(req, res, next) {
-	if(!req.user || req.user.lv != 7) {
-		///REVISIT:
-		res.json({ error: "Not logged in" });
-		throw new Error("Not logged in");
-	}
-
-	switch(req.body.hostType) {
-		case 'external': {
-			var newStar = new ServerStar(req.body);
-
-			// Create the star in the database:
-			return api.createStar(req.user, newStar)
-				.then(newStarDoc => {
-					res.json({
-						errors: false,
-						creatorName: req.user.creatorName,
-						newStarID: newStar.id,
-						starMovements: newStarDoc.starMovements,
-					});
-
-					return true;
-				})
-				.catch(err => {
-					//console.error(err); ///
-					//res.json({ error: "Could not create star." }); ///TODO improve error
-					//throw new Error(err);
-					next(err);
-				});
-
-			// api.actualize(starData, function(err, result) {
-			// 	if(err) {
-			// 		res.json({ error: "did not place" });
-			// 		return false;
-			// 	}
-
-			// 	if(star.lsid) {
-			// 		// $lstar = api.sid($star['lsid']);
-			// 		// $luser = $usr->gt($lstar['uid']);
-			// 		// $lmeta = api.meta($lstar['uid']);
-
-			// 		// $content = "Hello, ".$lmeta['name'].".\n\n";
-			// 		// $content .= "Someone has recreated your star on Telephenesis! Check it out here:\n\n";
-			// 		// $content .= URL.'/'.$sid."\n\n";
-			// 		// $content .= "Exciting!\n\n";
-			// 		// $content .= "Don't want these messages? Just reply to this email letting us know."; ///
-
-			// 		// api.email($luser['em'], 'Someone recreated your star', $content);
-			// 	}
-
-			// 	// res.json({ creator: umeta.name });
-			// 	res.json({ errors: false });
-			// });
-		} break;
-
-		// case 'upload': {
-		// 	// Star should already have been created ///REVISIT architecture; maybe it would be better to just have some token associated to the upload that we use when creating the star
-		// 	res.json({ errors: false });
-		// } break;
-
-		default: {
-			console.error('unhandled hostType: ' + req.body.hostType);
-		}
-	}
-
-	// api.getStar(sid, function(err, star) {
-	// 	if(err) {
-	// 		///
-	// 		o.json({ error: "could not get source star" });
-	// 		return false;
-	// 	}
-
-	// 	if(!i.user || i.user.id != star.creator.uid) {
-	// 		o.json({ error: "not logged in" });
-	// 		return false;
-	// 	}
-
-	// 	var x = parseInt(i.body.x);
-	// 	var y = -1 * parseInt(i.body.y);
-	// 	var rgb = i.body.rgb;
-
-	// 	api.actualize(sid, x, y, rgb, function(err, result) {
-	// 		if(err) {
-	// 			o.json({ error: "did not place" });
-	// 			return false;
-	// 		}
-
-	// 		if(star.lsid) {
-	// 			// $lstar = api.sid($star['lsid']);
-	// 			// $luser = $usr->gt($lstar['uid']);
-	// 			// $lmeta = api.meta($lstar['uid']);
-
-	// 			// $content = "Hello, ".$lmeta['name'].".\n\n";
-	// 			// $content .= "Someone has recreated your star on Telephenesis! Check it out here:\n\n";
-	// 			// $content .= URL.'/'.$sid."\n\n";
-	// 			// $content .= "Exciting!\n\n";
-	// 			// $content .= "Don't want these messages? Just reply to this email letting us know."; ///
-
-	// 			// api.email($luser['em'], 'Someone recreated your star', $content);
-	// 		}
-
-	// 		// o.json({ creator: umeta.name });
-	// 		o.json({ errors: false });
-	// 	});
-	// });
-
 }
 
 

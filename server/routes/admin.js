@@ -1,10 +1,15 @@
 const express = require('express');
 
-var adminRouter = express.Router();
+function generate() {
+	var adminRouter = express.Router();
+	adminRouter.post('/moveStar', moveStar);
 
-adminRouter.post('/moveStar', moveStar);
+	return adminRouter;
+}
 
 function moveStar() {
 }
 
-export default adminRouter;
+module.exports = { generate };
+
+//export default adminRouter;
