@@ -5,7 +5,8 @@ import HistoryTime from '../libs/history-time';
 
 import clientState from './ClientState';
 import Interface from './Interface';
-import Stars from './Stars.js';
+import Stars from './Stars';
+import Creator from './Creator';
 import CONSTS from '../../../abstract/constants';
 
 export default new ClientNavigation();
@@ -20,6 +21,25 @@ function ClientNavigation() {
 
 	var starContextMenu;
 	var galaxyContextMenu;
+
+	var boxPages = [
+		'login',
+		'register',
+		'settings',
+		//'invite',
+		'create',
+		'recreate',
+		'help',
+		//'renameStar',
+		//'deleteStar',
+	];
+
+	var createPages = [
+		'create',
+		'recreate',
+		'place',
+		'color',
+	];
 
 	this.init = function() {
 		// Setup element references:
@@ -62,13 +82,23 @@ function ClientNavigation() {
 		// from the server render:
 		var page = location.pathname.split('/')[1];
 		if(page) {
-			if(page == 'star') {
-				// If visited /star/[uri], run normal path logic:
-				observePath(location.pathname);
-			} else {
-				// Otherwise, assume the server has already displayed the page:
-				var initialPage = document.getElementById(page + '-page');
-				clientState.activeWindow = initialPage;
+			///REVISIT ugly architecture:
+			if(boxPages.includes(page)) {
+				// Assume the server already displayed the page; set variables:
+				clientState.currentPage = page;
+				var initialPageEle = document.getElementById(page + '-page');
+				clientState.activeWindow = initialPageEle;
+			}
+
+			switch(page) {
+				case 'star': {
+					// If visited /star/[uri], run normal path logic:
+					observePath(location.pathname);
+				} break;
+
+				case 'recreate': {
+					observePath(location.pathname, true);
+				} break;
 			}
 		}
 
@@ -161,11 +191,12 @@ function ClientNavigation() {
 	 **/
 	this.navigate = function(path) {
 		var pathParts = path.split('/');
-		var operation = pathParts[1];
+		var newPage = pathParts[1];
 
 		var pageTitle = "telephenesis";
-		if(operation) {
-			pageTitle += ' : ' + operation;
+		if(newPage) {
+			////TODO
+			pageTitle += ' : ' + newPage;
 		}
 
 		// Pass state handling to HistoryTime:
@@ -173,39 +204,86 @@ function ClientNavigation() {
 	}
 
 	/**
+	 * Unload anything related to the current page.
+	 * @param {string} newPage
+	 **/
+	function preparePathChange(newPage) {
+		var oldPage = clientState.currentPage;
+
+		// Handle previous page state: ///REVISIT move to separate method?
+		if(boxPages.includes(clientState.currentPage)) {
+			close();
+		} else {
+			switch(oldPage) {
+				case '':
+				case 'star':
+				{
+					// Nothing.
+				} break;
+
+				case 'place':
+				case 'color':
+				{
+					// If exiting creation flow:
+					if(!createPages.includes(newPage)) {
+						// Remove working star:
+						Creator.cancel();
+					}
+				} break;
+
+				default: {
+					console.error("observePath(): unhandled oldPage '" + oldPage + '"');
+				}
+			}
+		}
+	}
+
+	/**
 	 * Manipulates the page state according to the path.
 	 * @param {string} path - The path that the client navigated to.
 	 **/
-	function observePath(path) {
+	///REVISIT not sold on architecture of pageInitialization:
+	function observePath(path, pageInitialization = false) {
 		var pathParts = path.split('/');
-		var operation = pathParts[1];
+		var newPage = pathParts[1];
 
-		// if(operation.length && !isNaN(operation)) {
-		// 	var star = document.getElementById('s'+operation)
-		// 	playStar(star);
-		// 	// if(state.path == path) return true;
+		// If this is not initial page load:
+		if(!pageInitialization) {
+			closeContextMenu(); ///REVISIT always?
 
-		// } else switch(operation) {
-		switch(operation) {
-			/// REVISIT refactor?:
-			case 'login':
-			case 'register':
-			case 'settings':
-			case 'invite':
-			case 'create':
-			case 'recreate':
-			case 'renameStar':
-			case 'deleteStar':
-			case 'help':
-			{
-				closeContextMenu(); ///
-				close();
-				open(operation);
-			} break;
+			preparePathChange(newPage);
 
+			if(boxPages.includes(newPage)) {
+				open(newPage);
+			}
+		}
+
+		switch(newPage) {
 			case 'star': {
 				var starID = parseInt(pathParts[2]);
 				Stars.clientStars[starID].play();
+			} break;
+
+			case 'create': {
+				// Check if user has creation tickets:
+				if(!clientState.creationTickets) {
+					Interface.displayError(CONSTS.ERROR.NO_CREATION_TICKETS);
+					return false;
+				}
+
+				Creator.initializeCreation();
+			} break;
+
+			case 'recreate': {
+				var starID = parseInt(pathParts[2]);
+
+				// Check if user has recreation tickets:
+				if(!clientState.recreationTickets) {
+					Interface.displayError(CONSTS.ERROR.NO_RECREATION_TICKETS);
+					return false;
+				}
+
+				Creator.initializeCreation(Stars.clientStars[starID]);
 			} break;
 
 			case 'bookmark': {
@@ -218,38 +296,37 @@ function ClientNavigation() {
 				clientState.actingStar.removeBookmark();
 			} break;
 
-
 			case 'logout': {
-				close();
-				logout()
-					.then(() => me.navigate('/'));
+				logout() .then(() => me.navigate('/'));
 			} break;
 
-			case '': { ///REVISIT architecture; should operation be false for this?
+			case '': { ///REVISIT architecture; should newPage be false for this?
 				if(Interface.order != CONSTS.ORDER.GALAXY) {
 					Interface.sort(CONSTS.ORDER.GALAXY);
 				}
-
-				close();
 			} break;
 
 			default: {
-				console.error("Unhandled path: " + path);
-				///TODO some kind of 404?
-				close();
-
-				// spc.flt(false);
-				// spc.s = 'active';
+				if(boxPages.includes(page)) {
+					// Assuming no logic.
+				} else {
+					console.error("Unhandled path: " + path);
+					///TODO some kind of 404?
+				}
 			}
 		}
 
+		clientState.currentPage = newPage;
+
 		// if(state.updating) {
 		// 	state.path = path;
-		// 	history.pushState(state, 'telephenesis : ' + operation, path);
+		// 	history.pushState(state, 'telephenesis : ' + newPage, path);
 		// }
 	}
 
 	function open(page) {
+		clientState.currentPage = page;
+
 		var pageElement = document.getElementById(page + '-page');
 		if(pageElement) {
 			clientState.activeWindow = pageElement;
@@ -270,12 +347,23 @@ function ClientNavigation() {
 		// cor.rc(menuToggleElement, 'active');
 		// cor.rc(document.getElementById('menu'), 'active');
 
+		console.log(page);
 		if(page) {
+			switch(page) {
+				case 'place': {
+					console.log("place");
+				} break;
+
+				//default: {
+				//}
+			}
+
 			Anm.fadeOut(page, 250, function() {
 				limbo.appendChild(page);
 			});
 		}
 
+		clientState.currentPage = false;
 		clientState.activeWindow = false;
 	}
 

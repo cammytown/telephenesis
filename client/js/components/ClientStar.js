@@ -39,7 +39,6 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	this.isPlaced = false;
 	this.isBookmarked = false;
 
-
 	function init(element = false) {
 		Star.call(me);
 
@@ -65,6 +64,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		me.dateElement = me.element.getElementsByClassName('text creationTime')[0];
 
 		// Attach event listeners:
+		me.linkElement.addEventListener('mousedown', onMouseDown);
 		me.linkElement.addEventListener('click', onClick);
 
 		// Create identity properties:
@@ -72,6 +72,14 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 		// Add to DOM:
 		spc.map.appendChild(me.element);
+	}
+
+	function onMouseDown(event) {
+		// If user is placing this star, ignore mousedown to prevent dragging
+		// star intead of space:
+		if(!me.isPlaced) {
+			event.preventDefault();
+		}
 	}
 
 	function onClick(event) {
@@ -303,6 +311,12 @@ function ClientStar(element) { ///REVISIT element not in use atm
 				throw new Error(error);
 			}
 		}
+	}
+
+	/** Remove the ClientStar from the client. **/
+	this.delete = function() {
+		////TODO IE needs a polyfill; otherwise use removeChild:
+		me.element.remove();
 	}
 
 	init(element);

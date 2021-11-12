@@ -52,7 +52,9 @@ function TelepRouter() {
 		// me.app.post('/login', login);
 
 		me.app.get('/:page?', main);
-		me.app.get('/star/:starID', main);
+		me.app.get('/:page/:starID', main); ////REVISIT architecture
+		//me.app.get('/star/:starID', main);
+		//me.app.get('/recreate/:starID', main);
 	}
 
 	/**
@@ -135,6 +137,7 @@ function TelepRouter() {
 			'register',
 			'settings',
 			'create',
+			'recreate',
 			//'star',
 		];
 

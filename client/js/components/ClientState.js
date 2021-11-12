@@ -28,6 +28,15 @@ function ClientState() {
 	this.playingStar = null;
 
 	/**
+	 * The page open on the client.
+	 * @type {string}
+	 **/
+	///REVISIT consolidate this with activeWindow?
+	///REVISIT default value; doing this mainly because changes in historystate
+	//currently result in this value if going to homepage:
+	this.currentPage = ''; 
+
+	/**
 	 * The element of the page currently open on the client.
 	 * @type {Element}
 	 **/

@@ -192,7 +192,7 @@ function Interface() {
 	/**
 	 * Hide the message displayed to the user, if any.
 	 **/
-	this.hideMessage = function() {
+	this.hideMessage = function() { ///REVISIT rename to clearMessage ?
 		clearMessageTimer();
 
 		limbo.appendChild(messageElement);

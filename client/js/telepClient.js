@@ -3,7 +3,6 @@ import cor from './libs/minlab/cor';
 // import navigate from "./navigate";
 // import starSystem from "./starSystem";
 
-import creation from "./creation";
 import admin from "./admin";
 
 import clientState from './components/ClientState';
@@ -14,6 +13,7 @@ import Forms from './components/Forms';
 import ClientEffects from './components/ClientEffects';
 import mediaPlayer from './components/MediaPlayer';
 import Admin from './components/Admin';
+import Creator from "./components/Creator";
 
 // import "./constellations.scss";
 
@@ -34,8 +34,8 @@ function TelepClient() {
 		clientState.addComponent(Forms);
 		clientState.addComponent(mediaPlayer);
 		clientState.addComponent(Admin);
+		clientState.addComponent(Creator);
 		clientState.init();
 
-		creation.init(me);
 	}
 }
