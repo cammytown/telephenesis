@@ -86,7 +86,7 @@ function cc(ele, cls) {
  * Sends a POST request; attempts to automatically format body.
  * @param {string|FormData|Object} body
  **/
-function POST(url, body) {
+function POST(url, body = {}) {
 	var request = {
 		method: "POST",
 		headers: {},

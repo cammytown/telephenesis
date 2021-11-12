@@ -4,8 +4,9 @@ html, body {
 }
 
 body {
-	// background: #000;
-	background: #000 linear-gradient(to bottom, #111 0%, #000 30%) no-repeat;
+	background-color: #000;
+	//background-image: linear-gradient(to bottom, #0a0a0a 0%, #000 30%);
+	//background-repeat: no-repeat;
 	color: $text;
 	font-size: 16px; ///
 	font-family: 'Monda', sans-serif;
@@ -20,6 +21,11 @@ a {
 
 	&:hover {
 		color: $linkHover;
+	}
+
+	&.disabled {
+		background: $disabledBackground;
+		color: $disabledText;
 	}
 }
 

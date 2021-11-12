@@ -15,6 +15,7 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 		"creatorName",
 		"creationTickets",
 		"recreationTickets",
+		"bookmarks",
 	];
 
 	init(usrDoc, userMeta);

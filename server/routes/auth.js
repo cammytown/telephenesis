@@ -1,11 +1,12 @@
 const express = require('express');
 //const Telep = require('../components/TelepServer');
+const api = require('../components/TelepAPI');
 
 ///REVISIT weird architecture so we can access api without circular reference:
-var api;
+//var api;
 var usr;
-function generate(telepServer) { 
-	api = telepServer.api;
+function generate(telepServer) {
+	//api = telepServer.api;
 	usr = telepServer.usr;
 
 	var authRouter = express.Router();
@@ -24,10 +25,11 @@ function login(req, res, next) {
 			return usr.in(userDoc.ss);
 		})
 		.then(user => {
+			///REVISIT is user ever false? it would throw exception in that
+			//case, right?
 			if(user) {
 				req.user = user;
 			} else {
-				
 			}
 		})
 		.then(next)

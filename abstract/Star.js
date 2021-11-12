@@ -32,6 +32,7 @@ function Star() {
 
 	this.serverProps = [
 		'active',
+		'deleted',
 	];
 
 	this.objectProps = [
@@ -40,7 +41,6 @@ function Star() {
 
 	init();
 
-	// METHODS:
 	function init() {
 		var allProps = me.identityProps.concat(me.serverProps);
 

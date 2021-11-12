@@ -1,3 +1,8 @@
+input#user-bookmarks( ///REVISIT architecture
+	type="hidden"
+	value= user ? user.bookmarks.join(",") : ""
+)
+
 form#settings-page.ajax.uibox(method="POST")
 	label.floatBeside(for="email") Email
 	input(name="email" value=user.em type="text" placeholder="email" disabled)

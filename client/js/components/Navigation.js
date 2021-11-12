@@ -26,12 +26,6 @@ function ClientNavigation() {
 		starContextMenu = document.getElementById('starContextMenu');
 		galaxyContextMenu = document.getElementById('galaxyContextMenu');
 
-		// Set activeWindow if path calls for it:
-		///REVISIT architecture:
-		var page = location.pathname.split('/')[1];
-		var initialPage = document.getElementById(page + '-page');
-		clientState.activeWindow = initialPage;
-
 		// Add listener for URI changes:
 		HistoryTime.bindPathToCallback('*', observePath);
 
@@ -60,6 +54,24 @@ function ClientNavigation() {
 
 		// Open context menu on right click
 		cor.al(spc.element, 'contextmenu', onContextMenu);
+	}
+
+	this.ready = function() {
+		///REVISIT architecture:
+		// Set activeWindow if path calls for it; it will already be visible
+		// from the server render:
+		var page = location.pathname.split('/')[1];
+		if(page) {
+			if(page == 'star') {
+				// If visited /star/[uri], run normal path logic:
+				observePath(location.pathname);
+			} else {
+				// Otherwise, assume the server has already displayed the page:
+				var initialPage = document.getElementById(page + '-page');
+				clientState.activeWindow = initialPage;
+			}
+		}
+
 	}
 
 	function onNavLinkClick(event) {
@@ -148,8 +160,8 @@ function ClientNavigation() {
 	 * @param {string} path - The path to navigate to.
 	 **/
 	this.navigate = function(path) {
-		var parts = path.split('/');
-		var operation = parts[1];
+		var pathParts = path.split('/');
+		var operation = pathParts[1];
 
 		var pageTitle = "telephenesis";
 		if(operation) {
@@ -165,9 +177,8 @@ function ClientNavigation() {
 	 * @param {string} path - The path that the client navigated to.
 	 **/
 	function observePath(path) {
-		var parts = path.split('/');
-		var operation = parts[1];
-		console.log(operation);
+		var pathParts = path.split('/');
+		var operation = pathParts[1];
 
 		// if(operation.length && !isNaN(operation)) {
 		// 	var star = document.getElementById('s'+operation)
@@ -176,7 +187,7 @@ function ClientNavigation() {
 
 		// } else switch(operation) {
 		switch(operation) {
-			/// TODO: refactor:
+			/// REVISIT refactor?:
 			case 'login':
 			case 'register':
 			case 'settings':
@@ -190,6 +201,11 @@ function ClientNavigation() {
 				closeContextMenu(); ///
 				close();
 				open(operation);
+			} break;
+
+			case 'star': {
+				var starID = parseInt(pathParts[2]);
+				Stars.clientStars[starID].play();
 			} break;
 
 			case 'bookmark': {

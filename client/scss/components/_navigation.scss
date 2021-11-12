@@ -22,21 +22,27 @@ body {
 			.create { display: block; }
 		}
 
+		&.adminor {
+			.admin { display: block; }
+		}
 	}
 
 	nav {
 		ul {
 			li {
-				padding: 5px 10px;
-
-				&.disabled {
-					background: $disabledBackground;
-					color: $disabledText;
-
-					a { ///REVISIT
-						color: $disabledText;
-					}
+				a {
+					display: block;
+					padding: 5px 10px;
 				}
+
+				//&.disabled {
+					//background: $disabledBackground;
+					//color: $disabledText;
+
+					//a { ///REVISIT
+						//color: $disabledText;
+					//}
+				//}
 			}
 		}
 	}
@@ -152,19 +158,16 @@ body {
 
 			&.create {
 				color: $create;
+				display: none;
 
 				&:hover {
 					background-color: rgba(0, 150, 0, 0.3);
-				}
-
-				&.disabled {
-					background: $disabledBackground;
-					color: $disabledText;
 				}
 			}
 
 			&.admin {
 				color: $admin;
+				display: none;
 
 				&.danger {
 					color: #e77;

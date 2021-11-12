@@ -1,7 +1,8 @@
 mixin star(starData = {})
 	.star&attributes(attributes)
 		a(
-			href=starData.fileURL
+			href="/star/" + starData.id
+			data-mediaURL=starData.fileURL
 			style="background-color: rgb(" + starData.color + ')'
 		)
 

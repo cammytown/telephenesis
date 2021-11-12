@@ -6,6 +6,8 @@ import spc from '../libs/minlab/spc'; //// ultimately whatever spc becomes proba
 import Star from '../../../abstract/Star.js';
 import Vector from '../../../abstract/Vector.js';
 import mediaPlayer from './MediaPlayer';
+import clientState from './ClientState';
+import Navigation from './Navigation';
 
 export default ClientStar;
 
@@ -26,14 +28,16 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	var animationTimer;
 	var animatingPosition;
 
-	me.element;
-	me.linkElement;
-	me.titleElement;
+	///ARCHITECTURE:
+	this.element;
+	this.linkElement;
+	this.titleElement;
+	this.dateElement;
 
 	//this.state = ;
-	me.fileReady = false;
-	me.isPlaced = false;
-	me.isBookmarked = false;
+	this.fileReady = false;
+	this.isPlaced = false;
+	this.isBookmarked = false;
 
 
 	function init(element = false) {
@@ -55,8 +59,10 @@ function ClientStar(element) { ///REVISIT element not in use atm
 			me.element = document.getElementById('placementSymbol').cloneNode(true); /// deep parameter in IE8??
 		}
 
+		///REVISIT architecture
 		me.linkElement = me.element.getElementsByTagName('a')[0];
 		me.titleElement = me.element.getElementsByClassName('text title')[0];
+		me.dateElement = me.element.getElementsByClassName('text creationTime')[0];
 
 		// Attach event listeners:
 		me.linkElement.addEventListener('click', onClick);
@@ -73,8 +79,8 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 		///REVISIT me.isPlaced feels kinda hacky:
 		if(me.isPlaced) {
-			console.log(me.fileURL);
-			me.play();
+			//me.play();
+			Navigation.navigate("/star/" + me.id);
 		} else {
 			return false;
 		}
@@ -145,6 +151,8 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 				cor.ac(this.element, 'bookmarked');
 				me.isBookmarked = true;
+				clientState.bookmarks.push(me);
+				clientState.update();
 			})
 			.catch(err => {
 				console.error(err);
@@ -165,6 +173,8 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 				this.element.classList.remove('bookmarked');
 				me.isBookmarked = false;
+				clientState.bookmarks.splice(clientState.bookmarks.indexOf(me), 1);
+				clientState.update();
 			})
 			.catch(err => {
 				console.error(err);
@@ -247,6 +257,10 @@ function ClientStar(element) { ///REVISIT element not in use atm
 				case 'fileURL': {
 					me.element.setAttribute('data-fileURL', me.fileURL);
 					me.linkElement.href = me.fileURL;
+				} break;
+
+				case 'timestamp': {
+					me.dateElement.innerText = new Date(me.timestamp).toLocaleDateString();
 				} break;
 
 				default: {

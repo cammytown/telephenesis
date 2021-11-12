@@ -54,7 +54,7 @@ function MediaPlayer() {
 			cor.ac(clientStar.element, "active");
 
 			// Load the new star's media:
-			me.audio.load(clientStar.element.getElementsByTagName('a')[0].href);
+			me.audio.load(clientStar.linkElement.getAttribute('data-mediaURL'));
 			// me.audio.load('/music/'+sid+'.mp3');
 
 			if(activeMediaState) {
@@ -84,7 +84,6 @@ function MediaPlayer() {
 	}
 
 	function onMediaTimeUpdate(event) {
-
 		// Update playback time label:
 		clientState.playingStar.element.getElementsByClassName('playbackTime')[0].innerHTML = me.audio.timeString;
 

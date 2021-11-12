@@ -8,6 +8,7 @@ import Navigation from './Navigation';
 
 import clientState from './ClientState';
 import mediaPlayer from './MediaPlayer';
+//import effects from './ClientEffects';
 import Stars from './Stars';
 import CONSTS from '../../../abstract/constants.js';
 import locale from '../../../locale/en_us.json'; ///REVISIT
@@ -27,7 +28,7 @@ function Interface() {
 	var messageElement;
 
 	/**
-	 * The ID of the setTimeout timer being used to display 
+	 * The ID of the setTimeout timer being used to display
 	 * the current message.
 	 * @type {number}
 	 **/
@@ -45,6 +46,17 @@ function Interface() {
 		// }
 
 		spc.moveCallbacks.push(Stars.drawLineStep);
+
+		window.addEventListener('scroll', function(eve) {
+			window.requestAnimationFrame(Stars.drawLineStep);
+		});
+
+		////REVISIT can we guarantee this will run AFTER
+		//clientEffects's listener does on every browser?  if it
+		//doesn't, the canvas will be cleared after we draw the stars:
+		window.addEventListener('resize', () => {
+			window.requestAnimationFrame(Stars.drawLineStep);
+		});
 
 		/* NAVIGATION */
 		var menuToggleElement = document.getElementsByClassName('menuToggle')[0]; ////
@@ -67,7 +79,7 @@ function Interface() {
 		}
 
 		/* SHORTCUTS */
-		cor.al(window, 'keydown', function(e) {
+		window.addEventListener('keydown', function(e) {
 			if(e.target.tagName.toUpperCase() == "INPUT") { // .toUpperCase() out of paranoia
 				return true;
 			}
@@ -215,6 +227,12 @@ function Interface() {
 	}
 
 	function onSortClick(event) {
+		event.preventDefault();
+
+		if(event.currentTarget.classList.contains('disabled')) {
+			return false;
+		}
+
 		me.sort(
 			event.currentTarget.getAttribute('data-order'),
 			event.currentTarget.getAttribute('data-view'),

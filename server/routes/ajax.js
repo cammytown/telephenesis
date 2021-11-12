@@ -1,15 +1,18 @@
 const express = require('express');
 
 const Telep = require('../components/TelepServer');
+const Stars = require('../components/StarMapper');
 const ServerStar = require('../components/ServerStar.js');
+const api = require('../components/TelepAPI');
 
 const routesIndex = require('./index');
 const authRoutes = require('./auth');
+const adminRoutes = require('./admin');
 
-///REVISIT weird architecture to prevent circular reference:
-var api;
+///REVISIT weird architecture
+//var api;
 function generate(telepServer) {
-	api = telepServer.api;
+	//api = telepServer.api;
 
 	var ajaxRouter = express.Router();
 
@@ -22,10 +25,19 @@ function generate(telepServer) {
 	ajaxRouter.post('/register', authRoutes.register, authRoutes.login, userCheck);
 	ajaxRouter.post('/logout', authRoutes.logout);
 
+	ajaxRouter.use('/admin', adminRoutes.generate('json'));
+
 	//ajaxRouter.post('/upload/:starid', api.auth('creator'), routesIndex.upload.single('submission'), uploadMedia);
+	ajaxRouter.use(ajaxStatusHandler);
 	ajaxRouter.use(ajaxErrorHandler);
 
 	return ajaxRouter;
+}
+
+function ajaxStatusHandler(req, res, next) {
+	res.status(404).json({
+		errors: ["Invalid endpoint."], ///REVISIT maybe don't allow people to determine endpoints through trial/error
+	});
 }
 
 /**
@@ -120,13 +132,14 @@ function actualizeStar(req, res, next) { ///REVISIT move to a creation-specific 
 			var newStar = new ServerStar(req.body);
 
 			// Create the star in the database:
-			return api.createStar(req.user, newStar)
-				.then(newStarDoc => {
+			return Stars.createStar(req.user, newStar)
+				.then(result => {
 					res.json({
 						errors: false,
 						creatorName: req.user.creatorName,
-						newStarID: newStar.id,
-						starMovements: newStarDoc.starMovements,
+						newStarID: result.newStar.id,
+						timestamp: result.newStar.timestamp,
+						starMovements: result.starMovements,
 					});
 
 					return true;

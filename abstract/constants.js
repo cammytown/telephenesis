@@ -34,7 +34,18 @@ const CONSTANTS = {
 		LIST: "LIST",
 		GRID: "GRID",
 		GALAXY: "GALAXY",
-	}
+	},
+
+	/**
+	 * Client page actions.
+	 * @readonly
+	 * @enum {string}
+	 **/
+	ACTION: {
+		TOGGLE_BOOKMARK: "TOGGLE_BOOKMARK",
+		USE_CREATION_TICKET: "USE_CREATION_TICKET",
+		USE_RECREATION_TICKET: "USE_RECREATION_TICKET",
+	},
 }
 
 //export const ERROR = {

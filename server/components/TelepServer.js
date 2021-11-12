@@ -7,10 +7,11 @@ const MongoStore = require('connect-mongo')(session);
 const bcrypt = require('bcrypt-nodejs'); /// best?
 const validator = require('validator'); /// best?
 
-const Usr = require('../libs/Usr.js');
+const Usr = require('../libs/Usr.js'); ///REVISIT Usr or usr? changes between files...
 
 const TelepAPI = require('./TelepAPI.js');
-const routes = require('../routes');
+const StarMapper = require('./StarMapper');
+const TelepRouter = require('../routes'); ///REVISIT have a TelepRouter in components/ ?
 // const config = require('./telepServer.config.js');
 
 /**
@@ -21,13 +22,15 @@ function TelepServer() {
 	var me = this;
 
 	///REVISIT architecture:
-	me.config;
-	me.app;
-	me.db;
-	me.usr;
-	me.api;
+	this.config;
+	this.app;
+	this.db;
+	this.usr;
+	this.persistorDoc;
+	//this.api;
+	var components = [];
 
-	me.initialize = function() {
+	this.initialize = function() {
 		///REVISIT why not just require/import it wherever we need it? this might be semantically better?:
 		me.config = require('../telepServer.config.js');
 
@@ -36,18 +39,47 @@ function TelepServer() {
 		initializeDatabase()
 		.then(initializeExpress)
 		.then(initializeTelep)
+		.then(initializeComponents)
 		.then(exposeServer)
 		.catch(err => {
-			//console.error(err); ///
+			console.error(err); ///
 			throw new Error(err);
 		});
 	}
+
+	//this.addComponent = function(component) {
+		//components
+	//}
 
 	function initializeDatabase() {
 		return MongoClient.connect("mongodb://mongo:27017", { useUnifiedTopology: true })
 			.then(mongoClient => {
 				console.log("Database connection established.");
 				me.db = mongoClient.db('telephenesis');
+
+				// Retrieve or create persistorDoc:
+				///TODO maybe refactor into a database initialization file/method
+				var MLMeta = me.db.collection('MLMeta');
+				return MLMeta.find({ id: 'persistors' }).limit(1).next()
+					.then(persistorDoc => {
+						if(!persistorDoc) {
+							me.persistorDoc = {
+								id: 'persistors',
+								userIndex: 1,
+								constellationCount: 0,
+								starCount: 0
+							}
+
+							MLMeta.insertOne(me.persistorDoc);
+						} else {
+							me.persistorDoc = persistorDoc;
+						}
+
+					})
+					.catch(err => {
+						///REVISIT
+						throw err;
+					});
 			})
 			.catch(err => {
 				console.error(err); ///
@@ -74,13 +106,16 @@ function TelepServer() {
 	}
 
 	function initializeTelep() {
+		///TODO have a generic component initialization method like we
+		//do on the client:
+
 		me.usr = new Usr(me.db, validator, bcrypt);
 		console.log("usr initialized");
 
-		me.api = new TelepAPI(me);
-		console.log("api initialized");
-
+		// Setup user session data storage:
 		me.app.use(session({
+			///TODO document these options:
+
 			secret: me.config.sessionSecret, ////
 			resave: false,
 			saveUninitialized: false, ///
@@ -91,10 +126,31 @@ function TelepServer() {
 			//cookie: { secure: true } /// HTTPS only
 		}));
 
-		routes.initializeRoutes(me);
-		console.log("routes initialized");
+		components.push(TelepAPI);
+		components.push(StarMapper);
+		components.push(TelepRouter);
 
 		return true;
+	}
+
+	function initializeComponents() {
+		for(var component of components) {
+			// If component has initialize method, run it:
+			if(typeof component.initialize === 'function') {
+				component.initialize(me); ///REVISIT on clientState we use .init() ... keep consistent?
+			}
+		}
+
+		for(var component of components) {
+			///REVISIT does passing `me` in impact performance?
+			//doing this in case people don't want to write an
+			//initialize function but want ref to server:
+			// If component has ready method, run it:
+			if(typeof component.ready === 'function') {
+				component.ready(me);
+			}
+		}
+
 	}
 
 	function exposeServer() {

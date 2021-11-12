@@ -57,6 +57,25 @@ function init(Telep) {
 	validPlacementZone = document.getElementById('validPlacementZone');
 	validPlacementZone.style.display = 'none';
 	spc.map.appendChild(validPlacementZone);
+
+	var colorwheelSelect = document.getElementById('colorwheelSelect');
+
+	cor.al(colorwheelSelect, 'mousemove', getColorFromWheelPosition);
+	cor.al(colorwheelSelect, 'click', function() {
+		cor.rl(colorwheelSelect, 'mousemove', getColorFromWheelPosition);
+
+		workingStar.color = workingStar.linkElement.style.backgroundColor.substr(4).slice(0, -1); /// bad code / maybe unreliable
+		Anm.fadeOut(colorwheelSelect);
+
+		workingStar.isPlaced = true;
+		actualizeCreation();
+
+		// if(!workingStar.isUploaded) {
+		// 	workingStar.isPlaced = true;
+		// } else {
+		// 	actualizeCreation();
+		// }
+	});
 }
 
 function onCreateStarClick(event) {
@@ -89,7 +108,6 @@ function onRecreateStarClick(event) {
 	workingStar.id = "placeholder"; ///REVISIT architecture
 	workingStar.originStarID = clientState.actingStar.id;
 	workingStar.tier = clientState.actingStar.tier + 1;
-	console.log(clientState.actingStar.tier);
 }
 
 function onCreateSubmit(event) {
@@ -244,46 +262,8 @@ function initializeStarColoring(genesis) {
 	if(genesis) {
 		Interface.displayMessage("Choose a color for your star.", 'notification', 0);
 
-		// coloring a genesis star; any color is allowed
-
-		var colorwheelSelect = document.getElementById('colorwheelSelect');
 		workingStar.element.appendChild(colorwheelSelect);
 		Anm.fadeIn(colorwheelSelect);
-
-		cor.al(colorwheelSelect, 'mousemove', getColorFromWheelPosition);
-		cor.al(colorwheelSelect, 'click', function() {
-			cor.rl(colorwheelSelect, 'mousemove', getColorFromWheelPosition);
-
-			workingStar.color = workingStar.linkElement.style.backgroundColor.substr(4).slice(0, -1); /// bad code / maybe unreliable
-			Anm.fadeOut(colorwheelSelect);
-
-			workingStar.isPlaced = true;
-			actualizeCreation();
-
-			// if(!workingStar.isUploaded) {
-			// 	workingStar.isPlaced = true;
-			// } else {
-			// 	actualizeCreation();
-			// }
-		});
-
-		function getColorFromWheelPosition(e) {
-			var cx = -(workingStar.position.x + (spc.map.offsetLeft - e.clientX)); ///TODO + half star width, I think? same for below with height?
-			var cy = (workingStar.position.y + (spc.map.offsetTop - e.clientY));
-
-			var angle = -Math.atan2(cy, cx) * 180 / Math.PI + 180;
-
-			var selectedhue;
-
-			if(angle>0 && angle<60) selectedhue = 110;
-			else if(angle>60 && angle<120) selectedhue = 60;
-			else if(angle>120 && angle<180) selectedhue = 25;
-			else if(angle>180 && angle<240) selectedhue = 0;
-			else if(angle>240 && angle<300) selectedhue = 270;
-			else if(angle>300) selectedhue = 240;
-
-			workingStar.linkElement.style.backgroundColor = 'hsl('+selectedhue+', 45%, 80%)';
-		}
 	} else {
 		Interface.displayMessage("Choose a color for your star. You can only shift the color slightly "
 			+ "from the star you recreated!", 'notification', 0);
@@ -331,6 +311,25 @@ function initializeStarColoring(genesis) {
 	}
 
 	// 	guide.innerHTML = "Now choose a color. You can only shift the color 11 degrees from the previous star.";
+}
+
+// coloring a genesis star; any color is allowed
+function getColorFromWheelPosition(e) {
+	var cx = -(workingStar.position.x + (spc.map.offsetLeft - e.clientX)); ///TODO + half star width, I think? same for below with height?
+	var cy = (workingStar.position.y + (spc.map.offsetTop - e.clientY));
+
+	var angle = -Math.atan2(cy, cx) * 180 / Math.PI + 180;
+
+	var selectedhue;
+
+	if(angle>0 && angle<60) selectedhue = 110;
+	else if(angle>60 && angle<120) selectedhue = 60;
+	else if(angle>120 && angle<180) selectedhue = 25;
+	else if(angle>180 && angle<240) selectedhue = 0;
+	else if(angle>240 && angle<300) selectedhue = 270;
+	else if(angle>300) selectedhue = 240;
+
+	workingStar.linkElement.style.backgroundColor = 'hsl('+selectedhue+', 45%, 80%)';
 }
 
 function uploadCreation() {
@@ -406,15 +405,27 @@ function actualizeCreation() {
 				throw result.errors;
 			}
 
+			///REVISIT improve architecture, probably; maybe just
+			//have server return the whole new star and call
+			//loadData on workingStar:
+
 			// Update star element attributes:
 			workingStar.id = result.newStarID;
 			workingStar.titleElement.className = 'text name';
 			workingStar.titleElement.innerText = workingStar.title;
+			workingStar.timestamp = result.timestamp;
 			//workingStar.linkElement.href = '/' + result.newStarID;
 			workingStar.element.classList.remove('placementSymbol');
-			//workingStar.setAttribute('data-prev', 
+			//workingStar.setAttribute('data-prev',
 
 			Stars.addStar(workingStar);
+
+			// Update ticket count:
+			if(workingStar.originStarID == -1) {
+				clientState.act(CONSTS.ACTION.USE_CREATION_TICKET);
+			} else {
+				clientState.act(CONSTS.ACTION.USE_RECREATION_TICKET);
+			}
 
 			// Shift stars around according to server instructions:
 			for(var starID in result.starMovements) {

@@ -38,6 +38,20 @@ function TelepAdmin() {
 			case 'recolorStar': {
 				initializeRecolor();
 			} break;
+
+			case 'deleteStar': {
+				confirmDelete();
+			} break;
+
+			case 'updateDBSchemas': {
+				if(confirm("Update database schema to reflect changes in code?")) {
+					COR.POST('/ajax/admin/updateDBSchemas');
+				}
+			} break;
+
+			default: {
+				console.error("Unhandled admin operation: " + operation);
+			}
 		}
 	}
 
@@ -66,9 +80,9 @@ function TelepAdmin() {
 
 	function clickStarMove(eve) {
 		COR.POST('/ajax/admin/moveStar', {
-			x: me.targetStar.x,
-			y: me.targetStar.y,
 			starID: clientState.actingStar.id,
+			x: me.targetStar.position.x,
+			y: me.targetStar.position.y,
 		});
 
 		clientState.actingStar = null;
@@ -77,8 +91,16 @@ function TelepAdmin() {
 		spc.element.removeEventListener('click', clickStarMove);
 	}
 
-	function initializeRecolor() {
-		console.log('recolor');
+	//function initializeRecolor() {
+		//console.log('recolor');
+	//}
+
+	function confirmDelete() {
+		if(confirm("Delete the star?")) { ///FUTURE revisit admin ui some day
+			COR.POST('/ajax/admin/deleteStar', {
+				starID: clientState.actingStar.id,
+			});
+		}
 	}
 }
 

@@ -120,7 +120,7 @@ function ClientStarsAPI() {
 		// 	return;
 		// }
 
-		starMovements[targetStar.id] = newPosition; ///REVISIT 
+		starMovements[targetStar.id] = newPosition; ///REVISIT
 		// starMovements[targetStar.id] = newPosition;
 
 		// for(var clientStar of me.clientStars) {
@@ -241,10 +241,13 @@ function ClientStarsAPI() {
 						left: clientStar.element.getAttribute('data-x') + 'px',
 						top: clientStar.element.getAttribute('data-y') + 'px',
 						duration: 500,
-						complete: function() {
-							me.generateConstellationLines();
-						}
+						//complete: function() {}
 					});
+
+					setTimeout(function() {
+						me.generateConstellationLines();
+						effects.onResize();
+					}, 650);
 				});
 			} break;
 
@@ -286,10 +289,14 @@ function ClientStarsAPI() {
 						left: newX + styleVars.starGridPaddingX + xOffset + 'px',
 						top: newY + styleVars.starGridPaddingY + yOffset + 'px',
 						duration: 500,
-						complete: function() {
-							me.generateConstellationLines();
-						}
 					});
+
+					// Redraw constellation lines:
+					///REVISIT are we good to just use time of animation + 150ms here?:
+					setTimeout(function() {
+						me.generateConstellationLines();
+						effects.onResize();
+					}, 650);
 
 					if(view == CONSTS.VIEW.GRID) {
 						// Wrap grid if row filled
@@ -335,29 +342,7 @@ function ClientStarsAPI() {
 		}
 	}
 
-	// function play(starElement) {
-	// 	// var sid = starElement.id.split('s')[1];
-	// 	// var sid = starElement.getAttribute('data-id').split('s')[1];
-
-	// 	// var infoBox = cor._('#starInfoBox');
-	// 	// infoBox.get
-
-	// 	var starTitle = starElement.getAttribute('data-title');
-	// 	cor._('#playingStarTitle').innerHTML = starTitle;
-
-	// 	var creatorName = starElement.getAttribute('data-creatorName');
-	// 	cor._('#playingCreatorName').innerHTML = creatorName;
-
-	// 	var creatorLink = starElement.getAttribute('data-creatorLink');
-	// 	cor._('#playingCreatorLink').innerHTML = creatorLink;
-
-	// 	// cor._('#playingStarInfo').style.display = 'block';
-	// 	cor.ac(document.body, 'playing')
-
-	// 	mediaPlayer.playStar(starElement);
-	// }
-
-	function deleteStar(starElement) { ///REVISIT architecture; can't use delete name unless maybe this.delete because reserved word
+	function deleteStar(starElement) {
 		var starID = clientState.actingStar.id;
 		var p = "starID="+starID;
 		ajx('/ajax/deleteStar', p, function(d) {
@@ -369,13 +354,6 @@ function ClientStarsAPI() {
 
 		return false;
 	}
-
-//	/**
-//	 * Bookmark a star for the current user.
-//	 * @param {ClientStar} starElement - The star to bookmark.
-//	 **/
-//	function bookmark(starElement) {
-//	}
 
 	/**
 	 * Prepare constellation lines for drawing.
@@ -421,9 +399,10 @@ function ClientStarsAPI() {
 	/**
 	 * Draw a frame of the branching constellations.
 	 * @param {number} currentMS
+	 * @todo Rename, probably.
 	 **/
 	this.drawLineStep = function(currentMS) {
-		console.log("drawLineStep");
+		//console.log("drawLineStep");
 
 		effects.context.clearRect(0, 0, effects.canvas.width, effects.canvas.height);
 
