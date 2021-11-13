@@ -132,13 +132,17 @@ function TelepRouter() {
 
 	function main(req, res) {
 		var realPages = [
+			'star',
+			'about',
 			'help',
+
 			'login',
 			'register',
+
 			'settings',
+
 			'create',
 			'recreate',
-			//'star',
 		];
 
 

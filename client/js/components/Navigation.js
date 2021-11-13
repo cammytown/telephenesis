@@ -270,6 +270,12 @@ function ClientNavigation() {
 		switch(newPage) {
 			case 'star': {
 				var starID = parseInt(pathParts[2]);
+
+				if(pageInitialization) { ///REVISIT only on pageInit ?
+					///REVISIT probably do this on server side; though maybe it's cool
+					spc.ctr(Stars.clientStars[starID].position.x, Stars.clientStars[starID].position.y); ///TODO change spc over to Vectors
+				}
+
 				Stars.clientStars[starID].play();
 			} break;
 

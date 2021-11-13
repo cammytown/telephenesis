@@ -245,9 +245,13 @@ function ClientStarsAPI() {
 						//complete: function() {}
 					});
 
+					// Set the dimensions of the canvas to that of the window:
+					effects.canvas.width = document.body.offsetWidth;
+					effects.canvas.height = document.body.offsetHeight;
+
 					setTimeout(function() {
 						me.generateConstellationLines();
-						effects.onResize();
+						//effects.onResize();
 					}, 650);
 				});
 			} break;

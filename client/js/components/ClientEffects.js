@@ -20,6 +20,12 @@ function ClientEffects() {
 	}
 
 	this.onResize = function() {
+		///REVISIT I don't like this solution but can't think of something
+		//better right now:
+		// Reset height of canvas so it is not a part of scrollWidth/scrollHeight
+		me.canvas.width = 0;
+		me.canvas.height = 0;
+
 		me.canvas.width = document.documentElement.scrollWidth;
 		me.canvas.height = document.documentElement.scrollHeight;
 		//me.canvas.width = document.body.offsetWidth;

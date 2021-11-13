@@ -1,5 +1,5 @@
 body {
-	header#playingStarInfo { ///placement
+	header#playingStarHeader { ///placement
 		// display: none;
 		opacity: 0;
 		height: 0; ///REVISIT does this always work?
@@ -47,10 +47,14 @@ body {
 				content: "";
 			}
 		}
+
+		#playingStarInfo {
+			position: absolute;
+		}
 	}
 
 	&.playing {
-		header#playingStarInfo {
+		header#playingStarHeader {
 			// display: block;
 			opacity: 1;
 			height: auto; ///TODO auto doesn't work for transitions

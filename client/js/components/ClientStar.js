@@ -140,7 +140,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		var creatorLink = me.element.getAttribute('data-creatorLink');
 		cor._('#playingCreatorLink').innerHTML = creatorLink;
 
-		// cor._('#playingStarInfo').style.display = 'block';
+		// cor._('#playingStarHeader').style.display = 'block';
 		cor.ac(document.body, 'playing')
 
 		mediaPlayer.playStar(me);

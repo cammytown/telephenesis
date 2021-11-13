@@ -286,7 +286,7 @@ body nav ul li a {
 body nav.site-nav {
   display: block;
   position: absolute;
-  top: 7px;
+  top: 5px;
   right: 60px;
   width: 300px;
   text-align: right;
@@ -655,37 +655,40 @@ body #menu .user a, body #menu .guest a {
   display: block;
 }
 
-body header#playingStarInfo {
+body header#playingStarHeader {
   opacity: 0;
   height: 0;
   transition: height 500ms, opacity 500ms;
   overflow: hidden;
 }
-body header#playingStarInfo h2, body header#playingStarInfo h3 {
+body header#playingStarHeader h2, body header#playingStarHeader h3 {
   margin: 5px 0 5px 20px;
 }
-body header#playingStarInfo a {
+body header#playingStarHeader a {
   font-size: 0.8rem;
 }
-body header#playingStarInfo #playbackProgress {
+body header#playingStarHeader #playbackProgress {
   width: 100%;
   height: 20px;
   margin-bottom: 10px;
   background: rgba(121, 61, 155, 0.33);
 }
-body header#playingStarInfo #playbackProgress #playbackProgressBar {
+body header#playingStarHeader #playbackProgress #playbackProgressBar {
   width: 0%;
   height: 100%;
   background: rgba(227, 63, 84, 0.7);
 }
-body header#playingStarInfo #playbackProgress::after {
+body header#playingStarHeader #playbackProgress::after {
   display: block;
   width: 100%;
   height: 7px;
   background: rgba(76, 20, 200, 0.19);
   content: "";
 }
-body.playing header#playingStarInfo {
+body header#playingStarHeader #playingStarInfo {
+  position: absolute;
+}
+body.playing header#playingStarHeader {
   opacity: 1;
   height: auto;
 }
@@ -924,15 +927,21 @@ form#create label.rightsAgreement input.rights-confirmation {
   border-right: 650px solid transparent;
 }
 
+#sortingUI {
+  position: absolute;
+}
 #sortingUI nav {
   display: inline-block;
-  padding: 2px 10px;
+  padding: 6px 10px;
+  transition: padding 0.5s;
 }
 #sortingUI nav span.current-order,
 #sortingUI nav span.current-view {
   color: #b9c;
 }
 #sortingUI nav ul {
+  width: 150px;
+  z-index: 2;
   background: rgba(0, 0, 0, 0.82);
   position: absolute;
   display: none;
@@ -964,6 +973,10 @@ body.sorting #sortingUI header h2 {
 
 body.galaxy-view #sortingUI nav.view-nav {
   display: none;
+}
+body.playing #sortingUI {
+  position: static;
+  height: 40px;
 }
 body.sorting .star {
   width: 50px;
