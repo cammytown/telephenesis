@@ -91,12 +91,10 @@ function ClientNavigation() {
 			}
 
 			switch(page) {
-				case 'star': {
-					// If visited /star/[uri], run normal path logic:
-					observePath(location.pathname);
-				} break;
-
+				case 'star':
+				case 'create':
 				case 'recreate': {
+					// Run normal path logic, setting pageInit arg to true:
 					observePath(location.pathname, true);
 				} break;
 			}
@@ -139,7 +137,8 @@ function ClientNavigation() {
 		var isStarClick = cor.cc(event.target.parentNode, 'star'); ///REVISIT weird architecture?
 		if(isStarClick) {
 			var starEle = event.target.parentNode;
-			var starID = starEle.id.split('s')[1];
+			var starID = parseInt(starEle.id.split('s')[1]);
+			console.log(Stars.clientStars);
 			var clientStar = Stars.clientStars[starID];
 
 			//document.getElementById('download').href = '/f/'+starID+'.mp3';
@@ -159,8 +158,13 @@ function ClientNavigation() {
 				bookmarkLink.href = "/bookmark";
 			}
 
-			starContextMenu.style.left = clientStar.position.x + 12 + 'px';
-			starContextMenu.style.top = clientStar.position.y - 5 + 'px';
+			if(Interface.order == CONSTS.ORDER.GALAXY) {
+				starContextMenu.style.left = clientStar.position.x + 12 + 'px';
+				starContextMenu.style.top = clientStar.position.y - 5 + 'px';
+			} else {
+				starContextMenu.style.left = event.clientX + 'px';
+				starContextMenu.style.top = event.clientY + 'px';
+			}
 
 			//starContextMenu.children[1].href = starID+'/recreate';
 
@@ -171,6 +175,7 @@ function ClientNavigation() {
 
 			galaxyContextMenu.style.left = event.clientX + 'px';
 			galaxyContextMenu.style.top = event.clientY + 'px';
+
 			document.body.appendChild(galaxyContextMenu);
 		}
 	}
@@ -256,6 +261,10 @@ function ClientNavigation() {
 			if(boxPages.includes(newPage)) {
 				open(newPage);
 			}
+
+			if(createPages.includes(newPage)) {
+				Interface.sort(CONSTS.ORDER.GALAXY);
+			}
 		}
 
 		switch(newPage) {
@@ -297,7 +306,7 @@ function ClientNavigation() {
 			} break;
 
 			case 'logout': {
-				logout() .then(() => me.navigate('/'));
+				logout().then(() => me.navigate('/'));
 			} break;
 
 			case '': { ///REVISIT architecture; should newPage be false for this?
@@ -307,7 +316,7 @@ function ClientNavigation() {
 			} break;
 
 			default: {
-				if(boxPages.includes(page)) {
+				if(boxPages.includes(newPage)) {
 					// Assuming no logic.
 				} else {
 					console.error("Unhandled path: " + path);

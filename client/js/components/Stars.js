@@ -186,13 +186,14 @@ function ClientStarsAPI() {
 		// Rank stars according to order
 		switch(order) {
 			case CONSTS.ORDER.MOST_RECENT: {
-				// me.cachedSorts['most-recent'] = [];
-				me.cachedSorts[order] = me.clientStars.sort((a, b) => {
-					// If B is more recent than A, return true
-					return parseInt(b.element.getAttribute('data-timestamp'))
-						- parseInt(a.element.getAttribute('data-timestamp'));
-				}).map(star => star.element)
-				.filter(starEle => starEle); ///REVISIT is this readable? removes starEle if falsey
+				//me.cachedSorts[order] = [...me.clientStars] ///REVISIT not working
+				me.cachedSorts[order] = me.clientStars.slice()
+					.sort((a, b) => {
+						// If B is more recent than A, return true
+						return parseInt(b.element.getAttribute('data-timestamp'))
+							- parseInt(a.element.getAttribute('data-timestamp'));
+					}).map(star => star.element)
+					.filter(starEle => starEle); ///REVISIT is this readable? removes starEle if falsey
 
 				return me.cachedSorts[order];
 			} break;
@@ -415,7 +416,8 @@ function ClientStarsAPI() {
 			var progress;
 			if(line.isAnimating) {
 				// Slow down line drawing as it goes on:
-				var delay = ((line.tier) * 1000) - ((line.tier * 800));
+				var delay = ((line.tier - 1) * 1000) - ((line.tier - 1) * 915);
+				//var delay = (line.tier * 1000) / (line.tier + 1);
 
 				// var delay = (line.tier - 1) * 1000;
 

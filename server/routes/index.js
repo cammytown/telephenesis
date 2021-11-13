@@ -146,9 +146,9 @@ function TelepRouter() {
 		if(req.user) {
 			className += " in";
 
-			if(req.user.lv > 0) {
+			//if(req.user.lv > 0) {
 				className += " creator";
-			}
+			//}
 
 			if(req.user.lv == 7) {
 				className += " adminor";

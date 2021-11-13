@@ -30,6 +30,13 @@ function Creator() {
 	var workingStar;
 
 	/**
+	 * The originStar of the star the user is creating.
+	 * @type ClientStar
+	 **/
+	///REVISIT should we just keep this in workingStar.originStar?
+	var workingOriginStar;
+
+	/**
 	 * The creation step the user is on.
 	 * @type { false | "place" | "color" }
 	 **/
@@ -117,10 +124,15 @@ function Creator() {
 	 **/
 	this.initializeCreation = function(originStar = false) {
 		workingStar = new ClientStar();
+
 		workingStar.element.style.display = 'none';
 		workingStar.id = "placeholder"; ///REVISIT architecture
 		workingStar.originStarID = originStar ? originStar.id : -1;
 		workingStar.tier = originStar ? originStar.tier + 1 : 0;
+
+		if(originStar) {
+			workingOriginStar = originStar;
+		}
 	}
 
 	function onCreateSubmit(event) {
@@ -133,7 +145,7 @@ function Creator() {
 		workingStar.hostType = 'external'; ////
 		workingStar.title = formEle.getElementsByClassName('star-title')[0].value;
 		workingStar.fileURL = formEle.getElementsByClassName('file-url')[0].value;
-		workingStar.element.style.display = 'block';
+		workingStar.element.style.display = null; ///REVISIT best method?
 		//workingStar.title = cor._('#genesis-star-title').value;
 		//workingStar.fileURL = cor._('#genesis-file-url').value;
 
@@ -220,8 +232,8 @@ function Creator() {
 			Interface.displayMessage("Choose a spot for your star near the one you recreated!", 'notification', 0);
 
 			// Create valid placement zone around the area of the origin star:
-			var current_x = clientState.actingStar.position.x;
-			var current_y = clientState.actingStar.position.y;
+			var current_x = workingOriginStar.position.x;
+			var current_y = workingOriginStar.position.y;
 
 			validPlacementZone.style.left = current_x - 77 + 'px';
 			validPlacementZone.style.top = current_y - 73 + 'px';
@@ -303,8 +315,10 @@ function Creator() {
 
 			Anm.fadeOut(validPlacementZone);
 
+			///REVISIT at least document with comments if not refactor:
+
 			var colorShiftSelect = document.getElementById('colorShiftSelect');
-			var rgb = clientState.actingStar.element.getElementsByTagName('a')[0].style.backgroundColor.substr(4).split(',');
+			var rgb = workingOriginStar.linkElement.style.backgroundColor.substr(4).split(',');
 			var hsl = ColorTool.rgb(rgb[0], rgb[1], parseInt(rgb[2]));
 			colorShiftSelect.children[0].style.background = 'hsl('+(hsl[0]-17)+', 45%, 80%)';
 			colorShiftSelect.children[1].style.background = 'hsl('+(hsl[0]+17)+', 45%, 80%)';
@@ -372,7 +386,7 @@ function Creator() {
 		// document.body.className = null;
 		//spc.ctr(0, 0);
 
-		var originStarID = clientState.actingStar ? clientState.actingStar.id : -1;
+		var originStarID = workingOriginStar ? workingOriginStar.id : -1;
 		var file = document.getElementById('submission');
 		var upl = new Upl('/ajax/upload/'+originStarID, file, onUploadProgress, onUploadComplete);
 

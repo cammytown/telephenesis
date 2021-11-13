@@ -370,7 +370,7 @@ body #navigation a:first-child {
 body .menu {
   /* /// name? */
   position: absolute;
-  z-index: 3;
+  z-index: 4;
   margin: -5px 0 0 3px;
   background: rgba(0, 0, 0, 0.8);
 }
