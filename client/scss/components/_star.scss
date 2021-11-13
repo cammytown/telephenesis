@@ -28,8 +28,8 @@ $inactiveBorderWidth: 1px;
 	z-index: 1;
 	transform: translate(-50%, -50%); ///COMPAT ensure browser support and consistency
 
-	width: 20px;
-	height: 20px;
+	//width: 20px;
+	//height: 20px;
 	padding: 1px 0 0;
 
 	transition: background 350ms;
@@ -79,6 +79,12 @@ $inactiveBorderWidth: 1px;
 			// border: 2px yellow solid;
 			@include starProps($starSize, $activeBorderWidth - 10);
 			border-color: #a73292;
+		}
+	}
+
+	&.origin {
+		> a {
+			@include starProps($starSize + 5, $inactiveBorderWidth + 3)
 		}
 	}
 
@@ -192,8 +198,8 @@ $inactiveBorderWidth: 1px;
 				display: none;
 			}
 
-			&.name {
-			}
+			//&.name {
+			//}
 		}
 
 		.creationTime {

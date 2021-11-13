@@ -5,18 +5,20 @@
 
 	#map
 		each starData, i in stars
+			- var className = (user && user.bookmarks.indexOf(starData.id) != -1) ? ' bookmarked' : ''
+			- className += starData.tier == 0 ? ' origin' : ''
 			+star(starData)(
-				id = "s" + starData.id
+				id = 's' + starData.id
 				data-prev = starData.originStarID
 				data-originStarID = starData.originStarID
 				data-tier = starData.tier
 				data-title = starData.title
 				data-x = starData.position.x
 				data-y = starData.position.y
-				data-creatorName = starData.creator ? starData.creator.creatorName : ""
-				data-creatorLink = starData.creator ? starData.creator.creatorLink : ""
+				data-creatorName = starData.creator ? starData.creator.creatorName : ''
+				data-creatorLink = starData.creator ? starData.creator.creatorLink : ''
 				data-constellation = starData.constellationID
 				data-timestamp = starData.timestamp
-				class = (user && user.bookmarks.indexOf(starData.id) != -1) ? "bookmarked" : ""
-				style = "left: " + starData.position.x + "px; top: " + starData.position.y + "px"
+				class = className
+				style = 'left: ' + starData.position.x + 'px; top: ' + starData.position.y + 'px'
 			)

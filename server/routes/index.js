@@ -142,16 +142,16 @@ function TelepRouter() {
 		];
 
 
-		var className = "";
+		var className = '';
 		if(req.user) {
-			className += " in";
+			className += ' in';
 
 			//if(req.user.lv > 0) {
-				className += " creator";
+				className += ' creator';
 			//}
 
 			if(req.user.lv == 7) {
-				className += " adminor";
+				className += ' adminor';
 			}
 		}
 

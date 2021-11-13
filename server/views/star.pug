@@ -1,9 +1,9 @@
 mixin star(starData = {})
 	.star&attributes(attributes)
 		a(
-			href="/star/" + starData.id
+			href='/star/' + starData.id
 			data-mediaURL=starData.fileURL
-			style="background-color: rgb(" + starData.color + ')'
+			style='background-color: rgb(' + starData.color + ')'
 		)
 
 		//- div.gridBackground

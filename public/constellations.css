@@ -473,8 +473,6 @@ body #menu .user a, body #menu .guest a {
   position: absolute;
   z-index: 1;
   transform: translate(-50%, -50%);
-  width: 20px;
-  height: 20px;
   padding: 1px 0 0;
   transition: background 350ms;
   /*.inverse & { color: #222; }*/
@@ -510,6 +508,14 @@ body #menu .user a, body #menu .guest a {
   border-width: 4px;
   border-radius: 11px;
   border-color: #a73292;
+}
+.star.origin > a {
+  left: -13.5px;
+  top: -13.5px;
+  width: 19px;
+  height: 19px;
+  border-width: 4px;
+  border-radius: 13.5px;
 }
 .star.active {
   z-index: 3;
