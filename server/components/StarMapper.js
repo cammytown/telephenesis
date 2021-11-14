@@ -2,8 +2,9 @@
 
 const Lame = require('node-lame').Lame;
 const fs = require('fs');
-const Star = require('../../abstract/Star.js');
-const Vector = require('../../abstract/Vector.js');
+const Star = require('../../abstract/Star');
+const Vector = require('../../abstract/Vector');
+const config = require('../../abstract/telep.config')
 const ServerStar = require('./ServerStar');
 
 /**
@@ -28,8 +29,6 @@ function StarMapper() {
 	/** Current number of constellations. **/
 	var constellationCount;
 
-	var config;
-
 	var MLMeta; ///REVISIT probably removing in favor of a Persistor class
 
 	//var musicPath = __dirname + "/../public/music/";
@@ -48,7 +47,6 @@ function StarMapper() {
 
 		starCount = server.persistorDoc.starCount;
 		constellationCount = server.persistorDoc.constellationCount;
-		config = server.config;
 	}
 
 	/**
@@ -83,7 +81,8 @@ function StarMapper() {
 		var generalFilter = { deleted: { $ne: true } };
 		filter = Object.assign(generalFilter, filter);
 
-		return dbStars.find(filter)
+		return dbStars
+			.find(filter)
 			.sort({ longPlays: -1 })
 			// .then(mongoCursor => mongoCursor.toArray)
 			// .then(results => {
@@ -259,7 +258,7 @@ function StarMapper() {
 						});
 				}
 			})
-			.then(success => dbStars.insertOne(serverStar))
+			.then(success => dbStars.insertOne(serverStar.export()))
 			.then(result => {
 				///TODO my understanding is that result having the document is to be deprecated; must use insertId
 				returnObject.newStar = result.ops[0];
@@ -438,21 +437,16 @@ function StarMapper() {
 		return me.getStars(false, {})
 			.then(stars => {
 				stars.forEach(star => {
-					///TODO This will remove old properties. We need to be very careful doing that.
-					// Maybe make it not do that and have a separate method for examining old
-					// properties.
+					///TODO warn about unused properties and implement a param
+					//that if set true will remove them:
 
 					// Load data into a ServerStar to initialize data structure:
 					var serverStar = new ServerStar(star);
 					dbStars.updateOne(
 						{ id: star.id },
 						// Simply set all properties of the star to the newly crafted ServerStar's:
-						{ $set: serverStar },
+						{ $set: serverStar.export() },
 					);
-
-					//if(star.hasOwnProperty(identityProp) == false) {
-						//starUpdates
-					//}
 				});
 			});
 		}
@@ -474,7 +468,13 @@ function StarMapper() {
 			starIDs: [originStarID],
 		};
 
-		return dbConstellations.insertOne(newConstellation);
+		return dbConstellations.insertOne(newConstellation)
+			.then(result => {
+				return newConstellationID;
+			})
+			.catch(err => {
+				throw err;
+			});
 	}
 }
 

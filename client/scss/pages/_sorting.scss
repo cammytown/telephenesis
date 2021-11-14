@@ -70,7 +70,9 @@
 
 
 body {
-	&.galaxy-view {
+	&.galaxy-view,
+	&.constellations-view, ////TODO temporary until views are part of nav menu
+	{
 		#sortingUI {
 			nav.view-nav {
 				display: none;

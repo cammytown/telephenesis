@@ -11,7 +11,7 @@ function MediaPlayer() {
 	me.audio;
 
 	var lastSyncTime;
-	var config = {
+	var playerConfig = {
 		syncInterval: 30 * 1000,
 		partialPlaySeconds: 5,
 		longPlayPercent: 50,
@@ -34,7 +34,7 @@ function MediaPlayer() {
 		// pendingServerUpdates.push({ type: 'longPlay', starID: 42 });
 		// serverSync();
 
-		setInterval(serverSync, config.syncInterval); ////TODO probably don't use or use something in addition to setInterval
+		setInterval(serverSync, playerConfig.syncInterval); ////TODO probably don't use or use something in addition to setInterval
 	}
 
 	this.playStar = function(clientStar) {
@@ -101,7 +101,7 @@ function MediaPlayer() {
 		if(!activeMediaState.flags.longPlay) {
 			if(!activeMediaState.flags.partialPlay) {
 				// If played long enough to flag partial play:
-				if(activeMediaState.totalMediaPlaySeconds >= config.partialPlaySeconds) {
+				if(activeMediaState.totalMediaPlaySeconds >= playerConfig.partialPlaySeconds) {
 					activeMediaState.flags.partialPlay = true;
 					pendingServerUpdates.push({ type: 'partialPlay', starID: clientState.playingStar.id });
 				}
@@ -109,7 +109,7 @@ function MediaPlayer() {
 
 			// If played long enough to flag long play:
 			var totalPlayTimeFloat = activeMediaState.totalMediaPlaySeconds / me.audio.element.duration;
-			if(totalPlayTimeFloat >= config.longPlayPercent / 100) {
+			if(totalPlayTimeFloat >= playerConfig.longPlayPercent / 100) {
 				activeMediaState.flags.longPlay = true;
 				pendingServerUpdates.push({ type: 'longPlay', starID: clientState.playingStar.id });
 			}

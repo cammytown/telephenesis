@@ -38,7 +38,7 @@ function TelepRouter() {
 		});
 
 		// Get user if logged in.
-		me.app.use(observeSessionCode);
+		me.app.use(authRouter.observeSessionCookie);
 
 		///REVISIT because ajaxRouter references authRouter, auth.generate()
 		//must be called first so that api is available. The
@@ -56,42 +56,6 @@ function TelepRouter() {
 		//me.app.get('/star/:starID', main);
 		//me.app.get('/recreate/:starID', main);
 	}
-
-	/**
-	 * Attempt to log user in using a session code, if they have one.
-	 * @param {express.Request} req
-	 * @param {express.Response} res
-	 * @param {express.NextFunction} next
-	 **/
-	function observeSessionCode(req, res, next) {
-		return me.usr.in(req.cookies.usr_ss)
-			.then(user => {
-				req.user = user;
-
-				if(user) {
-					// Successfully logged in using session code.
-
-					api.getUserMeta(req.user.id)
-						.then(usrMeta => {
-							Object.assign(req.user, usrMeta);
-							//req.user = usrMeta;
-							next();
-							return user;
-						})
-						.catch(err => {
-							if(err) {
-								throw err;
-							}
-						});
-				} else {
-					// req.user = {}; ///
-					next();
-					return false;
-				}
-			})
-			.catch(err => next(err));
-	}
-
 
 	function uploadMedia(req, res) { /// could maybe just use .post('/create/:starid')
 	// me.app.post('/ajax/upload/:starid', api.auth('creator'), upload.single('submission'), function(i, o) { /// could maybe just use .post('/create/:starid')

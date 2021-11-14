@@ -82,7 +82,7 @@ function syncWithClient(req, res) {
 }
 
 function bookmarkStar(req, res) {
-	// if(!req.user || (req.user.id != star.creatorId && req.user.lv != 
+	// if(!req.user || (req.user.id != star.creatorId && req.user.lv !=
 	if(!req.user) {
 		res.json({ error: "not logged in" });
 		return false;
@@ -234,7 +234,14 @@ function userCheck(req, res) {
 		throw ["Not logged in."];
 	}
 
-	res.json({ errors: [] });
+	res.json({
+		errors: [],
+		///TODO probably generalize front-end props; maybe a ClientUser class
+		lv: req.user.lv,
+		bookmarks: req.user.bookmarks,
+		creationTickets: req.user.creationTickets,
+		recreationTickets: req.user.recreationTickets,
+	});
 	return true;
 }
 

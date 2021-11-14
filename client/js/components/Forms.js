@@ -2,8 +2,8 @@ import cor from '../libs/minlab/cor';
 import Pijin from '../libs/pijin-js';
 // import HistoryTime from '../libs/history-time';
 import navigation from './Navigation';
-
 import clientState from './ClientState';
+import config from '../../../abstract/telep.config.js';
 
 export default new ClientForms();
 
@@ -44,7 +44,7 @@ function ClientForms() {
 
 		var form = event.target;
 		// var children = form.children;
-		var op = form.id; ///REVISIT bad architecture
+		var op = form.id.split('-page')[0]; ///REVISIT bad architecture
 
 		if(result.errors.length) {
 			// console.error(result.errors);
@@ -79,14 +79,24 @@ function ClientForms() {
 			// 	window.reload();
 			// }
 
-			if(op == 'register' || op == 'login') {
-				cor.ac(document.body, 'in');
-				navigation.navigate('/'); ///
-			}
+			switch(op) {
+				case 'register':
+				case 'login':
+				{
+					cor.ac(document.body, 'in');
 
-			if(op == 'login' && result.lv) {
-				cor.ac(document.body, 'creator');
-				navigation.navigate('/'); ///
+					console.log(config);
+					console.log(result);
+					if(op == 'login' && result.lv >= config.creatorLevel) {
+						cor.ac(document.body, 'creator');
+					}
+
+					navigation.navigate('/'); ///
+				} break;
+
+				default: {
+					console.error("onAjaxResponse(): unhandled op '" + op + '"');
+				}
 			}
 		}
 	}

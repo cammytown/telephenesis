@@ -14,6 +14,17 @@ form#register-page.uibox.ajax(action="/register" method="POST" data-ajax-action=
 	label.floatBeside(for="email") Email
 	input(name="email" value=user.em type="text" placeholder="email")
 
+
+	label.floatBeside(for="password") Password
+	input(type="password" name="password" placeholder="password")
+
+	label.floatBeside(for="password-confirm") Confirm Password
+	input(type="password" name="password-confirm" placeholder="password again")
+
+	label
+		input(type='checkbox' name='artist-account')
+		| I would like to contribute art.
+
 	label.floatBeside(for="creatorName") Creator Name (optional)
 	input(
 		name="creatorName"
@@ -22,11 +33,16 @@ form#register-page.uibox.ajax(action="/register" method="POST" data-ajax-action=
 		value= user.usrMeta ? user.usrMeta.creatorName : ''
 	)
 
-	label.floatBeside(for="password") Password
-	input(type="password" name="password" placeholder="password")
+	//-fieldset
+	//-    legend Account Type
 
-	label.floatBeside(for="password-confirm") Confirm Password
-	input(type="password" name="password-confirm" placeholder="password again")
+	//-    div
+	//-        input(type='radio' name='account-type' value='listener' id='listener-account-option')
+	//-        label(for='listener-account-option') Listener Account
+
+	//-    div
+	//-        input(type='radio' name='account-type' value='artist' id='artist-account-option')
+	//-        label(for='artist') Artist Account
 
 	button.btn.main(type="submit") Register
 

@@ -56,7 +56,9 @@ function ClientStarsAPI() {
 				continue;
 			}
 
+			// Load HTML element into a ClientStar:
 			var clientStar = new ClientStar(starElement);
+
 			me.clientStars[clientStar.id] = clientStar;
 		}
 
@@ -178,6 +180,7 @@ function ClientStarsAPI() {
 	 * @param {CONSTANTS.ORDER} order
 	 **/
 	this.getSortedStars = function(order) {
+		///TODO enable cache:
 		// if(me.cachedSorts[order] != null) {
 		// 	////CHECK if there have been changes to the loaded stars, we cannot use cache
 		// 	return true;
@@ -187,13 +190,43 @@ function ClientStarsAPI() {
 		switch(order) {
 			case CONSTS.ORDER.MOST_RECENT: {
 				//me.cachedSorts[order] = [...me.clientStars] ///REVISIT not working
+
+				// Make a copy of the array:
 				me.cachedSorts[order] = me.clientStars.slice()
+					// Sort by newest:
 					.sort((a, b) => {
 						// If B is more recent than A, return true
 						return parseInt(b.element.getAttribute('data-timestamp'))
 							- parseInt(a.element.getAttribute('data-timestamp'));
 					}).map(star => star.element)
-					.filter(starEle => starEle); ///REVISIT is this readable? removes starEle if falsey
+					// Remove null/false elements:
+					.filter(starEle => starEle); ///REVISIT is this readable?
+
+				return me.cachedSorts[order];
+			} break;
+
+			case CONSTS.ORDER.CONSTELLATIONS: {
+				var constellations = {};
+
+				me.clientStars.forEach(star => {
+					if(!constellations[star.constellationID]) {
+						constellations[star.constellationID] = [];
+					}
+
+					constellations[star.constellationID].push(star);
+				});
+
+				Object.keys(constellations).forEach(constellationID => {
+					///REVISIT if we return from server and order elements in
+					//sequence of ID, this should be unnecessary:
+					constellations[constellationID].sort((a, b) => {
+						return a.timestamp - b.timestamp;
+					});
+				});
+
+				///REVISIT should we be concerned that this order returns a
+				//different data structure than others?:
+				me.cachedSorts[order] = constellations;
 
 				return me.cachedSorts[order];
 			} break;
@@ -241,19 +274,44 @@ function ClientStarsAPI() {
 						targets: clientStar.element,
 						left: clientStar.element.getAttribute('data-x') + 'px',
 						top: clientStar.element.getAttribute('data-y') + 'px',
-						duration: 500,
+						duration: 500, ///TODO move 500 into maybe styleVars or at least a const
 						//complete: function() {}
 					});
 
 					// Set the dimensions of the canvas to that of the window:
 					effects.canvas.width = document.body.offsetWidth;
 					effects.canvas.height = document.body.offsetHeight;
-
-					setTimeout(function() {
-						me.generateConstellationLines();
-						//effects.onResize();
-					}, 650);
 				});
+			} break;
+
+			case CONSTS.VIEW.CONSTELLATIONS: {
+				spc.s = false;
+				var sortedElements = this.getSortedStars(order);
+				console.log(sortedElements);
+
+				cor.ac(document.body, 'sorting');
+
+				var currentRow = 0;
+				for(var constellationID in sortedElements) {
+					var constellationStars = sortedElements[constellationID];
+					for(var starIndex = 0; starIndex < constellationStars.length; starIndex++) {
+						var constellationStar = constellationStars[starIndex];
+
+						var newX = starIndex * styleVars.starGridSquareSize;
+						var newY = currentRow * styleVars.starGridSquareSize;
+
+						anime({
+							targets: constellationStar.element,
+							left: newX + xOffset + styleVars.starGridPaddingX + 'px',
+							top: newY + yOffset + styleVars.starGridPaddingY + 'px',
+							duration: 500,
+						});
+
+						//constellationStar
+					}
+
+					currentRow += 1;
+				}
 			} break;
 
 			case CONSTS.VIEW.GRID:
@@ -279,9 +337,13 @@ function ClientStarsAPI() {
 					// Calculate target position of the star
 					var newX;
 					var newY;
+
+					// If grid view:
 					if(view == CONSTS.VIEW.GRID) {
 						newX = styleVars.starGridSquareSize * (starEleIndex % columnCount);
 						newY = styleVars.starGridSquareSize * currentRow;
+
+					// If list view:
 					} else if(view == CONSTS.VIEW.LIST) {
 						newX = 0;
 						newY = (styleVars.starGridSquareSize + styleVars.starGridMargin) * starEleIndex;
@@ -296,12 +358,6 @@ function ClientStarsAPI() {
 						duration: 500,
 					});
 
-					// Redraw constellation lines:
-					///REVISIT are we good to just use time of animation + 150ms here?:
-					setTimeout(function() {
-						me.generateConstellationLines();
-						effects.onResize();
-					}, 650);
 
 					if(view == CONSTS.VIEW.GRID) {
 						// Wrap grid if row filled
@@ -310,6 +366,13 @@ function ClientStarsAPI() {
 						}
 					}
 				}
+
+				// Redraw constellation lines:
+				///REVISIT are we good to just use time of animation + 150ms here?:
+				setTimeout(function() {
+					me.generateConstellationLines();
+					effects.onResize();
+				}, 650);
 			} break;
 
 			// case 'constellationRows': {

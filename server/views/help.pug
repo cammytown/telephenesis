@@ -1,27 +1,61 @@
-#about-page.uibox
+#help-page.uibox
 	p.
-		Telephenesis began as a two-person game in which two musicians would take turns adding a single element to a musical composition.
+		Telephenesis is a visualization of the metamorphosis of a musical
+		idea as it is reinterpreted and recreated by different artists.
 
-	p.
-		Chris had a dream [insert chris dream].
+	p It's like the game 'Telephone', but with music.
 
-	p.
-		The game went through many iterations. Initially, stars were islands and constellations were planets. In retrospect, constellations and stars seem like the obvious answer.
+
+	.control
+		.mouse.left
+			span
+			span
+			span
+
+		div Play / Pause
+		div(style="color: #bbb") Drag Galaxy
+
+	.control
+		.mouse.right
+			span
+			span
+			span
+
+		div Menu
+		div(style="color: #aea;") Create
+
+	.control
+		span.key &larr;
+		span Previous
+
+	.control
+		span.key &rarr;
+		span Next
+
+	.control.space
+		span.key spacebar
+		span Pause / Play
+
+	//- p.
+	//- 	The ability to contribute to Telephenesis is by invite only. Feel
+	//- 	free to send us a link to your music.
+
+	//-///TODO rename .credits:
+	div.credits
+		h3 contact
+		div
+			a(href="mailto:contact@telephenesis.com") contact@telephenesis.com
 
 	div.credits
 		h3 credits
-		a(href="http://nopiano.com") Chris Marianetti
-			span
-				|
-				| - concept, design
 
-		br
+		div Dreamed by Chris
+		div Conceptualized by Chris and Cameron
+		div Programmed by Cameron
 
-		a(href="https://steelecameron.com") Cameron Steele
-			span
-				|
-				| - programming, design
+		div
+			a(href="http://nopiano.com") Chris Marianetti
+		div
+			a(href="https://steelecameron.com") Cameron Steele
 
-		br
-
-		span Source Code on Github
+		//-span Source Code on Github

@@ -10,12 +10,13 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 
 	/** Properties relevant to import/export. **/
 	var identityProps = [
-		"userID",
-		"email",
-		"creatorName",
-		"creationTickets",
-		"recreationTickets",
-		"bookmarks",
+		'userID',
+		'email',
+		'sessionCode',
+		'creatorName',
+		'creationTickets',
+		'recreationTickets',
+		'bookmarks',
 	];
 
 	init(usrDoc, userMeta);
@@ -24,8 +25,9 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 		var userObject = {};
 
 		if(usrDoc) {
-			userObject["userID"] = usrDoc.id;
-			userObject["email"] = usrDoc.em;
+			userObject['userID'] = usrDoc.id;
+			userObject['email'] = usrDoc.em;
+			userObject['sessionCode'] = usrDoc.ss;
 		}
 
 		if(userMeta) {

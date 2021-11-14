@@ -24,5 +24,9 @@ Listeners can browse through a growing constellation of the progression of music
 - SASS
 
 ## Credits
+Dreamed by Chris
+Conceptualized by Chris and Cameron
+Programmed by Cameron
+
 - **Chris Marianetti** - [nopiano.com](http://nopiano.com) - design, concept
 - **Cameron Steele** - [steelecameron.com](https://steelecameron.com) - programming, design
