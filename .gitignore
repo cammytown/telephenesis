@@ -6,7 +6,8 @@ node_modules/
 *.css.map
 *.log
 
-telepServer.config.js
+server/telepServer.config.js
+abstract/telep.config.js
 uploads/*
 public/music/*
 !public/music/README
