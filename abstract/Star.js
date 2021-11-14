@@ -4,7 +4,6 @@
  * This class is used by both server and client to
  * work with stars; largely as a centralized
  * data structure.
- * 
  * @constructor
  */
 function Star() {

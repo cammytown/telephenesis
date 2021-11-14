@@ -971,7 +971,7 @@ body.sorting #sortingUI header h2 {
   display: block;
 }
 
-body.galaxy-view #sortingUI nav.view-nav {
+body.galaxy-view #sortingUI nav.view-nav, body.constellations-view #sortingUI nav.view-nav {
   display: none;
 }
 body.playing #sortingUI {

@@ -22,7 +22,8 @@ const CONSTANTS = {
 		MOST_RECENT: "MOST_RECENT",
 		MOST_POPULAR: "MOST_POPULAR",
 		BOOKMARKS: "BOOKMARKS",
-		GALAXY: "GALAXY" ///REVISIT do we want this in both order and view or should we choose one?
+		CONSTELLATIONS: "CONSTELLATIONS", ///REVISIT architecture; also both order and view?
+		GALAXY: "GALAXY", ///REVISIT do we want this in both order and view or should we choose one?
 	},
 
 	/**
@@ -33,6 +34,7 @@ const CONSTANTS = {
 	VIEW: {
 		LIST: "LIST",
 		GRID: "GRID",
+		CONSTELLATIONS: "CONSTELLATIONS", ///REVISIT architecture
 		GALAXY: "GALAXY",
 	},
 

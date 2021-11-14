@@ -389,14 +389,18 @@ function ClientNavigation() {
 		})
 			.then(response => response.json())
 			.then(result => {
-				if(result.errors) {
+				if(result.errors.length) {
 					console.error(result.errors); ///
 				} else {
-					var login = document.getElementById('login');
-					login.children[1].value = "";
+					var loginPageEle = document.getElementById('login-page');
+					loginPageEle.children[1].value = "";
 					cor.rc(document.body, 'in');
 					cor.rc(document.body, 'creator');
 				}
+			})
+			.catch(err => {
+				///REVISIT client error handling
+				console.error(err);
 			});
 	}
 }

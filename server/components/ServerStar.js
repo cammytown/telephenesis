@@ -14,6 +14,9 @@ function ServerStar(starData) {
 	function init(starData) {
 		Star.call(me);
 
+		// Add serverProps to identityProps:
+		me.identityProps = me.identityProps.concat(me.serverProps);
+
 		me.loadData(starData);
 	}
 
@@ -51,6 +54,16 @@ function ServerStar(starData) {
 
 		// data = filteredData;
 		// }
+	}
+
+	this.export = function() {
+		var exportObject = {};
+
+		for(var identityProp of me.identityProps) {
+			exportObject[identityProp] = me[identityProp];
+		}
+
+		return exportObject;
 	}
 
 	init(starData);

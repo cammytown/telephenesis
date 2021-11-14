@@ -1,4 +1,4 @@
 module.exports = {
 	sessionSecret: '[change me]',
-	port: '8777'
+	port: '8777',
 }

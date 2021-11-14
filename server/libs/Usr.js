@@ -58,16 +58,16 @@ module.exports = function Usr(db, vl, bcrypt) {
 				.then(doc => {
 					if(callback) callback(false, doc);
 
-					if(!doc) {
-						throw "No user with sessionString.";
-					}
+					//if(!doc) {
+					//    throw "No user with sessionString.";
+					//}
 
 					return doc;
 				})
 				.catch(error => {
 					// console.log(err);
 					// return false;
-					throw [error];
+					throw error;
 				});
 		}
 	}

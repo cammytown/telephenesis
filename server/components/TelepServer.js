@@ -12,7 +12,7 @@ const Usr = require('../libs/Usr.js'); ///REVISIT Usr or usr? changes between fi
 const TelepAPI = require('./TelepAPI.js');
 const StarMapper = require('./StarMapper');
 const TelepRouter = require('../routes'); ///REVISIT have a TelepRouter in components/ ?
-// const config = require('./telepServer.config.js');
+const serverConfig = require('../telepServer.config.js');
 
 /**
  * Central component of the server which initializes the database connection, API, and networking.
@@ -22,7 +22,6 @@ function TelepServer() {
 	var me = this;
 
 	///REVISIT architecture:
-	this.config;
 	this.app;
 	this.db;
 	this.usr;
@@ -31,9 +30,6 @@ function TelepServer() {
 	var components = [];
 
 	this.initialize = function() {
-		///REVISIT why not just require/import it wherever we need it? this might be semantically better?:
-		me.config = require('../telepServer.config.js');
-
 		console.log("initializing telephenesis...");
 
 		initializeDatabase()
@@ -98,7 +94,7 @@ function TelepServer() {
 
 		app.use(bodyParser.json({ limit: "2400mb" }));
 		app.use(bodyParser.urlencoded({ limit: "2400mb", extended: true }));
-		app.use(cookieParser(me.config.sessionSecret));
+		app.use(cookieParser(serverConfig.sessionSecret));
 
 		me.app = app;
 
@@ -116,7 +112,7 @@ function TelepServer() {
 		me.app.use(session({
 			///TODO document these options:
 
-			secret: me.config.sessionSecret, ////
+			secret: serverConfig.sessionSecret, ////
 			resave: false,
 			saveUninitialized: false, ///
 			store: new MongoStore({
@@ -159,8 +155,8 @@ function TelepServer() {
 		}
 
 		me.app.listen(
-			me.config.port,
-			() => console.log('telephenesis: listening on port ' + me.config.port)
+			serverConfig.port,
+			() => console.log('telephenesis: listening on port ' + serverConfig.port)
 		);
 	}
 }

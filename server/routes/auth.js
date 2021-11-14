@@ -16,23 +16,17 @@ function generate(telepServer) {
 }
 
 function login(req, res, next) {
-	return usr.li(req.body.email, req.body.password, req.ip)
-		.then(userDoc => {
-			res.cookie('usr_ss', userDoc.ss, {
+	return api.login(req.body.email, req.body.password, req.ip)
+		.then(telepUser => {
+			// Send cookie to client for saving:
+			res.cookie('session_code', telepUser.sessionCode, {
 				// secure: true /// https only
 			});
 
-			return usr.in(userDoc.ss);
+			req.user = telepUser;
+			next();
 		})
-		.then(user => {
-			///REVISIT is user ever false? it would throw exception in that
-			//case, right?
-			if(user) {
-				req.user = user;
-			} else {
-			}
-		})
-		.then(next)
+		//.then(observeSessionCode)
 		.catch(errors => {
 			// res.render('login', { p: req.body, errors: err });
 			console.error(errors);
@@ -54,7 +48,11 @@ function register(req, res, next) {
 		req.body.creatorName,
 		req.ip
 	)
-		.then(() => next())
+		//.then(observeSessionCode)
+		.then(newUser => {
+			req.user = newUser;
+			next();
+		})
 		.catch(err => next(err));
 		// .catch(err => {
 		// 	// res.json({ error: err });
@@ -63,13 +61,62 @@ function register(req, res, next) {
 }
 
 function logout(req, res, next) {
-	res.clearCookie('usr_ss', {});
+	res.clearCookie('session_code', {});
 
 	///TODO confine json responses to ./ajax.js i think
-	res.json({ errors: false });
+	res.json({ errors: []});
 
-	next();
+	//next();
 }
+
+/**
+ * Retrieve a user using their session code.
+ * @param {string} sessionCode
+ **/
+function getUserSession(sessionCode) {
+	return usr.in(sessionCode)
+		.then(user => {
+			// If successfully logged in using session code:
+			if(user) {
+				// Get user meta information:
+				return api.getUserMeta(user.id)
+					.then(usrMeta => {
+						// Attach meta info to user object:
+						Object.assign(user, usrMeta);
+						//next();
+						return user;
+					})
+					.catch(err => {
+						if(err) {
+							throw err;
+						}
+					});
+			} else {
+				//throw "No user with that session code.";
+				// req.user = {}; ///
+				//next();
+				return false;
+			}
+		});
+}
+
+/**
+ * Attempt to log user in using a session code, if they have one.
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
+ **/
+function observeSessionCookie(req, res, next) {
+	return getUserSession(req.cookies.session_code)
+		.then(user => {
+			// User is either TelepUser or false:
+			req.user = user;
+
+			next();
+		})
+		.catch(err => next(err));
+}
+
 
 
 ///TODO improve architecture:
@@ -79,5 +126,6 @@ module.exports = {
 	login,
 	register,
 	logout,
+	observeSessionCookie,
 }
 

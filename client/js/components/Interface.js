@@ -267,16 +267,18 @@ function Interface() {
 			// Add the new order's class to document.body:
 			cor.ac(document.body, order.toLowerCase() + '-order'); ////
 
-			// If the order is GALAXY, so is the view:
-			if(order == CONSTS.ORDER.GALAXY) {
-				view = CONSTS.VIEW.GALAXY; ///REVISIT this solution; not sure it's best architecture
+			// If the order is GALAXY or CONSTELLATIONS, so is the view:
+			if(order == CONSTS.ORDER.GALAXY || order == CONSTS.ORDER.CONSTELLATIONS) {
+				////REVISIT this solution; not sure it's best architecture; for
+				//one, we're not referencing CONSTS.VIEW but CONSTS.ORDER:
+				view = order;
 
 			// If view is not GALAXY:
 			} else {
 				// If no view was provided to sort():
 				if(!view) {
 					// If we're already in a non-galaxy view (i.e. list/grid):
-					if(me.view != CONSTS.VIEW.GALAXY) {
+					if(me.view != CONSTS.VIEW.GALAXY && me.view != CONSTS.VIEW.CONSTELLATIONS) { ///TODO remove constellations
 						// Do nothing; keep current view.
 
 					// If we're in galaxy view, default to 'list' so that new order can be shown:
@@ -287,7 +289,7 @@ function Interface() {
 				}
 			}
 
-
+			// Convert to upper in case of user input:
 			me.order = order.toUpperCase();
 		}
 
@@ -301,7 +303,7 @@ function Interface() {
 			// Add the new view's class to document.body:
 			cor.ac(document.body, view.toLowerCase() + '-view'); ////
 
-
+			// Convert to upper in case of user input:
 			me.view = view.toUpperCase();
 		}
 

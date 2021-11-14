@@ -6,6 +6,7 @@ const ServerStar = require('./ServerStar.js');
 const Stars = require('./StarMapper.js');
 
 const CONSTS = require('../../abstract/constants.js');
+//const config = require('../../abstract/telep.config.js');
 
 /**
  * Base Telephenesis methods.
@@ -19,9 +20,6 @@ function TelepAPI(server) {
 
 	/** Connection to the database. **/
 	var db;
-
-	/** The loaded Telephenesis config file. **/
-	var config;
 
 	/** MongoCollection of stars. **/
 	var stars;
@@ -40,7 +38,6 @@ function TelepAPI(server) {
 		api = server.api;
 		usr = server.usr;
 		db = server.db;
-		config = server.config;
 		// me.grr = false;
 
 		stars = db.collection('MLstars');
@@ -96,6 +93,18 @@ function TelepAPI(server) {
 			// return doc;
 	}
 
+	me.login = function(email, password, ip) {
+		return usr.li(email, password, ip)
+			.then(usrDoc => {
+				var userMeta = me.getUserMeta(usrDoc.id);
+				var user = new TelepUser(usrDoc, userMeta);
+				return user;
+			})
+			.catch(err => {
+				throw err;
+			});
+	}
+
 	me.register = function(email, password, creatorName, ip) {
 		return usr.rg(email, password, ip)
 			.then(usrDoc => {
@@ -110,7 +119,7 @@ function TelepAPI(server) {
 
 				return usrMeta.insertOne(newUser.export())
 					.then(result => {
-						return true;
+						return newUser;
 					})
 					.catch(err => {
 						throw err;
