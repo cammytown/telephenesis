@@ -19,12 +19,15 @@
     "validator": "^13.6.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.16.0",
     "@babel/core": "^7.16.0",
+    "@babel/plugin-transform-react-jsx": "^7.16.0",
     "@babel/preset-env": "^7.16.0",
     "babel-loader": "^8.2.3",
     "css-loader": "^5.2.7",
     "mini-css-extract-plugin": "^1.6.2",
     "nodemon": "^2.0.14",
+    "react": "^17.0.2",
     "sass": "^1.43.4",
     "sass-loader": "^11.1.1",
     "style-loader": "^2.0.0",
