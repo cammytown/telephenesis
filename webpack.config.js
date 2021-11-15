@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = [{
@@ -12,9 +13,15 @@ module.exports = [{
 	module: {
 		rules: [
 			{ 
-				test: /\.js$/,
+				test: /\.jsx?$/,
 				exclude: /node_modules/,
-				loader: "babel-loader"
+				loader: "babel-loader",
+				options: {
+					///REVISIT don't know why we need this and future versions
+					//of babel probably don't:
+					//...JSON.parse(fs.readFileSync(path.resolve(__dirname, '../.babelrc'))),
+					//babelrc: true,
+				}
 			},
 			{
 				test: /\.scss$/i,
