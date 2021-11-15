@@ -4,62 +4,83 @@
  * @constructor
  */
 function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta architecture
-	var me = this;
+	const me = this;
 
 	/* PROPERTIES: */
 
 	/** Properties relevant to import/export. **/
-	var identityProps = [
-		'userID',
-		'email',
-		'sessionCode',
-		'creatorName',
-		'creationTickets',
-		'recreationTickets',
-		'bookmarks',
-	];
+	//const identityProps = [
+	//];
 
-	init(usrDoc, userMeta);
+	const exportLists = {
+		identity: [
+			'id',
+			'email',
+			'sessionCode',
+			'displayName',
+			'creatorName',
+			'creationTickets',
+			'recreationTickets',
+			'bookmarks',
+		],
 
-	function init(usrDoc = false, userMeta = false) {
-		var userObject = {};
+		commentCache: [
+			'id',
+			'displayName',
+		]
+	};
+
+	function init(usrDoc = null, userMeta = null) {
+		var proposedValues = {};
 
 		if(usrDoc) {
-			userObject['userID'] = usrDoc.id;
-			userObject['email'] = usrDoc.em;
-			userObject['sessionCode'] = usrDoc.ss;
+			proposedValues['id'] = usrDoc.id;
+			proposedValues['email'] = usrDoc.em;
+			proposedValues['sessionCode'] = usrDoc.ss;
 		}
 
 		if(userMeta) {
-			Object.assign(userObject, userMeta);
+			userMeta['id'] = userMeta.userID; ///REVISIT architecture
+			Object.assign(proposedValues, userMeta);
 		}
 
-		for (var propIndex = 0; propIndex < identityProps.length; propIndex++) {
-			var identityProp = identityProps[propIndex];
+		me.loadData(proposedValues);
 
-			if(userObject.hasOwnProperty(identityProp)) {
-				me[identityProp] = userObject[identityProp];
+		console.log(me);
+	}
+
+	/**
+	 * Safely loads new values and properties into the object by simply
+	 * filtering out non-identity props.
+	 * @param {object} data - An object of new properties/values to load.
+	 **/
+	this.loadData = function(data, initializeProps = false) {
+		for(var identityProp of exportLists.identity) {
+			if(data.hasOwnProperty(identityProp)) {
+				me[identityProp] = data[identityProp];
 			} else {
-				me[identityProp] = null;
+				if(initializeProps) {
+					me[identityProp] = null;
+				}
 			}
 		}
-
 	}
 
 	/**
 	 * Convert properties to object for use with database.
 	 * @returns {Object}
 	 **/
-	me.export = function() {
+	this.export = function(exportType = 'identity') {
 		var returnObject = {};
 
-		for (var propIndex = 0; propIndex < identityProps.length; propIndex++) {
-			var identityProp = identityProps[propIndex];
-			returnObject[identityProp] = me[identityProp];
+		for(var prop of exportLists[exportType]) {
+			returnObject[prop] = me[prop];
 		}
 
 		return returnObject;
 	}
+
+	init(usrDoc, userMeta);
 }
 
 module.exports = TelepUser;

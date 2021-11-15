@@ -3,17 +3,35 @@ input#user-bookmarks( ///REVISIT architecture
 	value= user ? user.bookmarks.join(",") : ""
 )
 
-form#settings-page.ajax.uibox(method="POST")
-	label.floatBeside(for="email") Email
-	input(name="email" value=user.em type="text" placeholder="email" disabled)
-
-	label.floatBeside(for="creatorName") Creator Name
-	input(
-		name="creatorName"
+form#settings-page.ajax.uibox(
+	method='POST',
+	action='/update-profile'
+	data-ajax-action='/ajax/update-profile'
+)
+	label.floatBeside(for="profile_email") Email
+	input#profile_email(
 		type="text"
-		placeholder="creator name"
-		value= user.creatorName
+		name="email"
+		placeholder="email"
+		value=user.email
+		disabled
 	)
+
+	label.floatBeside(for="profile_display-name") Display Name
+	input#profile_display-name(
+		type="text"
+		name="displayName"
+		placeholder="display name"
+		value= user.displayName
+	)
+
+	//-label.floatBeside(for="profile_creator-name") Creator Name
+	//-input#profile_creator-name(
+	//-    type="text"
+	//-    name="creator-name"
+	//-    placeholder="creator name"
+	//-    value= user.creatorName
+	//-)
 
 	.ticketCount.floatBeside Tickets [?]
 	.ticketCount.creationTickets Tickets:

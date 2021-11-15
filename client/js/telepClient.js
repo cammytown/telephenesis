@@ -10,6 +10,7 @@ import Interface from './components/Interface';
 import Stars from './components/Stars';
 import Navigation from './components/Navigation';
 import Forms from './components/Forms';
+import Comments from './components/Comments';
 import ClientEffects from './components/ClientEffects';
 import mediaPlayer from './components/MediaPlayer';
 import Admin from './components/Admin';
@@ -32,10 +33,10 @@ function TelepClient() {
 		clientState.addComponent(Stars);
 		clientState.addComponent(Navigation);
 		clientState.addComponent(Forms);
+		clientState.addComponent(Comments);
 		clientState.addComponent(mediaPlayer);
 		clientState.addComponent(Admin);
 		clientState.addComponent(Creator);
 		clientState.init();
-
 	}
 }

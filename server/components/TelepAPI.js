@@ -30,6 +30,8 @@ function TelepAPI(server) {
 	/** MongoCollection of user profile information. **/
 	var usrMeta;
 
+	/** MongoCollection of star comments. **/
+	var dbComments;
 
 	/** A path to where uploaded art will be stored on the server. **/
 	var musicPath = __dirname + "/../public/music/"; ///MOVE to config
@@ -43,7 +45,7 @@ function TelepAPI(server) {
 		stars = db.collection('MLstars');
 		MLMeta = db.collection('MLMeta'); /// do we need to filter MLMeta?
 		usrMeta = db.collection('usrMeta'); /// do we need to filter MLMeta?
-
+		dbComments = db.collection('starComments');
 	}
 
 
@@ -77,7 +79,35 @@ function TelepAPI(server) {
 		}
 	}
 
-	me.getUserMeta = function(userID, callback) {
+	/**
+	 * Retrieve a user by their session code.
+	 * @param {string} sessionCode
+	 * @returns {TelepUser | false}
+	 **/
+	this.getUserBySessionCode = function(sessionCode) {
+		return usr.in(sessionCode)
+			.then(user => {
+				// If successfully logged in using session code:
+				if(user) {
+					// Get user meta information:
+					return me.getUserMeta(user.id)
+						.then(usrMeta => {
+							// Create a secure object by loading into
+							// TelepUser:
+							return new TelepUser(user, usrMeta);
+						})
+						.catch(err => {
+							if(err) {
+								throw err;
+							}
+						});
+				} else {
+					return false;
+				}
+			});
+	}
+
+	this.getUserMeta = function(userID, callback) {
 		return usrMeta.findOne({ userID })
 			.then(doc => {
 				if(callback) callback(false, doc);
@@ -105,11 +135,12 @@ function TelepAPI(server) {
 			});
 	}
 
-	me.register = function(email, password, creatorName, ip) {
+	me.register = function(email, password, displayName, creatorName, ip) {
 		return usr.rg(email, password, ip)
 			.then(usrDoc => {
 				var userMetaObject = {
-					creatorName: creatorName,
+					displayName,
+					creatorName,
 					creationTickets: 1,
 					recreationTickets: 3,
 					bookmarks: [],
@@ -142,22 +173,38 @@ function TelepAPI(server) {
 	// 	});
 	// }
 
-	me.updateProfile = function(userID, post, callback) { /// post naming?
-		//// if post.email is in use, error
+	/**
+	 * Update user profile information.
+	 * @param {TelepUser} user - The user to update.
+	 * @param {object} newValues - The new properties/values to set.
+	 **/
+	this.updateProfile = function(user, newValues) {
+		if(newValues.email) {
+			///@TODO allow email changes
+			// Not allowing email changes for now:
+			delete newValues.email;
+		}
 
-		usrMeta.updateOne(
-			{ userID },
+		user.loadData(newValues);
+
+		// Update references to the user document:
+		//stars.updateMany(
+		//    { creatorId: userID },
+		//    { $set: { "creator.creatorName": post.creatorName }}
+		//);
+
+		// Update the usrMeta object:
+		return usrMeta.updateOne(
+			{ userID: user.id },
 			{
 				// "email": post.email, //// send confirmation if different
-				$set: { "creatorName": post.creatorName }
-			},
-			callback
-		);
+				//$set: { "creatorName": post.creatorName }
 
-		stars.updateMany(
-			{ creatorId: userID },
-			{ $set: { "creator.creatorName": post.creatorName }}
-		); /// no callback
+				//@REVISIT only need to set properties thave have changed but
+				//we're setting all of them; do we care?:
+				$set: user.export()
+			}
+		);
 	}
 
 	me.bookmark = function(starID, userID) {
@@ -196,6 +243,48 @@ function TelepAPI(server) {
 			{ $set: { creatorName } },
 			callback
 		);
+	}
+
+	/**
+	 * Create a new comment for a star by a user.
+	 * @param {TelepUser} telepUser - The user creating the comment.
+	 * @param {number} starID - ID of star.
+	 * @param {string} commentText - Text content of comment.
+	 * @returns {Promise<number>} The database _id of the new comment.
+	 **/
+	this.createComment = function(telepUser, starID, commentText) {
+		var newComment = {
+			user: telepUser.export('commentCache'),
+			starID,
+			text: commentText,
+		};
+
+		return dbComments.insertOne(newComment)
+			.then(result => {
+				////TODO do we care about result.acknowledged or can we assume
+				//that if something goes wrong it will be sent to the .catch
+				//block?:
+				return result.insertedID;
+			});
+	}
+
+	/**
+	 * Get comments for a star.
+	 * @param {number} userID - ID of user retrieving comments.
+	 * @param {number} starID - ID of star to retrieve comments for.
+	 **/
+	this.getComments = function(userID, starID) {
+		///TODO do something with userID or remove it from params
+
+		return dbComments.find({ starID })
+			.toArray() ///REVISIT speed?
+			.then(docArray => {
+				docArray.forEach(doc => {
+					doc.timestamp = new Date(doc._id.getTimestamp()).getTime();
+				});
+
+				return docArray;
+			});
 	}
 
 	// me.actualize = function(starData, callback) {

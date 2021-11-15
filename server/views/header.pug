@@ -17,7 +17,9 @@ header#galaxy-ui
 	#sortingUI
 		//-///REVISIT not sure about use of nav in terms of best semantics
 		nav.order-nav
-			span order: 
+			span order:
+			|
+			|
 			span.current-order galaxy
 
 			ul
@@ -38,7 +40,8 @@ header#galaxy-ui
 				//- li recently played
 
 		nav.view-nav
-			span view: 
+			span view:
+			| &nbsp;
 			span.current-view galaxy
 
 			ul
@@ -59,3 +62,25 @@ header#galaxy-ui
 			h2#playingStarTitle Song Title
 			h3#playingCreatorName Artist Name
 			a#playingCreatorLink artistwebsite.com
+			a#togglePlayingComments Comments
+			div#playingComments
+				//-button + Add Comment
+
+				form#commentText.ajax(
+					method='POST'
+					action='/create-comment'
+					data-ajax-action='/ajax/create-comment'
+				)
+					input.playing-star-id(
+						type='hidden'
+						name='starID'
+					)
+
+					textarea.comment-entry(
+						placeholder="Something positive..."
+						name='commentText'
+					)
+
+					button(type='submit') + Add Comment
+
+				ul.comments

@@ -12,6 +12,8 @@ export default {
 	POST,
 };
 
+export { POST };
+
 function _(selector) {
 	if(selector[0] == '#') {
 		var elementID = selector.slice(1); // remove '#'
@@ -85,6 +87,7 @@ function cc(ele, cls) {
 /**
  * Sends a POST request; attempts to automatically format body.
  * @param {string|FormData|Object} body
+ * @returns {Promise}
  **/
 function POST(url, body = {}) {
 	var request = {

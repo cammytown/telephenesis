@@ -1,4 +1,4 @@
-body {
+//body {
 	header#playingStarHeader { ///placement
 		// display: none;
 		opacity: 0;
@@ -6,8 +6,9 @@ body {
 		transition: height 500ms, opacity 500ms;
 		overflow: hidden;
 
-		h2, h3 {
-			margin: 5px 0 5px 20px;
+		body.playing & {
+			opacity: 1;
+			height: auto; ///TODO auto doesn't work for transitions
 		}
 
 		a {
@@ -50,14 +51,74 @@ body {
 
 		#playingStarInfo {
 			position: absolute;
+			max-width: 50%;
+			margin-left: 20px;
+
+			h2, h3 {
+				margin: 5px 0;
+			}
+
+			a#togglePlayingComments {
+				&::after {
+					content: " \25B2";
+				}
+
+				.show-comments &::after {
+					content: " \25BC";
+				}
+			}
+
+			#playingComments {
+				display: none;
+
+				.show-comments & {
+					display: block;
+				}
+
+				//max-width: 465px;
+
+				ul.comments {
+					padding-left: 15px;
+
+					li.comment {
+						.comment-text {}
+						.comment-meta {
+							max-width: 465px;
+							font-size: 0.8em;
+
+							.comment-date {
+								//font-size: 0.8em;
+								font-style: italic;
+							}
+							.comment-user {}
+						}
+
+						ul.reply {
+						}
+					}
+				}
+			}
 		}
 	}
 
-	&.playing {
-		header#playingStarHeader {
-			// display: block;
-			opacity: 1;
-			height: auto; ///TODO auto doesn't work for transitions
-		}
-	}
-}
+	//&.show-comments {
+	//    #togglePlayingComments {
+	//        body.show-comments &::after {
+	//            content: " \25BC";
+	//        }
+	//    }
+
+	//    #playingComments {
+	//        display: block;
+	//    }
+	//}
+
+	//&.playing {
+	//body.playing {
+	//    header#playingStarHeader {
+	//        // display: block;
+	//        opacity: 1;
+	//        height: auto; ///TODO auto doesn't work for transitions
+	//    }
+	//}
+//}
