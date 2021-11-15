@@ -10,6 +10,8 @@ server/telepServer.config.js
 abstract/telep.config.js
 uploads/*
 public/music/*
+public/constellations.css
+public/telephenesis.js
 !public/music/README
 
 *.sublime-workspace
