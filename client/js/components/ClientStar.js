@@ -1,13 +1,14 @@
 import anime from 'animejs/lib/anime.es.js';
 import cor from '../libs/minlab/cor';
-import spc from '../libs/minlab/spc'; //// ultimately whatever spc becomes probably won't output a singleton
+////REVISIT ultimately whatever spc becomes probably won't output a singleton:
+import spc from '../libs/minlab/spc';
 
-// import clientState from './components/ClientState';
 import Star from '../../../abstract/Star.js';
 import Vector from '../../../abstract/Vector.js';
-import mediaPlayer from './MediaPlayer';
-import clientState from './ClientState';
+import MediaPlayer from './MediaPlayer';
+import ClientState from './ClientState';
 import Navigation from './Navigation';
+import Comments from './Comments';
 
 export default ClientStar;
 
@@ -45,17 +46,21 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		if(element) {
 			me.element = element;
 
-			///TODO I think we should have a more semantically-clear way of expressing that setting these to true is safe:
-			/// for now, we just assume that if we're passing in an element, it's a completed star...
+			///@TODO I think we should have a more semantically-clear way of
+			//expressing that setting these to true is safe:
+			///@REVISIT for now, we just assume that if we're passing in an element,
+			//it's a completed star...
 			me.fileReady = true;
 			me.isPlaced = true;
 
-			if(me.element.classList.contains('bookmarked')) { ///REVISIT improve architecture?
+			///REVISIT improve architecture?
+			if(me.element.classList.contains('bookmarked')) {
 				me.isBookmarked = true;
 			}
 		} else {
 			///REVISIT cleaner solution?:
-			me.element = document.getElementById('placementSymbol').cloneNode(true); /// deep parameter in IE8??
+			/// deep parameter in IE8??
+			me.element = document.getElementById('placementSymbol').cloneNode(true);
 		}
 
 		///REVISIT architecture
@@ -143,7 +148,13 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		// cor._('#playingStarHeader').style.display = 'block';
 		cor.ac(document.body, 'playing')
 
-		mediaPlayer.playStar(me);
+		var playingStarInputs = document.querySelectorAll('.playing-star-id');
+		for(var playingStarInput of playingStarInputs) {
+			playingStarInput.value = me.id;
+		}
+
+		Comments.loadStarComments(me);
+		MediaPlayer.playStar(me);
 	}
 
 	/**
@@ -159,8 +170,8 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 				cor.ac(this.element, 'bookmarked');
 				me.isBookmarked = true;
-				clientState.bookmarks.push(me);
-				clientState.update();
+				ClientState.bookmarks.push(me);
+				ClientState.update();
 			})
 			.catch(err => {
 				console.error(err);
@@ -181,8 +192,8 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 				this.element.classList.remove('bookmarked');
 				me.isBookmarked = false;
-				clientState.bookmarks.splice(clientState.bookmarks.indexOf(me), 1);
-				clientState.update();
+				ClientState.bookmarks.splice(ClientState.bookmarks.indexOf(me), 1);
+				ClientState.update();
 			})
 			.catch(err => {
 				console.error(err);

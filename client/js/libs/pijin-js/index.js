@@ -61,31 +61,70 @@ function Pijin() {
 
 		var form = submitEvent.target;
 
-		// Run user-defined general submit callbacks:
-		for (var cbIndex = 0; cbIndex < me.callbacks.submit.length; cbIndex++) {
-			var submitCallback = me.callbacks.submit[cbIndex];
-			submitCallback(submitEvent);
-		}
+		// Build request object:
+		var request = generateRequest(form);
 
-		// Run user-defined callbacks for matching selectors: ///TODO currently only one callback allowed
+		///TODO currently only one callback allowed:
+		// Run user-defined pre-submit callbacks for matching selectors:
 		var selector = '#' + form.id;
 		var selectorSubmitCallback = me.selectorCallbacks['submit'][selector];
 		if(typeof selectorSubmitCallback === 'function') {
 			///REVISIT should we make sure this returns before moving on?
-			selectorSubmitCallback(submitEvent);
+			selectorSubmitCallback(request, submitEvent);
 		}
 
-		me.submit(form, submitEvent);
+		// Run user-defined general submit callbacks:
+		for (var cbIndex = 0; cbIndex < me.callbacks.submit.length; cbIndex++) {
+			var submitCallback = me.callbacks.submit[cbIndex];
+			submitCallback(request, submitEvent);
+		}
+
+		// Regenerate request in case user callbacks manipulated the form:
+		///REVISIT optimization. At the very least, we can not run this if
+		//there are no callbacks:
+		request = generateRequest(form);
+
+		var actionURI = form.action;
+
+		// If form has user-defined action override attribute:
+		if(form.hasAttribute(me.options.actionAttribute)) {
+			actionURI = form.getAttribute(me.options.actionAttribute);
+		}
+
+		fetch(actionURI, request)
+			.then(response => response.json())
+			.then(result => {
+				///TODO probably check classes, too. (and what about compound class selectors like .one.two ?)
+
+				for (var cbIndex = 0; cbIndex < me.callbacks.response.length; cbIndex++) {
+					var responseCallback = me.callbacks.response[cbIndex];
+					responseCallback(result, me.parseRequest(request), submitEvent);
+				}
+
+				var selector = '#' + form.id;
+				var selectorResponseCallback = me.selectorCallbacks['response'][selector];
+				// console.log(selectorCallback);
+
+				if(typeof selectorResponseCallback === 'function') {
+					// responsePromise = responsePromise.then(result => selectorResponseCallback);
+					selectorResponseCallback(
+						result, // the parsed response
+						me.parseRequest(request), // the initial request as an object of params
+						submitEvent
+					); ///TODO the nature of request.body is unreliable. do we want some convenience functions
+				}
+			});
 
 		return true;
 	}
 
-	me.submit = function(form, submitEvent = false) { ///REVISIT architecture; maybe don't actually need to split this and onPijinFormSubmit
+	function generateRequest(form) {
 		var method = form.method;
 
-		///REVISIT not really into this solution but for whatever reason there's no Element.getElementsByName():
-		// support PUT and DELETE even though form method attribute does not
-		var formInputs = form.getElementsByTagName('input');
+		// Support PUT and DELETE even though form method attribute does not by
+		// reading an (optional) manually created input with name _method:
+		///REVISIT compatibility of querySelectorAll()? concat multiple getElementsByTagName?
+		var formInputs = form.querySelectorAll('input,textarea,select');
 		for (var inputIndex = 0; inputIndex < formInputs.length; inputIndex++) {
 			var formInput = formInputs[inputIndex];
 			if(formInput.name == '_method') {
@@ -94,6 +133,7 @@ function Pijin() {
 			}
 		}
 
+		// Build payload:
 		var payload = new FormData(form);
 
 		// // store request data in object in case client wants to use it in callbacks
@@ -131,40 +171,8 @@ function Pijin() {
 			body: payload
 		};
 
-		var actionURI = form.action;
-
-		// If form has user-defined action override attribute:
-		if(form.hasAttribute(me.options.actionAttribute)) {
-			actionURI = form.getAttribute(me.options.actionAttribute);
-		}
-
-		fetch(actionURI, request)
-			.then(response => response.json())
-			.then(result => {
-				///TODO probably check classes, too. (and what about compound class selectors like .one.two ?)
-
-				for (var cbIndex = 0; cbIndex < me.callbacks.response.length; cbIndex++) {
-					var responseCallback = me.callbacks.response[cbIndex];
-					responseCallback(result, me.parseRequest(request), submitEvent);
-				}
-
-				var selector = '#' + form.id;
-				var selectorResponseCallback = me.selectorCallbacks['response'][selector];
-				// console.log(selectorCallback);
-
-				if(typeof selectorResponseCallback === 'function') {
-					// responsePromise = responsePromise.then(result => selectorResponseCallback);
-					selectorResponseCallback(
-						result, // the parsed response
-						me.parseRequest(request), // the initial request as an object of params
-						submitEvent
-					); ///TODO the nature of request.body is unreliable. do we want some convenience functions
-				}
-			});
-
-		return true;
+		return request;
 	}
-
 
 	me.parseRequest = function(request) {
 		switch(typeof request.body) {

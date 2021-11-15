@@ -10,25 +10,31 @@ form#login-page.uibox.ajax(action="/login" method="POST" data-ajax-action="/ajax
 	ul.errors
 
 
-form#register-page.uibox.ajax(action="/register" method="POST" data-ajax-action="/ajax/register")
-	label.floatBeside(for="email") Email
-	input(name="email" value=user.em type="text" placeholder="email")
+form#register-page.uibox.ajax(
+	action='/register'
+	method='POST'
+	data-ajax-action='/ajax/register'
+)
+	label.floatBeside(for='email') Email
+	input(name='email' value=user.em type='text' placeholder='email')
 
+	label.floatBeside(for='display-name') Display Name
+	input(name='display-name' type='text' placeholder='display name')
 
-	label.floatBeside(for="password") Password
-	input(type="password" name="password" placeholder="password")
+	label.floatBeside(for='password') Password
+	input(type='password' name='password' placeholder='password')
 
-	label.floatBeside(for="password-confirm") Confirm Password
-	input(type="password" name="password-confirm" placeholder="password again")
+	label.floatBeside(for='password-confirm') Confirm Password
+	input(type='password' name='password-confirm' placeholder='password again')
 
 	label
 		input(type='checkbox' name='artist-account')
 		| I would like to contribute art.
 
-	label.floatBeside(for="creatorName") Creator Name (optional)
+	label.floatBeside(for='creatorName') Creator Name (optional)
 	input(
-		name="creatorName"
-		type="text"
+		name='creatorName'
+		type='text'
 		placeholder="creator name (optional)"
 		value= user.usrMeta ? user.usrMeta.creatorName : ''
 	)
@@ -44,6 +50,6 @@ form#register-page.uibox.ajax(action="/register" method="POST" data-ajax-action=
 	//-        input(type='radio' name='account-type' value='artist' id='artist-account-option')
 	//-        label(for='artist') Artist Account
 
-	button.btn.main(type="submit") Register
+	button.btn.main(type='submit') Register
 
 	ul.errors

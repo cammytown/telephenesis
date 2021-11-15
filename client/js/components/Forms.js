@@ -1,13 +1,19 @@
 import cor from '../libs/minlab/cor';
 import Pijin from '../libs/pijin-js';
 // import HistoryTime from '../libs/history-time';
+
 import navigation from './Navigation';
 import clientState from './ClientState';
+import ClientComment from './ClientComment.jsx';
+
 import config from '../../../abstract/telep.config.js';
 
 export default new ClientForms();
 
 function ClientForms() {
+	///REVISIT architecture:
+	var commentingStar;
+
 	this.init = function() {
 		//// not a good solution:
 		// var forms = document.getElementsByTagName('form');
@@ -26,8 +32,22 @@ function ClientForms() {
 		});
 	}
 
-	function onAjaxSubmit(event) {
-		/// quick-fix; if working on a star, update the field values appropriately; this should obviously happen somewhere else
+	function onAjaxSubmit(request, event) {
+		var form = event.target;
+		var op = form.action.split('/').pop();
+
+		///REVISIT I don't like this architecture. Perhaps solution would be to
+		//have this class have a method that allows us to hook into this
+		//function; i.e. bindForm()
+		switch(op) {
+			case 'create-comment': {
+				commentingStar = clientState.playingStar;
+			} break;
+		}
+
+		/// quick-fix; if working on a star, update the field values
+		//appropriately; this should happen somewhere else; at least in the
+		//switch block above:
 		if(clientState.actingStar) {
 			var activeStarIdInputs = document.getElementsByClassName('activeStarIdInput');
 			for (var inputIndex = 0; inputIndex < activeStarIdInputs.length; inputIndex++) {
@@ -35,16 +55,17 @@ function ClientForms() {
 				input.value = clientState.actingStar.id;
 			}
 		}
-
 	}
 
-	// function onFormSubmit(event) { //// temporary; should find more robust solution probably // converts all form elements to ajax
+	// function onFormSubmit(event) { //// temporary; should find more robust
+	// solution probably // converts all form elements to ajax
 	function onAjaxResponse(result, request, event) {
 		// event.preventDefault();
 
 		var form = event.target;
 		// var children = form.children;
-		var op = form.id.split('-page')[0]; ///REVISIT bad architecture
+		//var op = form.id.split('-page')[0]; ///REVISIT bad architecture
+		var op = form.action.split('/').pop(); ///REVISIT not very future-proof architecture
 
 		if(result.errors.length) {
 			// console.error(result.errors);
@@ -69,7 +90,7 @@ function ClientForms() {
 		} else {
 			///
 			// HistoryTime.goBack()
-			history.back(); ////
+			//history.back(); ////
 
 			// window.history.go(-1);
 			// navigate('/'); /// previous screen
@@ -85,13 +106,26 @@ function ClientForms() {
 				{
 					cor.ac(document.body, 'in');
 
-					console.log(config);
-					console.log(result);
 					if(op == 'login' && result.lv >= config.creatorLevel) {
 						cor.ac(document.body, 'creator');
 					}
 
 					navigation.navigate('/'); ///
+				} break;
+
+				case 'create-comment': {
+					console.log('create comment');
+					// If user is still on the star they left a comment for:
+					if(clientState.playingStar == commentingStar) {
+						// Add new comment to interface:
+						new ClientComment({
+							starID: parseInt(request.body['starID']),
+							text: request.body['commentText'],
+							timestamp: new Date(),
+							user: { displayName: document.querySelector('#profile_display-name').value } ///TODO
+							//user: { displayName: "You" } ///TODO
+						});
+					}
 				} break;
 
 				default: {

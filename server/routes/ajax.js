@@ -1,8 +1,10 @@
 const express = require('express');
 
+const config = require('../../abstract/telep.config.js');
+
 const Telep = require('../components/TelepServer');
 const Stars = require('../components/StarMapper');
-const ServerStar = require('../components/ServerStar.js');
+const ServerStar = require('../components/ServerStar');
 const api = require('../components/TelepAPI');
 
 const routesIndex = require('./index');
@@ -17,8 +19,13 @@ function generate(telepServer) {
 	var ajaxRouter = express.Router();
 
 	ajaxRouter.post('/sync', syncWithClient);
+	ajaxRouter.post('/update-profile', updateProfile);
+
 	ajaxRouter.post('/bookmark', bookmarkStar);
-	ajaxRouter.post('/removeBookmark', removeBookmarkStar);
+	ajaxRouter.post('/remove-bookmark', removeBookmarkStar);
+	ajaxRouter.post('/create-comment', createComment);
+	ajaxRouter.post('/get-comments', getComments);
+
 	ajaxRouter.post('/actualize', actualizeStar);
 
 	ajaxRouter.post('/login', authRoutes.login, userCheck);
@@ -81,7 +88,22 @@ function syncWithClient(req, res) {
 		});
 }
 
-function bookmarkStar(req, res) {
+function updateProfile(req, res, next) {
+	if(!req.user) { ///TODO moving
+		res.json({ errors: ["not logged in"] });
+		return false;
+	}
+
+	api.updateProfile(
+		req.user,
+		// Convert to normal object with helper methods like hasOwnProperty:
+		Object.assign({}, req.body)
+	).then(result => {
+		res.json({ errors: [] });
+	});
+}
+
+function bookmarkStar(req, res, next) {
 	// if(!req.user || (req.user.id != star.creatorId && req.user.lv !=
 	if(!req.user) {
 		res.json({ error: "not logged in" });
@@ -119,9 +141,55 @@ function removeBookmarkStar(req, res) {
 		});
 }
 
+/**
+ * Router handler for posting a new comment.
+ **/
+function createComment(req, res, next) {
+	if(!req.user) { ///TODO move somewhere general
+		///REVISIT:
+		res.json({ error: "Not logged in or not permitted." });
+		throw new Error("Not logged in or not permitted.");
+	}
+
+	console.log(req.user);
+	return api.createComment(
+		req.user,
+		parseInt(req.body['starID']),
+		req.body['commentText']
+	)
+		.then(commentID => {
+			res.json({
+				errors: [],
+				commentID
+			});
+			//return commentID;
+			//next();
+		})
+		.catch(err => {
+			throw err;
+		});
+
+}
+
+/** Router handler for retrieving star comments. **/
+function getComments(req, res, next) {
+	return api.getComments(
+		req.user.id,
+		parseInt(req.body['starID']),
+	)
+		.then(comments => {
+			res.json({
+				errors: [],
+				comments,
+			});
+		})
+		.catch(err => {
+			next(err);
+		});
+}
 
 function actualizeStar(req, res, next) { ///REVISIT move to a creation-specific set of routes?
-	if(!req.user || req.user.lv != 7) {
+	if(!req.user || req.user.lv < config.creatorLevel) { ///TODO move somewhere general
 		///REVISIT:
 		res.json({ error: "Not logged in or not permitted." });
 		throw new Error("Not logged in or not permitted.");

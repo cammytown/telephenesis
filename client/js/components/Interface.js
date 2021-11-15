@@ -80,7 +80,8 @@ function Interface() {
 
 		/* SHORTCUTS */
 		window.addEventListener('keydown', function(e) {
-			if(e.target.tagName.toUpperCase() == "INPUT") { // .toUpperCase() out of paranoia
+			///REVISIT better way to check if it's a form element?
+			if(["INPUT", "TEXTAREA"].includes(e.target.tagName.toUpperCase())) { // .toUpperCase() out of paranoia
 				return true;
 			}
 

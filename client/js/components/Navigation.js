@@ -152,7 +152,7 @@ function ClientNavigation() {
 
 			if(clientStar.isBookmarked) {
 				bookmarkLink.innerText = "Remove Bookmark";
-				bookmarkLink.href = "/removeBookmark";
+				bookmarkLink.href = "/remove-bookmark";
 			} else {
 				bookmarkLink.innerText = "Bookmark";
 				bookmarkLink.href = "/bookmark";
@@ -273,7 +273,13 @@ function ClientNavigation() {
 
 				if(pageInitialization) { ///REVISIT only on pageInit ?
 					///REVISIT probably do this on server side; though maybe it's cool
-					spc.ctr(Stars.clientStars[starID].position.x, Stars.clientStars[starID].position.y); ///TODO change spc over to Vectors
+					///TODO change spc over to Vectors probably
+
+					// Center screen around focused star:
+					spc.ctr(
+						Stars.clientStars[starID].position.x,
+						Stars.clientStars[starID].position.y
+					); 
 				}
 
 				Stars.clientStars[starID].play();
@@ -306,7 +312,7 @@ function ClientNavigation() {
 				clientState.actingStar.bookmark();
 			} break;
 
-			case 'removeBookmark': {
+			case 'remove-bookmark': {
 				limbo.appendChild(starContextMenu);
 				clientState.actingStar.removeBookmark();
 			} break;

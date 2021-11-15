@@ -1,5 +1,5 @@
 # Telephenesis
-Telephenesis (https://telephenesis.com) is a visualization of the metamorphosis of a musical idea as it is reinterpreted and recreated by different artists. It's like the game "Telephone", but with music.
+Telephenesis (https://telephenesis.com) is a visualization of the metamorphosis of a musical idea as it is reinterpreted by different artists. It's like the game "Telephone", but with music.
 
 First, someone composes a piece of music and uploads it in digital form to the website. It shows up as a star in an outerspace interface. When a user clicks the star, the track plays.
 
@@ -24,8 +24,8 @@ Listeners can browse through a growing constellation of the progression of music
 - SASS
 
 ## Credits
-Dreamed by Chris
-Conceptualized by Chris and Cameron
+Dreamed by Chris\
+Conceptualized by Chris and Cameron\
 Programmed by Cameron
 
 - **Chris Marianetti** - [nopiano.com](http://nopiano.com) - design, concept

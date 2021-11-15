@@ -45,6 +45,7 @@ function register(req, res, next) {
 	return api.register(
 		req.body.email,
 		req.body.password,
+		req.body.displayName,
 		req.body.creatorName,
 		req.ip
 	)
@@ -70,47 +71,17 @@ function logout(req, res, next) {
 }
 
 /**
- * Retrieve a user using their session code.
- * @param {string} sessionCode
- **/
-function getUserSession(sessionCode) {
-	return usr.in(sessionCode)
-		.then(user => {
-			// If successfully logged in using session code:
-			if(user) {
-				// Get user meta information:
-				return api.getUserMeta(user.id)
-					.then(usrMeta => {
-						// Attach meta info to user object:
-						Object.assign(user, usrMeta);
-						//next();
-						return user;
-					})
-					.catch(err => {
-						if(err) {
-							throw err;
-						}
-					});
-			} else {
-				//throw "No user with that session code.";
-				// req.user = {}; ///
-				//next();
-				return false;
-			}
-		});
-}
-
-/**
- * Attempt to log user in using a session code, if they have one.
+ * Attempt to log user in using a session code, if they have one. Sets req.user
+ * to a TelepUser representing authenticated user if there was one.
  * @param {express.Request} req
  * @param {express.Response} res
  * @param {express.NextFunction} next
  **/
 function observeSessionCookie(req, res, next) {
-	return getUserSession(req.cookies.session_code)
-		.then(user => {
+	return api.getUserBySessionCode(req.cookies.session_code)
+		.then(telepUser => {
 			// User is either TelepUser or false:
-			req.user = user;
+			req.user = telepUser;
 
 			next();
 		})
