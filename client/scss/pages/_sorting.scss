@@ -71,7 +71,7 @@
 
 body {
 	&.galaxy-view,
-	&.constellations-view, ////TODO temporary until views are part of nav menu
+	&.constellations-view ////TODO temporary until views are part of nav menu
 	{
 		#sortingUI {
 			nav.view-nav {
@@ -115,7 +115,9 @@ body {
 			}
 		}
 
-		&.list-view, &.grid-view {
+		&.list-view,
+		&.grid-view,
+		&.constellations-view{
 			#spc {
 				overflow: visible;
 			}
