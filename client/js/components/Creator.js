@@ -22,12 +22,13 @@ export default new Creator();
  * @constructor
  **/
 function Creator() {
+	const me = this;
 
 	/**
 	 * The star that the user is creating.
 	 * @type ClientStar
 	 **/
-	var workingStar;
+	this.workingStar;
 
 	/**
 	 * The originStar of the star the user is creating.
@@ -43,6 +44,8 @@ function Creator() {
 	var currentStep;
 
 	var validPlacementZone;
+	var colorShiftSelect;
+
 	//var accessSettingInput;
 	//var publicGameButton;
 	//var privateGameButton;
@@ -76,22 +79,21 @@ function Creator() {
 
 		validPlacementZone = document.getElementById('validPlacementZone');
 		validPlacementZone.style.display = 'none';
-		spc.map.appendChild(validPlacementZone);
-
+		colorShiftSelect = document.getElementById('colorShiftSelect');
 		colorwheelSelect = document.getElementById('colorwheelSelect');
 
 		cor.al(colorwheelSelect, 'mousemove', getColorFromWheelPosition);
 		cor.al(colorwheelSelect, 'click', function() {
 			cor.rl(colorwheelSelect, 'mousemove', getColorFromWheelPosition);
 
-			workingStar.color = workingStar.linkElement.style.backgroundColor.substr(4).slice(0, -1); /// bad code / maybe unreliable
+			me.workingStar.color = me.workingStar.linkElement.style.backgroundColor.substr(4).slice(0, -1); /// bad code / maybe unreliable
 			Anm.fadeOut(colorwheelSelect);
 
-			workingStar.isPlaced = true;
+			me.workingStar.isPlaced = true;
 			actualizeCreation();
 
-			// if(!workingStar.isUploaded) {
-			// 	workingStar.isPlaced = true;
+			// if(!me.workingStar.isUploaded) {
+			// 	me.workingStar.isPlaced = true;
 			// } else {
 			// 	actualizeCreation();
 			// }
@@ -100,9 +102,11 @@ function Creator() {
 
 	/** Cancel creation process. **/
 	this.cancel = function() {
-		workingStar.delete();
+		console.log('star creation cancelled');
+		me.workingStar.delete();
 		Interface.hideMessage();
 		endCreationStep();
+		navigation.navigate('/');
 	}
 
 	function onCreateStarClick(event) {
@@ -123,12 +127,12 @@ function Creator() {
 	 * @param {ClientStar | false} originStar
 	 **/
 	this.initializeCreation = function(originStar = false) {
-		workingStar = new ClientStar();
+		me.workingStar = new ClientStar();
 
-		workingStar.element.style.display = 'none';
-		workingStar.id = "placeholder"; ///REVISIT architecture
-		workingStar.originStarID = originStar ? originStar.id : -1;
-		workingStar.tier = originStar ? originStar.tier + 1 : 0;
+		me.workingStar.element.style.display = 'none';
+		me.workingStar.id = "placeholder"; ///REVISIT architecture
+		me.workingStar.originStarID = originStar ? originStar.id : -1;
+		me.workingStar.tier = originStar ? originStar.tier + 1 : 0;
 
 		if(originStar) {
 			workingOriginStar = originStar;
@@ -142,20 +146,20 @@ function Creator() {
 
 		var formEle = event.target;
 
-		workingStar.hostType = 'external'; ////
-		workingStar.title = formEle.getElementsByClassName('star-title')[0].value;
-		workingStar.fileURL = formEle.getElementsByClassName('file-url')[0].value;
-		workingStar.element.style.display = null; ///REVISIT best method?
-		//workingStar.title = cor._('#genesis-star-title').value;
-		//workingStar.fileURL = cor._('#genesis-file-url').value;
+		me.workingStar.hostType = 'external'; ////
+		me.workingStar.title = formEle.getElementsByClassName('star-title')[0].value;
+		me.workingStar.fileURL = formEle.getElementsByClassName('file-url')[0].value;
+		me.workingStar.element.style.display = null; ///REVISIT best method?
+		//me.workingStar.title = cor._('#genesis-star-title').value;
+		//me.workingStar.fileURL = cor._('#genesis-file-url').value;
 
-		if(workingStar.hostType == 'upload') {
+		if(me.workingStar.hostType == 'upload') {
 			////REVISIT
 			// uploadCreation();
 		} else {
 			////TODO validate the file
 
-			workingStar.fileReady = true;
+			me.workingStar.fileReady = true;
 
 			initializePlacement();
 		}
@@ -190,12 +194,15 @@ function Creator() {
 	function endCreationStep() {
 		switch(currentStep) {
 			case 'place': {
-				if(workingStar.originStarID == -1) { // Is a constellation genesis star.
+				if(me.workingStar.originStarID == -1) { // Is a constellation genesis star.
 					spc.element.removeEventListener('mousemove', moveWorkingStarToMouse);
 					spc.element.removeEventListener('mouseup', onPlacementMouseUp);
 				} else {
 					validPlacementZone.removeEventListener('mousemove', moveWorkingStarToMouse);
 					validPlacementZone.removeEventListener('mouseup', onPlacementMouseUp);
+					Anm.fadeOut(validPlacementZone, 300, () => {
+						limbo.appendChild(validPlacementZone);
+					});
 				}
 			} break;
 
@@ -214,13 +221,15 @@ function Creator() {
 		currentStep = 'place';
 
 		// close the creation UI
+		navigation.close();
+
 		///REVISIT uris /create/place doesn't work with our thrown-together uri system
-		navigation.navigate('place');
+		//navigation.navigate('place');
 
 		///TODO probably replace 'notification' message type with something
 		//like 'createInstruction' or something and have it appear differently
 		//(more prominently):
-		if(workingStar.originStarID == -1) {
+		if(me.workingStar.originStarID == -1) {
 			Interface.displayMessage("Choose a spot for your star!", 'notification', 0);
 
 			// User can place star anywhere in the galaxy:
@@ -237,11 +246,14 @@ function Creator() {
 
 			validPlacementZone.style.left = current_x - 77 + 'px';
 			validPlacementZone.style.top = current_y - 73 + 'px';
-			validPlacementZone.style.display = 'block';
+			//validPlacementZone.style.display = 'block';
+			Anm.fadeIn(validPlacementZone);
 
 			cor.al(validPlacementZone, 'mousemove', moveWorkingStarToMouse);
 			validPlacementZone.addEventListener('mousedown', onPlacementMouseDown);
 			validPlacementZone.addEventListener('mouseup', onPlacementMouseUp);
+
+			spc.map.appendChild(validPlacementZone);
 
 			// Center camera around origin star:
 			spc.ctr(current_x, current_y);
@@ -250,7 +262,7 @@ function Creator() {
 	}
 
 	function moveWorkingStarToMouse(event) {
-		workingStar.moveToXY(
+		me.workingStar.animateToXY(
 			event.clientX - spc.map.offsetLeft,
 			event.clientY - spc.map.offsetTop
 		);
@@ -283,14 +295,14 @@ function Creator() {
 	function workingStarClick(event) {
 		// User has selected the position for their star.
 
-		// workingStar.moveToXY( ///REVISIT do we need to have this code both here and in moveWorkingStarToMouse?
+		// me.workingStar.animateToXY( ///REVISIT do we need to have this code both here and in moveWorkingStarToMouse?
 		// 	event.clientX - spc.map.offsetLeft,
 		// 	event.clientY - spc.map.offsetTop
 		// );
 
-		// Stars.addStar(workingStar);
+		// Stars.addStar(me.workingStar);
 
-		// spc.ctr(workingStar.position.x, workingStar.position.y); /// create callback function for ctr? currently using validPlacementZone fadeOut delay
+		// spc.ctr(me.workingStar.position.x, me.workingStar.position.y); /// create callback function for ctr? currently using validPlacementZone fadeOut delay
 
 		endCreationStep();
 
@@ -302,10 +314,10 @@ function Creator() {
 
 		currentStep = 'color';
 
-		if(workingStar.originStarID == -1) {
+		if(me.workingStar.originStarID == -1) {
 			Interface.displayMessage("Choose a color for your star.", 'notification', 0);
 
-			workingStar.element.appendChild(colorwheelSelect);
+			me.workingStar.element.appendChild(colorwheelSelect);
 			Anm.fadeIn(colorwheelSelect);
 		} else {
 			Interface.displayMessage("Choose a color for your star. You can only shift the color slightly "
@@ -313,41 +325,39 @@ function Creator() {
 
 			// Coloring a constellation star; only hues adjacent to origin star are allowed.
 
-			Anm.fadeOut(validPlacementZone);
 
 			///REVISIT at least document with comments if not refactor:
 
-			var colorShiftSelect = document.getElementById('colorShiftSelect');
 			var rgb = workingOriginStar.linkElement.style.backgroundColor.substr(4).split(',');
 			var hsl = ColorTool.rgb(rgb[0], rgb[1], parseInt(rgb[2]));
 			colorShiftSelect.children[0].style.background = 'hsl('+(hsl[0]-17)+', 45%, 80%)';
 			colorShiftSelect.children[1].style.background = 'hsl('+(hsl[0]+17)+', 45%, 80%)';
-			workingStar.element.appendChild(colorShiftSelect);
+			me.workingStar.element.appendChild(colorShiftSelect);
 
 			Anm.fadeIn(colorShiftSelect, 250, function() {
 				cor.al(colorShiftSelect, 'mouseover', function(e) {
-					workingStar.linkElement.style.background = e.target.style.background;
+					me.workingStar.linkElement.style.background = e.target.style.background;
 				});
 
 				cor.al(colorShiftSelect, 'click', function(e) { // (finish)
-					workingStar.color = e.target.style.backgroundColor.substr(4).slice(0, -1);
-					workingStar.linkElement.style.background = e.target.style.background;
+					me.workingStar.color = e.target.style.backgroundColor.substr(4).slice(0, -1);
+					me.workingStar.linkElement.style.background = e.target.style.background;
 
 					Anm.fadeOut(colorShiftSelect, 300, function() {
-						colorShiftSelect.parentNode.removeChild(colorShiftSelect);
+						limbo.appendChild(colorShiftSelect);
+						//colorShiftSelect.parentNode.removeChild(colorShiftSelect);
 					});
 
-					limbo.appendChild(validPlacementZone);
 
 					// document.body.removeAttribute('class');
 					// spc.on = true;
-					workingStar.isPlaced = true;
+					me.workingStar.isPlaced = true;
 					actualizeCreation();
 
-					// if(!workingStar.isUploaded) {
-					// 	workingStar.isPlaced = true;
+					// if(!me.workingStar.isUploaded) {
+					// 	me.workingStar.isPlaced = true;
 					// 	Anm.fadeOut(colorShiftSelect);
-					// 	// console.log(workingStar.color);
+					// 	// console.log(me.workingStar.color);
 					// } else {
 					// 	actualizeCreation()
 					// }
@@ -360,8 +370,8 @@ function Creator() {
 
 	// coloring a genesis star; any color is allowed
 	function getColorFromWheelPosition(e) {
-		var cx = -(workingStar.position.x + (spc.map.offsetLeft - e.clientX)); ///TODO + half star width, I think? same for below with height?
-		var cy = (workingStar.position.y + (spc.map.offsetTop - e.clientY));
+		var cx = -(me.workingStar.position.x + (spc.map.offsetLeft - e.clientX)); ///TODO + half star width, I think? same for below with height?
+		var cy = (me.workingStar.position.y + (spc.map.offsetTop - e.clientY));
 
 		var angle = -Math.atan2(cy, cx) * 180 / Math.PI + 180;
 
@@ -374,7 +384,7 @@ function Creator() {
 		else if(angle>240 && angle<300) selectedhue = 270;
 		else if(angle>300) selectedhue = 240;
 
-		workingStar.linkElement.style.backgroundColor = 'hsl('+selectedhue+', 45%, 80%)';
+		me.workingStar.linkElement.style.backgroundColor = 'hsl('+selectedhue+', 45%, 80%)';
 	}
 
 	function uploadCreation() {
@@ -395,13 +405,13 @@ function Creator() {
 		function onUploadProgress(e) {
 			if (e.lengthComputable) {
 				var progress = e.loaded / e.total;
-				workingStar.textElement.innerHTML = Math.floor(progress*100) + '% uploaded';
+				me.workingStar.textElement.innerHTML = Math.floor(progress*100) + '% uploaded';
 
 				if(progress == 1) { /// safe?
 					// complete();
 				}
 
-				//workingStar.linkElement.style.background = 'rgba(100, 255, 100', '+progress+')';
+				//me.workingStar.linkElement.style.background = 'rgba(100, 255, 100', '+progress+')';
 			} else {
 				//console.log('total size is unknown');
 			}
@@ -418,9 +428,9 @@ function Creator() {
 				throw(response.error);
 			}
 
-			workingStar.id = response.sid;
-			workingStar.element.id = 's'+workingStar.id;
-			workingStar.element.setAttribute('data-prev', originStarID);
+			me.workingStar.id = response.sid;
+			me.workingStar.element.id = 's'+me.workingStar.id;
+			me.workingStar.element.setAttribute('data-prev', originStarID);
 
 			actualizeCreation();
 		}
@@ -429,14 +439,14 @@ function Creator() {
 	function actualizeCreation() {
 		window.onbeforeunload = false;
 
-		if(!workingStar.fileReady || !workingStar.isPlaced) {
-			console.log(workingStar);
+		if(!me.workingStar.fileReady || !me.workingStar.isPlaced) {
+			console.log(me.workingStar);
 			return false;
 		}
 
 		Interface.hideMessage();
 
-		var formData = workingStar.export('FormData');
+		var formData = me.workingStar.export('FormData');
 
 		var request = {
 			method: "POST",
@@ -454,19 +464,19 @@ function Creator() {
 				//have server return the whole new star and call
 				//loadData on workingStar:
 
+				console.log(result);
 				// Update star element attributes:
-				workingStar.id = result.newStarID;
-				workingStar.titleElement.className = 'text name';
-				workingStar.titleElement.innerText = workingStar.title;
-				workingStar.timestamp = result.timestamp;
-				//workingStar.linkElement.href = '/' + result.newStarID;
-				workingStar.element.classList.remove('placementSymbol');
-				//workingStar.setAttribute('data-prev',
+				me.workingStar.id = result.newStarID;
+				me.workingStar.titleElement.className = 'text name';
+				me.workingStar.titleElement.innerText = me.workingStar.title;
+				me.workingStar.timestamp = result.timestamp;
+				me.workingStar.element.classList.remove('placementSymbol');
+				//me.workingStar.setAttribute('data-prev',
 
-				Stars.addStar(workingStar);
+				Stars.addStar(me.workingStar);
 
 				// Update ticket count:
-				if(workingStar.originStarID == -1) {
+				if(me.workingStar.originStarID == -1) {
 					clientState.act(CONSTS.ACTION.USE_CREATION_TICKET);
 				} else {
 					clientState.act(CONSTS.ACTION.USE_RECREATION_TICKET);
@@ -475,14 +485,12 @@ function Creator() {
 				// Shift stars around according to server instructions:
 				for(var starID in result.starMovements) {
 					var newPosition = result.starMovements[starID];
-					Promise.resolve(Stars.clientStars[starID].moveToXY(newPosition.x, newPosition.y))
-						///REVISIT architecture... should we prefer just a ClientStar.actualize() method?:
-						.then(() => workingStar.observeProperties())
+					Promise.resolve(Stars.clientStars[starID].animateToXY(newPosition.x, newPosition.y))
+						.then(() => me.workingStar.observeProperties())
+						///@REVISIT is it safe to not unset workingStar til later??:
+						.then(() => me.workingStar = null)
 						.then(() => Stars.generateConstellationLines());
 				}
-
-				// Unset workingStar; we're finished:
-				workingStar = null;
 
 				// Back to homepage.
 				navigation.navigate('/');

@@ -258,7 +258,7 @@ function ClientStarsAPI() {
 		var xOffset = -spc.x;
 		var yOffset = -spc.y;
 
-		me.clearConstellationLines();
+		//me.clearConstellationLines();
 
 		// Reposition each star
 		switch(view) {
@@ -272,9 +272,11 @@ function ClientStarsAPI() {
 
 					anime({
 						targets: clientStar.element,
-						left: clientStar.element.getAttribute('data-x') + 'px',
-						top: clientStar.element.getAttribute('data-y') + 'px',
-						duration: 500, ///TODO move 500 into maybe styleVars or at least a const
+						left: clientStar.position.x + 'px',
+						top: clientStar.position.y + 'px',
+						///TODO move 500 into maybe styleVars or at least a const
+						duration: 500,
+						update: (anim) => me.updateConstellationLines()
 						//complete: function() {}
 					});
 
@@ -305,6 +307,7 @@ function ClientStarsAPI() {
 							left: newX + xOffset + styleVars.starGridPaddingX + 'px',
 							top: newY + yOffset + styleVars.starGridPaddingY + 'px',
 							duration: 500,
+							update: (anim) => me.updateConstellationLines()
 						});
 
 						//constellationStar
@@ -356,6 +359,7 @@ function ClientStarsAPI() {
 						left: newX + styleVars.starGridPaddingX + xOffset + 'px',
 						top: newY + styleVars.starGridPaddingY + yOffset + 'px',
 						duration: 500,
+						update: (anim) => me.updateConstellationLines()
 					});
 
 
@@ -367,12 +371,6 @@ function ClientStarsAPI() {
 					}
 				}
 
-				// Redraw constellation lines:
-				///REVISIT are we good to just use time of animation + 150ms here?:
-				setTimeout(function() {
-					me.generateConstellationLines();
-					effects.onResize();
-				}, 650);
 			} break;
 
 			// case 'constellationRows': {
@@ -408,6 +406,14 @@ function ClientStarsAPI() {
 				console.error("Unhandled star view: " + view);
 			}
 		}
+
+		// Redraw constellation lines:
+		//@REVISIT are we good to just use time of animation + 100ms here?:
+		setTimeout(function() {
+			effects.onResize();
+			//me.generateConstellationLines();
+			me.updateConstellationLines();
+		}, 600);
 	}
 
 	function deleteStar(starElement) {
@@ -426,8 +432,12 @@ function ClientStarsAPI() {
 	/**
 	 * Prepare constellation lines for drawing.
 	 **/
+	//this.generateConstellationLines = function(animating = true) {
 	this.generateConstellationLines = function() {
-		lineDrawStartMS = performance.now();
+		//if(animating) {
+			lineDrawStartMS = performance.now();
+		//}
+
 		constellationLines = [];
 		animatingLines = [];
 		// isAnimating = true;
@@ -437,23 +447,30 @@ function ClientStarsAPI() {
 		// for (var starIndex = 0; starIndex < me.clientStars.length; starIndex++) {
 		// 	var clientStar = me.clientStars[starIndex];
 		me.clientStars.forEach((clientStar, starIndex) => {
-			var starElement = clientStar.element;
+			var starEle = clientStar.element;
 
 			if(clientStar.originStarID != -1) { // If this is not an origin star
-				var rootStar = document.getElementById('s' + clientStar.originStarID);
-				rootStar.setAttribute('data-next', clientStar.id); ///TODO figure out what "next" means when there are multiple child stars; also this shouldn't be here if it were being used
+				var originStarEle = document.getElementById('s' + clientStar.originStarID);
+				if(!originStarEle) {
+					console.error('root star not loaded for ' + clientStar.id);
+					throw false;
+				}
+
+				originStarEle.setAttribute('data-next', clientStar.id); ///TODO figure out what "next" means when there are multiple child stars; also this shouldn't be here if it were being used
 
 				// We use the star's style.left and .top in case we're in list/grid view:
 				constellationLines.push({
-					startX: parseInt(rootStar.style.left),
-					startY: parseInt(rootStar.style.top),
+					starEle,
+					originStarEle,
+					startX: parseInt(originStarEle.style.left),
+					startY: parseInt(originStarEle.style.top),
 					//endX: clientStar.position.x,
 					//endY: clientStar.position.y,
-					endX: parseInt(starElement.style.left),
-					endY: parseInt(starElement.style.top),
-					startColor: rootStar.getElementsByTagName('a')[0].style.backgroundColor, ///
-					endColor: starElement.getElementsByTagName('a')[0].style.backgroundColor, ///
-					tier: parseInt(starElement.getAttribute('data-tier')),
+					endX: parseInt(starEle.style.left),
+					endY: parseInt(starEle.style.top),
+					startColor: originStarEle.getElementsByTagName('a')[0].style.backgroundColor, ///
+					endColor: starEle.getElementsByTagName('a')[0].style.backgroundColor, ///
+					tier: parseInt(starEle.getAttribute('data-tier')),
 					isAnimating: true /// OPTIMIZATION?
 				});
 
@@ -465,12 +482,26 @@ function ClientStarsAPI() {
 	}
 
 	/**
+	 * Update the start and end positions of constellation lines.
+	 **/
+	this.updateConstellationLines = function() {
+		constellationLines.forEach(line => {
+			line.startX = parseInt(line.originStarEle.style.left);
+			line.startY = parseInt(line.originStarEle.style.top);
+			line.endX = parseInt(line.starEle.style.left);
+			line.endY = parseInt(line.starEle.style.top);
+		});
+
+		window.requestAnimationFrame(me.drawLineStep);
+	}
+
+	/**
 	 * Draw a frame of the branching constellations.
 	 * @param {number} currentMS
 	 * @todo Rename, probably.
 	 **/
-	this.drawLineStep = function(currentMS) {
-		//console.log("drawLineStep");
+	this.drawLineStep = function(currentMS = performance.now(), animating = true) {
+		console.log("drawLineStep");
 
 		effects.context.clearRect(0, 0, effects.canvas.width, effects.canvas.height);
 
@@ -514,10 +545,6 @@ function ClientStarsAPI() {
 			// var lineGradient = effects.context.createLinearGradient(0,0,170,0);
 			// var lineGradient = effects.context.createLinearGradient(line.startX,line.startY,line.endX,line.endY);
 			// var lineGradient = effects.context.createLinearGradient(0, 0, line.endX + line.startX, line.endY + line.startY);
-			if(!drawVec.x) {
-				console.log(line);
-				console.log(drawVec);
-			}
 
 			var lineGradient = effects.context.createLinearGradient( ///TODO maybe save this with the line? or the data involved?
 				line.startX + spc.x,
@@ -538,13 +565,13 @@ function ClientStarsAPI() {
 		}
 
 		/// optimize
-		if(animatingLines.length) {
+		if(animatingLines.length && animating) {
 			window.requestAnimationFrame(me.drawLineStep); ////
 		}
 	}
 
 	/**
-	 * Clear the canvas of the constellation lines.
+	 * Clear the cache and canvas of the constellation lines.
 	 * @todo /// make it not just clear the whole canvas or rename this method
 	 **/
 	this.clearConstellationLines = function() {

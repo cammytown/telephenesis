@@ -429,29 +429,6 @@ function StarMapper() {
 	}
 
 	/**
-	 * Updates documents in database to reflect any changes to structure of
-	 * Star.
-	 **/
-	this.updateDBSchemas = function() {
-		///REVISIT
-		return me.getStars(false, {})
-			.then(stars => {
-				stars.forEach(star => {
-					///TODO warn about unused properties and implement a param
-					//that if set true will remove them:
-
-					// Load data into a ServerStar to initialize data structure:
-					var serverStar = new ServerStar(star);
-					dbStars.updateOne(
-						{ id: star.id },
-						// Simply set all properties of the star to the newly crafted ServerStar's:
-						{ $set: serverStar.export() },
-					);
-				});
-			});
-		}
-
-	/**
 	 * Creates a new constellation and returns its ID.
 	 * @returns {number} - The ID of the constellation.
 	 */

@@ -50,18 +50,21 @@ class HistoryTime { //v0.1
 
 		if(path[0] != '/') path = '/' + path; ///REVISIT is this what we want to do?
 
-		while(this.activePathBinds.length) { ///REVISIT do we always want to clear the whole array on every navigateTo() call?
+		// Call any page unload callbacks:
+		//@REVISIT do we always want to clear the whole array on every
+		//navigateTo() call?
+		while(this.activePathBinds.length) { 
 			var activePathBind = this.activePathBinds.pop();
 			this.deactivatePathBind(activePathBind);
 		}
 
-		// Run wildcard callbacks
+		// Run wildcard callbacks:
 		for (var constantBindIndex = 0; constantBindIndex < this.pathBinds['*'].length; constantBindIndex++) {
 			var constantPathBind = this.pathBinds['*'][constantBindIndex];
 			this.activatePathBind(constantPathBind, path);
 		}
 
-		// Run callbacks for target path
+		// Run callbacks for target path:
 		if(this.pathBinds.hasOwnProperty(path)) {
 			for(var bindIndex = 0; bindIndex < this.pathBinds[path].length; bindIndex++) {
 				var pathBind = this.pathBinds[path][bindIndex];

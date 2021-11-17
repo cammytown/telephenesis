@@ -23,6 +23,8 @@ function login(req, res, next) {
 				// secure: true /// https only
 			});
 
+			console.log(telepUser);
+
 			req.user = telepUser;
 			next();
 		})

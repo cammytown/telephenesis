@@ -1,6 +1,9 @@
 //import mediaPlayer from './MediaPlayer';
 import CONSTS from '../../../abstract/constants';
+import config from '../../../abstract/telep.config.js';
 import Stars from './Stars';
+import ClientUser from './ClientUser';
+import profile from '../pages/Profile.jsx';
 
 /**
  * Holds data relevant to the client and initializes components.
@@ -10,10 +13,12 @@ function ClientState() {
 	var me = this;
 
 	/**
-	 * The user's bookmarks.
-	 * @type {ClientStar[]}
+	 * The logged-in user.
+	 * @type {ClientUser}
 	 **/
-	this.bookmarks = [];
+	///@TODO this is currently only populated on ajax login/register
+	///@TODO probably make some distinguishing 'guest' param
+	this.user = new ClientUser();
 
 	/**
 	 * The star being created or interacted with by the user.
@@ -34,7 +39,7 @@ function ClientState() {
 	///REVISIT consolidate this with activeWindow?
 	///REVISIT default value; doing this mainly because changes in historystate
 	//currently result in this value if going to homepage:
-	this.currentPage = ''; 
+	this.currentPage = '';
 
 	/**
 	 * The element of the page currently open on the client.
@@ -75,7 +80,7 @@ function ClientState() {
 	function initializeComponents() {
 		// Call init() on each component:
 		for(var component of components) {
-			component.init();
+			component.init(me);
 		}
 
 		// If component has a ready function, call it.
@@ -99,9 +104,11 @@ function ClientState() {
 	}
 
 	function readBookmarksCache() { ///REVISIT placement
+		///@TODO probably remove with something that more generally reads
+		//various properties of the logged-in user
 		var bookmarksInputEle = document.getElementById('user-bookmarks');
 		for(var starID of bookmarksInputEle.value.split(',')) {
-			me.bookmarks.push(Stars.clientStars[parseInt(starID)]);
+			me.user.bookmarks.push(Stars.clientStars[parseInt(starID)]);
 		}
 	}
 
@@ -131,16 +138,18 @@ function ClientState() {
 
 	/**
 	 * Updates elements of the interface to reflect new state.
+	 * @param [{Array.<CONSTS.ACTION>}] actions - The actions that occurred
+	 * which necessitate interface update.
 	 **/
-	this.update = function(actions = Object.values(CONSTS.ACTION)) { ///REVISIT naming; updateState? updateInterface?
-		// For each state-watcher, run relevant method:
-
+	///@REVISIT naming; updateState? updateInterface?:
+	this.update = function(actions = Object.values(CONSTS.ACTION)) {
+		// Only update parts of the interface relevant to the actions taken:
 		for(var action of actions) {
 			switch(action) {
 				case CONSTS.ACTION.TOGGLE_BOOKMARK: {
-					//var bookmarkCount = document.getElementsByClassName();
+					// Enable or disable bookmark sort links based on if there are bookmarks:
 					for(var bookmarkSortLink of document.getElementsByClassName('bookmarks-sort')) {
-						if(me.bookmarks.length) {
+						if(me.user.bookmarks.length) {
 							if(bookmarkSortLink.classList.contains('disabled')) {
 								bookmarkSortLink.classList.remove('disabled');
 							}
@@ -181,6 +190,46 @@ function ClientState() {
 		//uninitializedComponents.push(component);
 	};
 
+	/**
+	 * Updates interface to reflect logged-in user.
+	 * @param {ClientUser} user
+	 **/
+	this.login = function(user) {
+		me.user = user;
+
+		// Add logged-in class to page:
+		document.body.classList.add('in');
+
+		// Enable creator interface elements if authorized:
+		if(user.lv >= config.creatorLevel) {
+			document.body.classList.add('creator');
+		}
+
+		// Mark all bookmarks:
+		///@TODO i feel like this should be done in ClientUser... maybe a lot
+		//of this block
+		user.bookmarks.forEach(bookmarkedStar => {
+			bookmarkedStar.element.classList.add('bookmarked');
+			bookmarkedStar.isBookmarked = true;
+		});
+
+		// Re-render profile page:
+		profile.render();
+	}
+
+	this.logout = function() {
+		// Remove logged-in classes from interface:
+		document.body.classList.remove('in');
+		document.body.classList.remove('creator');
+
+		// Unset bookmarks in the interface:
+		for(var bookmarkedStar of me.user.bookmarks) {
+			bookmarkedStar.element.classList.remove('bookmarked');
+			bookmarkedStar.isBookmarked = false;
+		}
+
+		me.user = new ClientUser();
+	}
 	// me.observeEvent = function(event) { ///REVISIT naming/architecture
 	// }
 

@@ -4,12 +4,13 @@ import cor from '../libs/minlab/cor';
 // import ajx from '../libs/minlab/ajx';
 import spc from '../libs/minlab/spc';
 import HistoryTime from '../libs/history-time';
-import Navigation from './Navigation';
+import navigation from './Navigation';
 
 import clientState from './ClientState';
 import mediaPlayer from './MediaPlayer';
+import creator from './Creator';
 //import effects from './ClientEffects';
-import Stars from './Stars';
+import stars from './Stars';
 import CONSTS from '../../../abstract/constants.js';
 import locale from '../../../locale/en_us.json'; ///REVISIT
 
@@ -45,17 +46,17 @@ function Interface() {
 		// 	});
 		// }
 
-		spc.moveCallbacks.push(Stars.drawLineStep);
+		spc.moveCallbacks.push(stars.drawLineStep);
 
 		window.addEventListener('scroll', function(eve) {
-			window.requestAnimationFrame(Stars.drawLineStep);
+			window.requestAnimationFrame(stars.drawLineStep);
 		});
 
 		////REVISIT can we guarantee this will run AFTER
 		//clientEffects's listener does on every browser?  if it
 		//doesn't, the canvas will be cleared after we draw the stars:
 		window.addEventListener('resize', () => {
-			window.requestAnimationFrame(Stars.drawLineStep);
+			window.requestAnimationFrame(stars.drawLineStep);
 		});
 
 		/* NAVIGATION */
@@ -80,6 +81,12 @@ function Interface() {
 
 		/* SHORTCUTS */
 		window.addEventListener('keydown', function(e) {
+			// Ignore key presses with modifier keys:
+			if(e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) {
+				console.log("??");
+				return true;
+			}
+
 			///REVISIT better way to check if it's a form element?
 			if(["INPUT", "TEXTAREA"].includes(e.target.tagName.toUpperCase())) { // .toUpperCase() out of paranoia
 				return true;
@@ -94,7 +101,7 @@ function Interface() {
 					if(clientState.playingStar) {
 						// If there's a previous star:
 						if(clientState.playingStar.originStarID != -1) {
-							var previousStar = Stars.clientStars[clientState.playingStar.originStarID];
+							var previousStar = stars.clientStars[clientState.playingStar.originStarID];
 							mediaPlayer.playStar(previousStar);
 						}
 					}
@@ -108,7 +115,7 @@ function Interface() {
 						///TODO better solution:
 						var nsid = parseInt(clientState.playingStar.element.getAttribute('data-next'));
 						/// if next star isn't loaded? if there is no next star?
-						var nextStar = Stars.clientStars[nsid];
+						var nextStar = stars.clientStars[nsid];
 						if(!nextStar) {
 							///REVISIT
 							return false;
@@ -129,11 +136,16 @@ function Interface() {
 
 				// ESC / Escape:
 				case 27: {
-					if(HistoryTime.state.url != '/') {
-						Navigation.navigate('/'); //// page title
+					///@TODO probably come up with prettier check:
+					if(creator.workingStar) {
+						creator.cancel();
+					} else {
+						if(HistoryTime.state.url != '/') {
+							navigation.navigate('/'); //// page title
 
-						if(me.view != CONSTS.VIEW.GALAXY) {
-							me.sort(CONSTS.VIEW.GALAXY);
+							if(me.view != CONSTS.VIEW.GALAXY) {
+								me.sort(CONSTS.VIEW.GALAXY);
+							}
 						}
 					}
 				} break;
@@ -151,22 +163,23 @@ function Interface() {
 	 * @see ClientState#addComponent
 	 **/
 	this.ready = function() {
-		Stars.generateConstellationLines();
+		stars.generateConstellationLines();
 
-		///TODO revisit implementation; probably render on the server:
 		// If loaded URL contains a query string:
-		if(location.search.length) {
-			// Check for view and/or order in query string:
-			var params = new URLSearchParams(location.search);
-			var initialOrder = params.get('order');
-			var initialView = params.get('view');
+		//@TODO-1 revisit implementation; probably render on the server:
+		//if(window.location.search.length) {
+		//    // Check for view and/or order in query string:
+		//    //@TODO-2 ensure IE support:
+		//    var params = new URLSearchParams(location.search);
+		//    var initialOrder = params.get('order');
+		//    var initialView = params.get('view');
 
-			// If there's a view or order in the query string:
-			if(initialOrder || initialView) {
-				// Display the view and/or order:
-				me.sort(initialOrder, initialView);
-			}
-		}
+		//    // If there's a view or order in the query string:
+		//    if(initialOrder || initialView) {
+		//        // Display the view and/or order:
+		//        me.sort(initialOrder, initialView);
+		//    }
+		//}
 	}
 
 	/**
@@ -174,7 +187,7 @@ function Interface() {
 	 * @param {string} message - The message to display.
 	 * @param {string} [type="notification"] - The type of message.
 	 * @param {number} [duration=5000] - How long to display the message for.
-	 */
+	 **/
 	this.displayMessage = function(message, type = "notification", duration = 5000) { ///REVISIT naming
 		clearMessageTimer();
 
@@ -247,7 +260,7 @@ function Interface() {
 				+ '&order=' + me.order.toLowerCase();
 		}
 
-		Navigation.navigate(newURI);
+		navigation.navigate(newURI);
 	}
 
 	/**
@@ -257,6 +270,7 @@ function Interface() {
 	 * @param {Element} [clickedEle = false] - The sort link that was clicked to run this method.
 	 **/
 	this.sort = function(order, view, clickedEle = false) {
+		console.log('Navigation.sort(): ' + [order, view]);
 		///REVISIT not into all this .toLowerCase() business... better design?
 
 		if(order) {
@@ -326,7 +340,7 @@ function Interface() {
 		}
 
 		// Actually sort and position the stars:
-		Stars.sort(me.order, me.view);
+		stars.sort(me.order, me.view);
 	}
 
 	// me.invite = function(event) {

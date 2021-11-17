@@ -6,19 +6,33 @@
 function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta architecture
 	const me = this;
 
-	/* PROPERTIES: */
-
-	/** Properties relevant to import/export. **/
-	//const identityProps = [
-	//];
-
 	const exportLists = {
 		identity: [
 			'id',
 			'email',
+			'lv',
 			'sessionCode',
 			'displayName',
 			'creatorName',
+			'creationTickets',
+			'recreationTickets',
+			'bookmarks',
+		],
+
+		usrMeta: [
+			'userID', ///REVISIT weird architecture relies on converting id to userID sometimes
+			'email',
+			'displayName',
+			'creatorName',
+			'creationTickets',
+			'recreationTickets',
+			'bookmarks',
+		],
+
+		client: [
+			'email',
+			'lv',
+			'displayName',
 			'creationTickets',
 			'recreationTickets',
 			'bookmarks',
@@ -31,22 +45,29 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 	};
 
 	function init(usrDoc = null, userMeta = null) {
-		var proposedValues = {};
-
+		//var proposedValues = {};
+		
 		if(usrDoc) {
-			proposedValues['id'] = usrDoc.id;
-			proposedValues['email'] = usrDoc.em;
-			proposedValues['sessionCode'] = usrDoc.ss;
+			me.loadData({
+				'id': usrDoc.id,
+				'lv': usrDoc.lv,
+				'email': usrDoc.em,
+				'sessionCode': usrDoc.ss,
+			});
 		}
+		//me.loadData(usrDoc);
 
 		if(userMeta) {
-			userMeta['id'] = userMeta.userID; ///REVISIT architecture
-			Object.assign(proposedValues, userMeta);
+			if(userMeta['id']) {
+				userMeta['id'] = userMeta.userID; ///REVISIT architecture
+			}
+
+			me.loadData(userMeta);
 		}
 
-		me.loadData(proposedValues);
+		//me.loadData(proposedValues);
 
-		console.log(me);
+		//console.log(me);
 	}
 
 	/**
@@ -54,6 +75,7 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 	 * filtering out non-identity props.
 	 * @param {object} data - An object of new properties/values to load.
 	 **/
+	///@TODO initializeProps not currently in use:
 	this.loadData = function(data, initializeProps = false) {
 		for(var identityProp of exportLists.identity) {
 			if(data.hasOwnProperty(identityProp)) {
@@ -75,6 +97,13 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 
 		for(var prop of exportLists[exportType]) {
 			returnObject[prop] = me[prop];
+		}
+
+		///@RE-1 architecture:
+		if(exportType == 'usrMeta') {
+			if(me.hasOwnProperty('id')) {
+				returnObject['userID'] = me['id'];
+			}
 		}
 
 		return returnObject;

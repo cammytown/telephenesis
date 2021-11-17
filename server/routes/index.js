@@ -7,6 +7,7 @@ const ServerStar = require('../components/ServerStar.js');
 const api = require('../components/TelepAPI');
 const Stars = require('../components/StarMapper');
 const CONSTS = require('../../abstract/constants.js');
+const config = require('../../abstract/telep.config.js');
 
 const authRouter = require('./auth');
 const ajaxRouter = require('./ajax');
@@ -114,9 +115,9 @@ function TelepRouter() {
 		if(req.user) {
 			className += ' in';
 
-			//if(req.user.lv > 0) {
+			if(req.user.lv >= config.creatorLevel) {
 				className += ' creator';
-			//}
+			}
 
 			if(req.user.lv == 7) {
 				className += ' adminor';
