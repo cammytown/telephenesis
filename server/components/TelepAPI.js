@@ -126,9 +126,10 @@ function TelepAPI(server) {
 	me.login = function(email, password, ip) {
 		return usr.li(email, password, ip)
 			.then(usrDoc => {
-				var userMeta = me.getUserMeta(usrDoc.id);
-				var user = new TelepUser(usrDoc, userMeta);
-				return user;
+				return me.getUserMeta(usrDoc.id)
+					.then(userMeta => {
+						return new TelepUser(usrDoc, userMeta);
+					});
 			})
 			.catch(err => {
 				throw err;
@@ -146,9 +147,10 @@ function TelepAPI(server) {
 					bookmarks: [],
 				};
 
+				console.log(userMetaObject);
 				var newUser = new TelepUser(usrDoc, userMetaObject);
 
-				return usrMeta.insertOne(newUser.export())
+				return usrMeta.insertOne(newUser.export('usrMeta'))
 					.then(result => {
 						return newUser;
 					})

@@ -14,19 +14,21 @@ form#recreate-page.uibox(method="POST" action="/recreate")
 	include _creationForm.pug
 
 
-form#renameStar.uibox(action="/renameStar" method="POST")
-	h2 Rename Star
-	input.bad.init(name="creatorName" type="text" placeholder="Creator Name")
-	input.activeStarIdInput(name="sid" type="hidden")
-	button.btn.main(type="submit") submit
-	//- a.btn.red.close close
+//-form#renameStar.uibox(action="/renameStar" method="POST")
+//-    h2 Rename Star
 
-form#deleteStar.uibox(action="/deleteStar" method="POST")
-	h2 Delete Star Confirmation
-	input.activeStarIdInput(name="starID" type="hidden")
-	div Are you sure?
-		button.btn.main(type="submit") Yes.
-		a.btn.red.close No.
+//-    input.bad.init(name="creatorName" type="text" placeholder="Creator Name")
+//-    input.activeStarIdInput(name="sid" type="hidden")
+//-    button.btn.main(type="submit") submit
+//-    //- a.btn.red.close close
+
+//-form#deleteStar.uibox(action="/deleteStar" method="POST")
+//-    h2 Delete Star Confirmation
+
+//-    input.activeStarIdInput(name="starID" type="hidden")
+//-    div Are you sure?
+//-        button.btn.main(type="submit") Yes.
+//-        a.btn.red.close No.
 
 +star()#placementSymbol.placementSymbol
 

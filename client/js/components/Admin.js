@@ -72,7 +72,7 @@ function TelepAdmin() {
 	}
 
 	function mouseMoveStarMove(eve) {
-		me.targetStar.moveToXY(
+		me.targetStar.animateToXY(
 			eve.clientX - spc.map.offsetLeft, ///TODO spc should just have properties... shouldnt have to use offsetLeft
 			eve.clientY - spc.map.offsetTop,
 		);

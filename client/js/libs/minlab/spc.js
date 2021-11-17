@@ -23,7 +23,7 @@ function Spc(elementID = "spc") {
 	document.addEventListener("DOMContentLoaded", init); //// backwards-compatibility
 
 	var targetCenter = false;
-	var centering = false;
+	var animating = false;
 
 	var bfr = 3; ///
 	var seg = 500; ///
@@ -42,7 +42,9 @@ function Spc(elementID = "spc") {
 		lyr = document.getElementsByClassName('lyr'); /// ByClassName
 
 		cor.al(me.element, 'mousedown', grb);
+		//cor.al(me.element, 'mouseup', rls);
 		cor.al(window, 'mouseup', rls);
+		cor.al(window, 'dragend', rls);
 		//al(window, 'mouseout', rls);
 
 		me.s = 1;
@@ -96,7 +98,12 @@ function Spc(elementID = "spc") {
 		}
 	}
 
-	function stepCenter(ms) {
+	function stepTowardsPos(ms) {
+		// If animation has been cancelled (i.e. user clicked):
+		if(!animating) {
+			return false;
+		}
+
 		var curPos = new me.Vec2(me.x, me.y); /// use globally later
 		var diff = targetCenter.subtract(curPos);
 		var distance = diff.getMagnitude();
@@ -104,13 +111,15 @@ function Spc(elementID = "spc") {
 		// var speed = 9;
 		var speed = Math.max(Math.min(distance / 25, 25), 1);
 
+		// If there's still distance to move after this frame:
 		if(distance > speed) {
 			var change = diff.normalize().scale(speed);
 			me.set(me.x + change.x, me.y + change.y); ///
-			window.requestAnimationFrame(stepCenter);
+			window.requestAnimationFrame(stepTowardsPos);
+		// Otherwise, just set it to the target position:
 		} else {
 			me.set(targetCenter.x, targetCenter.y);
-			centering = false;
+			animating = false;
 		}
 	}
 
@@ -124,9 +133,9 @@ function Spc(elementID = "spc") {
 
 		targetCenter = new me.Vec2(x, y);
 
-		if(!centering) {
-			centering = true;
-			window.requestAnimationFrame(stepCenter);
+		if(!animating) {
+			animating = true;
+			window.requestAnimationFrame(stepTowardsPos);
 		}
 
 		// for(var i = lyr.length - 1; i >= 0; i--) {
@@ -217,9 +226,13 @@ function Spc(elementID = "spc") {
 	}
 
 	function grb(e) {
+		///@TODO check if e.target == .spc or .lyr at least as config option
 		if(!me.s || e.button == 2) {
 			return false;
 		}
+
+		// Cancel any panning animation:
+		animating = false;
 
 		lastX = e.clientX;
 		lastY = e.clientY;
@@ -229,6 +242,7 @@ function Spc(elementID = "spc") {
 	}
 
 	function rls(e) {
+		console.log('spc release');
 		cor.rl(me.element, 'mousemove', drg);
 		me.element.removeAttribute('class');
 	}
@@ -243,7 +257,7 @@ function Spc(elementID = "spc") {
 
 		me.set(x, y);
 		// me.ctr(Math.floor(x), Math.floor(y));
-		// centering = true;
+		// animating = true;
 		// targetCenter = new me.Vec2(x, y);
 		// mov(x, y);
 	}

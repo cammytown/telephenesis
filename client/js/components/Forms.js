@@ -2,11 +2,10 @@ import cor from '../libs/minlab/cor';
 import Pijin from '../libs/pijin-js';
 // import HistoryTime from '../libs/history-time';
 
-import navigation from './Navigation';
 import clientState from './ClientState';
+import navigation from './Navigation';
+import ClientUser from './ClientUser';
 import ClientComment from './ClientComment.jsx';
-
-import config from '../../../abstract/telep.config.js';
 
 export default new ClientForms();
 
@@ -104,12 +103,8 @@ function ClientForms() {
 				case 'register':
 				case 'login':
 				{
-					cor.ac(document.body, 'in');
-
-					if(op == 'login' && result.lv >= config.creatorLevel) {
-						cor.ac(document.body, 'creator');
-					}
-
+					var user = new ClientUser(result.user);
+					clientState.login(user);
 					navigation.navigate('/'); ///
 				} break;
 

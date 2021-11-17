@@ -6,7 +6,7 @@ import spc from '../libs/minlab/spc';
 import Star from '../../../abstract/Star.js';
 import Vector from '../../../abstract/Vector.js';
 import MediaPlayer from './MediaPlayer';
-import ClientState from './ClientState';
+import clientState from './ClientState';
 import Navigation from './Navigation';
 import Comments from './Comments';
 
@@ -100,35 +100,32 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	}
 
 	/**
-	 * Moves the star to a 2D coordinate.
+	 * Moves the star to a 2D coordinate over time.
 	 * @param x {number}
 	 * @param y {number}
 	 * @param animate {bool}
 	 */
-	this.moveToXY = function(x, y, animate = true) {
+	this.animateToXY = function(x, y) {
 		var newPos = new Vector(x, y);
-		if(!animate) {
-			me.position = newPos;
-		} else {
-			animatingPosition = newPos;
-			animationTimer = animationLength;
 
-			if(!currentAnimation) {
-				var animation = anime({
-					/// move this block somewhere central:
-					targets: me.element,
-					left: () => { return animatingPosition.x + 'px' },
-					top: () => { return animatingPosition.y + 'px' },
-					duration: () => { return animationTimer },
-					complete: () => {
-						// Stars.generateConstellationLines();
-						currentAnimation = false;
-						this.moveToXY(x, y, false);
-					}
-				});
+		animatingPosition = newPos;
+		animationTimer = animationLength;
 
-				return animation.finished;
-			}
+		if(!currentAnimation) {
+			var animation = anime({
+				/// move this block somewhere central:
+				targets: me.element,
+				left: () => { return animatingPosition.x + 'px' },
+				top: () => { return animatingPosition.y + 'px' },
+				duration: () => { return animationTimer },
+				complete: () => {
+					// Stars.generateConstellationLines();
+					currentAnimation = false;
+					me.position = newPos;
+				}
+			});
+
+			return animation.finished;
 		}
 	}
 
@@ -146,7 +143,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		cor._('#playingCreatorLink').innerHTML = creatorLink;
 
 		// cor._('#playingStarHeader').style.display = 'block';
-		cor.ac(document.body, 'playing')
+		cor.ac(document.body, 'playing');
 
 		var playingStarInputs = document.querySelectorAll('.playing-star-id');
 		for(var playingStarInput of playingStarInputs) {
@@ -170,8 +167,8 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 				cor.ac(this.element, 'bookmarked');
 				me.isBookmarked = true;
-				ClientState.bookmarks.push(me);
-				ClientState.update();
+				clientState.user.bookmarks.push(me);
+				clientState.update();
 			})
 			.catch(err => {
 				console.error(err);
@@ -183,7 +180,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	 * Removes bookmark from star for client's user account.
 	 **/
 	this.removeBookmark = function() {
-		return cor.POST('/ajax/removeBookmark', { starID: this.id })
+		return cor.POST('/ajax/remove-bookmark', { starID: this.id })
 			.then(response => response.json())
 			.then(result => {
 				if(result.errors) {
@@ -192,8 +189,8 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 				this.element.classList.remove('bookmarked');
 				me.isBookmarked = false;
-				ClientState.bookmarks.splice(ClientState.bookmarks.indexOf(me), 1);
-				ClientState.update();
+				clientState.user.bookmarks.splice(clientState.user.bookmarks.indexOf(me), 1);
+				clientState.update();
 			})
 			.catch(err => {
 				console.error(err);
@@ -261,6 +258,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 			switch(property) {
 				case 'id': {
 					me.element.id = 's' + me.id;
+					me.linkElement.href = '/star/' + me.id;
 				} break;
 
 				case 'position': {
@@ -275,7 +273,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 				case 'fileURL': {
 					me.element.setAttribute('data-fileURL', me.fileURL);
-					me.linkElement.href = me.fileURL;
+					//me.linkElement.href = me.fileURL;
 				} break;
 
 				case 'timestamp': {

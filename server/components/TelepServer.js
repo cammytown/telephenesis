@@ -11,6 +11,7 @@ const Usr = require('../libs/Usr.js'); ///REVISIT Usr or usr? changes between fi
 
 const TelepAPI = require('./TelepAPI.js');
 const StarMapper = require('./StarMapper');
+const AdminMapper = require('./AdminMapper');
 const TelepRouter = require('../routes'); ///REVISIT have a TelepRouter in components/ ?
 const serverConfig = require('../telepServer.config.js');
 
@@ -124,6 +125,7 @@ function TelepServer() {
 
 		components.push(TelepAPI);
 		components.push(StarMapper);
+		components.push(AdminMapper);
 		components.push(TelepRouter);
 
 		return true;

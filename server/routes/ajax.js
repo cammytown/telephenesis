@@ -151,7 +151,6 @@ function createComment(req, res, next) {
 		throw new Error("Not logged in or not permitted.");
 	}
 
-	console.log(req.user);
 	return api.createComment(
 		req.user,
 		parseInt(req.body['starID']),
@@ -305,11 +304,9 @@ function userCheck(req, res) {
 	res.json({
 		errors: [],
 		///TODO probably generalize front-end props; maybe a ClientUser class
-		lv: req.user.lv,
-		bookmarks: req.user.bookmarks,
-		creationTickets: req.user.creationTickets,
-		recreationTickets: req.user.recreationTickets,
+		user: req.user.export('client'),
 	});
+
 	return true;
 }
 

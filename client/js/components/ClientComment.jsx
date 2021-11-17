@@ -4,7 +4,6 @@ export default ClientComment;
 
 /**
  * Represents a comment for a star on the client interface.
- * @param {string} text - Text content of the comment.
  * @param {object} commentData
  * @constructor
  */

@@ -89,17 +89,9 @@ function ClientNavigation() {
 				var initialPageEle = document.getElementById(page + '-page');
 				clientState.activeWindow = initialPageEle;
 			}
-
-			switch(page) {
-				case 'star':
-				case 'create':
-				case 'recreate': {
-					// Run normal path logic, setting pageInit arg to true:
-					observePath(location.pathname, true);
-				} break;
-			}
 		}
 
+		observePath(location.href, true);
 	}
 
 	function onNavLinkClick(event) {
@@ -198,6 +190,33 @@ function ClientNavigation() {
 		var pathParts = path.split('/');
 		var newPage = pathParts[1];
 
+		//if(clientState.currentPage == newPage) {
+		//    return false;
+		//}
+
+		// Validate ability to navigate to page:
+		///@REVISIT maybe move this switch somewhere else:
+		switch(newPage) {
+			case 'create': {
+				// Check if user has creation tickets:
+				if(!clientState.creationTickets) {
+					Interface.displayError(CONSTS.ERROR.NO_CREATION_TICKETS);
+					return false;
+				}
+			} break;
+
+			case 'recreate': {
+				var starID = parseInt(pathParts[2]);
+
+				// Check if user has recreation tickets:
+				if(!clientState.recreationTickets) {
+					Interface.displayError(CONSTS.ERROR.NO_RECREATION_TICKETS);
+					return false;
+				}
+			} break;
+		}
+
+		// Change page title:
 		var pageTitle = "telephenesis";
 		if(newPage) {
 			////TODO
@@ -217,23 +236,15 @@ function ClientNavigation() {
 
 		// Handle previous page state: ///REVISIT move to separate method?
 		if(boxPages.includes(clientState.currentPage)) {
-			close();
+			if(oldPage != newPage) {
+				me.close();
+			}
 		} else {
 			switch(oldPage) {
 				case '':
 				case 'star':
 				{
 					// Nothing.
-				} break;
-
-				case 'place':
-				case 'color':
-				{
-					// If exiting creation flow:
-					if(!createPages.includes(newPage)) {
-						// Remove working star:
-						Creator.cancel();
-					}
 				} break;
 
 				default: {
@@ -249,24 +260,46 @@ function ClientNavigation() {
 	 **/
 	///REVISIT not sold on architecture of pageInitialization:
 	function observePath(path, pageInitialization = false) {
-		var pathParts = path.split('/');
+		///@TODO I don't really like using window.location.origin:
+		///@TODO store url somewhere in clientState
+		var url = new URL(path, window.location.origin); ///@TODO ensure IE support for URL
+		var pathParts = url.pathname.split('/');
 		var newPage = pathParts[1];
 
-		// If this is not initial page load:
+		// If this is not initial page load (and thus we cannot rely on the
+		// server having rendered certain things):
 		if(!pageInitialization) {
 			closeContextMenu(); ///REVISIT always?
 
 			preparePathChange(newPage);
 
+			// Open the UI for the page if there is one:
 			if(boxPages.includes(newPage)) {
 				open(newPage);
 			}
 
+			// If starting to create a star; change to galaxy view:
 			if(createPages.includes(newPage)) {
 				Interface.sort(CONSTS.ORDER.GALAXY);
 			}
 		}
 
+		//@TODO-1 revisit implementation; probably render on the server for page load:
+		var params = url.searchParams;
+		var order = params.get('order');
+		var view = params.get('view');
+
+		// If there's a view or order in the query string:
+		if(order || view) {
+			// Display the view and/or order:
+			Interface.sort(order, view);
+		} else {
+			if(Interface.order != CONSTS.ORDER.GALAXY) {
+				Interface.sort(CONSTS.ORDER.GALAXY);
+			}
+		}
+
+		// Do page-specific things:
 		switch(newPage) {
 			case 'star': {
 				var starID = parseInt(pathParts[2]);
@@ -279,42 +312,37 @@ function ClientNavigation() {
 					spc.ctr(
 						Stars.clientStars[starID].position.x,
 						Stars.clientStars[starID].position.y
-					); 
+					);
 				}
 
 				Stars.clientStars[starID].play();
 			} break;
 
 			case 'create': {
-				// Check if user has creation tickets:
-				if(!clientState.creationTickets) {
-					Interface.displayError(CONSTS.ERROR.NO_CREATION_TICKETS);
-					return false;
-				}
-
 				Creator.initializeCreation();
 			} break;
 
 			case 'recreate': {
 				var starID = parseInt(pathParts[2]);
-
-				// Check if user has recreation tickets:
-				if(!clientState.recreationTickets) {
-					Interface.displayError(CONSTS.ERROR.NO_RECREATION_TICKETS);
-					return false;
-				}
-
 				Creator.initializeCreation(Stars.clientStars[starID]);
 			} break;
 
 			case 'bookmark': {
-				limbo.appendChild(starContextMenu); ///REVISIT
-				clientState.actingStar.bookmark();
+				if(!pageInitialization) {
+					limbo.appendChild(starContextMenu); ///REVISIT
+					clientState.actingStar.bookmark();
+				} else {
+					//@TODO-1
+				}
 			} break;
 
 			case 'remove-bookmark': {
-				limbo.appendChild(starContextMenu);
-				clientState.actingStar.removeBookmark();
+				if(!pageInitialization) {
+					limbo.appendChild(starContextMenu);
+					clientState.actingStar.removeBookmark();
+				} else {
+					//@TODO-1
+				}
 			} break;
 
 			case 'logout': {
@@ -322,9 +350,6 @@ function ClientNavigation() {
 			} break;
 
 			case '': { ///REVISIT architecture; should newPage be false for this?
-				if(Interface.order != CONSTS.ORDER.GALAXY) {
-					Interface.sort(CONSTS.ORDER.GALAXY);
-				}
 			} break;
 
 			default: {
@@ -346,7 +371,7 @@ function ClientNavigation() {
 	}
 
 	function open(page) {
-		clientState.currentPage = page;
+		//clientState.currentPage = page;
 
 		var pageElement = document.getElementById(page + '-page');
 		if(pageElement) {
@@ -359,8 +384,11 @@ function ClientNavigation() {
 		}
 	}
 
-	///:
-	function close(page) {
+	/**
+	 * Close an open page.
+	 * @param {Element} [page]
+	 **/
+	this.close = function(page) {
 		page = (typeof page === "undefined") ? clientState.activeWindow : page;
 
 		///:
@@ -368,7 +396,6 @@ function ClientNavigation() {
 		// cor.rc(menuToggleElement, 'active');
 		// cor.rc(document.getElementById('menu'), 'active');
 
-		console.log(page);
 		if(page) {
 			switch(page) {
 				case 'place': {
@@ -384,11 +411,12 @@ function ClientNavigation() {
 			});
 		}
 
-		clientState.currentPage = false;
-		clientState.activeWindow = false;
+		//clientState.currentPage = false;
+		clientState.activeWindow = null;
 	}
 
-	function logout() { ///REVISIT placement
+	function logout() { ///REVISIT placement; maybe put into a ClientUser
+		///@REVISIT technically I suppose we don't even need to ping the server?
 		return fetch('/ajax/logout', {
 			method: "POST",
 			body: {}
@@ -398,10 +426,7 @@ function ClientNavigation() {
 				if(result.errors.length) {
 					console.error(result.errors); ///
 				} else {
-					var loginPageEle = document.getElementById('login-page');
-					loginPageEle.children[1].value = "";
-					cor.rc(document.body, 'in');
-					cor.rc(document.body, 'creator');
+					clientState.logout();
 				}
 			})
 			.catch(err => {
@@ -410,3 +435,4 @@ function ClientNavigation() {
 			});
 	}
 }
+
