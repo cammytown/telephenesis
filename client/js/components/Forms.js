@@ -33,7 +33,8 @@ function ClientForms() {
 
 	function onAjaxSubmit(request, event) {
 		var form = event.target;
-		var op = form.action.split('/').pop();
+		//var op = form.action.split('/').pop();
+		var op = form.getAttribute('data-ajax-action').split('/').pop();
 
 		///REVISIT I don't like this architecture. Perhaps solution would be to
 		//have this class have a method that allows us to hook into this
@@ -64,7 +65,8 @@ function ClientForms() {
 		var form = event.target;
 		// var children = form.children;
 		//var op = form.id.split('-page')[0]; ///REVISIT bad architecture
-		var op = form.action.split('/').pop(); ///REVISIT not very future-proof architecture
+		///REVISIT not very future-proof architecture:
+		var op = form.getAttribute('data-ajax-action').split('/').pop();
 
 		if(result.errors.length) {
 			// console.error(result.errors);
@@ -109,17 +111,23 @@ function ClientForms() {
 				} break;
 
 				case 'create-comment': {
-					console.log('create comment');
 					// If user is still on the star they left a comment for:
 					if(clientState.playingStar == commentingStar) {
+						// If new comment is a reply:
+						if(result.newComment.replyingTo) {
+							// Close reply controls:
+							var activeControls = document.querySelector('.comment-controls.replying');
+							if(activeControls) { //@REVISIT necessary?
+								activeControls.classList.remove('replying');
+							}
+						// Comment is not a reply:
+						} else {
+							// Reset comment textarea:
+							form.querySelector('textarea.comment-text').value = '';
+						}
+
 						// Add new comment to interface:
-						new ClientComment({
-							starID: parseInt(request.body['starID']),
-							text: request.body['commentText'],
-							timestamp: new Date(),
-							user: { displayName: document.querySelector('#profile_display-name').value } ///TODO
-							//user: { displayName: "You" } ///TODO
-						});
+						new ClientComment(result.newComment);
 					}
 				} break;
 

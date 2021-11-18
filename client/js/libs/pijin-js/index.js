@@ -29,12 +29,14 @@ function Pijin() {
 
 		me.options = Object.assign(me.options, options);
 
-		let pijinForms = document.getElementsByClassName(me.options.className);
-		for (var formIndex = 0; formIndex < pijinForms.length; formIndex++) {
-			var pijinForm = pijinForms[formIndex];
-			// pijinForm.addEventListener('submit', me.onPijinFormSubmit);
-			pijinForm.addEventListener('submit', (event) => me.onPijinFormSubmit(event));
-		}
+		document.body.addEventListener('submit', onBodySubmit);
+
+		//let pijinForms = document.getElementsByClassName(me.options.className);
+		//for (var formIndex = 0; formIndex < pijinForms.length; formIndex++) {
+		//    var pijinForm = pijinForms[formIndex];
+		//    // pijinForm.addEventListener('submit', me.onPijinFormSubmit);
+		//    pijinForm.addEventListener('submit', (event) => me.onPijinFormSubmit(event));
+		//}
 
 		if(me.options.submitCallback) {
 			me.callbacks.submit.push(me.options.submitCallback);
@@ -42,6 +44,12 @@ function Pijin() {
 
 		if(me.options.responseCallback) {
 			me.callbacks.response.push(me.options.responseCallback);
+		}
+	}
+
+	function onBodySubmit(event) {
+		if(event.target.classList.contains(me.options.className)) {
+			me.onPijinFormSubmit(event);
 		}
 	}
 
@@ -84,6 +92,7 @@ function Pijin() {
 		//there are no callbacks:
 		request = generateRequest(form);
 
+		console.log(form);
 		var actionURI = form.action;
 
 		// If form has user-defined action override attribute:

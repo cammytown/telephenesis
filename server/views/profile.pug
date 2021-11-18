@@ -3,13 +3,13 @@ input#user-bookmarks( ///REVISIT architecture
 	value= user ? user.bookmarks.join(",") : ""
 )
 
-form#settings-page.ajax.uibox(
+form#settings-page.ajax.uibox.center-text(
 	method='POST',
 	action='/update-profile'
 	data-ajax-action='/ajax/update-profile'
 )
 	label.floatBeside(for="profile_email") Email
-	input#profile_email(
+	input#profile_email.center-text(
 		type="text"
 		name="email"
 		placeholder="email"
@@ -18,7 +18,7 @@ form#settings-page.ajax.uibox(
 	)
 
 	label.floatBeside(for="profile_display-name") Display Name
-	input#profile_display-name(
+	input#profile_display-name.center-text(
 		type="text"
 		name="displayName"
 		placeholder="display name"

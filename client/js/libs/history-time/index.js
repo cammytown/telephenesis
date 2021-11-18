@@ -36,6 +36,14 @@ class HistoryTime { //v0.1
 	// }
 
 	popState(event) {
+		if(!event.state) {
+			//@TODO-3 I don't fully understand when event.state is null. I
+			//think, for one, it's null when using hash/anchor links as the
+			//document has not changed
+
+			return false;
+		}
+
 		this.state = event.state;
 		// var pageTitle = this.state.url.split('/').pop();
 		if(this.gtag) {

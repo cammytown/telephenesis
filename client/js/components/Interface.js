@@ -22,8 +22,8 @@ function Interface() {
 	// var currentOrderLink;
 	var me = this;
 
-	me.order = CONSTS.ORDER.GALAXY;
-	me.view = CONSTS.VIEW.GALAXY;
+	this.order = CONSTS.ORDER.GALAXY;
+	this.view = CONSTS.VIEW.GALAXY;
 
 	/** Element which holds messages shown to user. **/
 	var messageElement;
@@ -83,7 +83,6 @@ function Interface() {
 		window.addEventListener('keydown', function(e) {
 			// Ignore key presses with modifier keys:
 			if(e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) {
-				console.log("??");
 				return true;
 			}
 

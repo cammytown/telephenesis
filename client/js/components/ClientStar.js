@@ -17,7 +17,7 @@ export default ClientStar;
  * @param [element] {Element} - Optional pre-existing DOM element which holds the star and attributes.
  * @extends Star
  * @constructor
- */
+ **/
 function ClientStar(element) { ///REVISIT element not in use atm
 	var me = this;
 

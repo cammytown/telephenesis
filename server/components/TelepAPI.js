@@ -1,3 +1,6 @@
+//@REVISIT non-secure because we don't care in this context, right?
+//const nanoid = require('nanoid/non-secure').nanoid;
+const nanoid = require('nanoid/async').nanoid;
 const Lame = require('node-lame').Lame;
 const fs = require('fs');
 
@@ -248,26 +251,59 @@ function TelepAPI(server) {
 	}
 
 	/**
+	 * Generate a unique comment ID that is safe to expose.
+	 * @returns Promise<string> The unique ID.
+	 **/
+	function generatePublicID() {
+		//var unique = false;
+
+		//@REVISIT should we prefer the non-secure nanoid()? I'm not sure it
+		//allows async but if it's fast enough maybe it doesn't matter??
+		return nanoid(6).then(publicID => {
+			return dbComments.findOne({ publicID })
+				.then(doc => {
+					//@REVISIT kinda weird architecture; maybe better to use await:
+					if(!doc) {
+						return publicID;
+					} else {
+						return generatePublicID();
+					}
+				});
+		});
+
+		//return publicID;
+	}
+
+	/**
 	 * Create a new comment for a star by a user.
 	 * @param {TelepUser} telepUser - The user creating the comment.
 	 * @param {number} starID - ID of star.
 	 * @param {string} commentText - Text content of comment.
-	 * @returns {Promise<number>} The database _id of the new comment.
+	 * @returns {Promise<object>} The database _id of the new comment.
 	 **/
-	this.createComment = function(telepUser, starID, commentText) {
-		var newComment = {
-			user: telepUser.export('commentCache'),
-			starID,
-			text: commentText,
-		};
+	this.createComment = function(telepUser, starID, commentText, replyingTo) {
+		return generatePublicID().then(publicID => {
+			var newComment = {
+				//@TODO consider creating a library that automatically increases
+				//size of nanoid based on number of collisions:
+				publicID,
+				user: telepUser.export('commentCache'),
+				starID,
+				text: commentText,
+				replyingTo, //@REVISIT naming
+			};
 
-		return dbComments.insertOne(newComment)
-			.then(result => {
-				////TODO do we care about result.acknowledged or can we assume
-				//that if something goes wrong it will be sent to the .catch
-				//block?:
-				return result.insertedID;
-			});
+			//CommentPotion.createComment(
+
+			return dbComments.insertOne(newComment)
+				.then(result => {
+					////TODO do we care about result.acknowledged or can we assume
+					//that if something goes wrong it will be sent to the .catch
+					//block?:
+					//return result.insertedID;
+					return newComment;
+				});
+		});
 	}
 
 	/**
@@ -281,11 +317,25 @@ function TelepAPI(server) {
 		return dbComments.find({ starID })
 			.toArray() ///REVISIT speed?
 			.then(docArray => {
+				//var commentsObject = {};
+
 				docArray.forEach(doc => {
+					// Retrieve timestamp from MongoDB's _id field:
 					doc.timestamp = new Date(doc._id.getTimestamp()).getTime();
+
+					//// If comment is a reply to another comment:
+					//if(doc.replyingTo) {
+					//    // Add comment as child of comment it replies to:
+					//    doc.replyingTo
+					//}
+
+					//commentsObject.push(doc);
 				});
 
-				return docArray;
+				return docArray
+
+				//@TODO filter values; prob by having a class with export()
+				//return commentsObject;
 			});
 	}
 

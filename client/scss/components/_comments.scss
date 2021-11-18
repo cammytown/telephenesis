@@ -1,3 +1,50 @@
-textarea.comment-entry {
+ul.comments {
+	padding-left: 15px;
+
+	li.comment-list-item {
+		.comment {
+			.comment-meta {
+				max-width: 465px;
+				font-size: 0.8em;
+
+				.comment-date {
+					//font-size: 0.8em;
+					font-style: italic;
+				}
+
+				//.comment-user {}
+
+				.comment-controls {
+					visibility: hidden;
+
+					.comment-reply-form {
+						display: none;
+					}
+
+					&.replying {
+						visibility: visible;
+
+						.comment-reply-form {
+							display: block;
+						}
+					}
+				}
+			}
+
+			&:hover {
+				> .comment-meta {
+					.comment-controls {
+						visibility: visible;
+					}
+				}
+			}
+		}
+
+		//ul.replies {
+		//}
+	}
+}
+
+textarea.comment-text {
 	text-align: left;
 }
