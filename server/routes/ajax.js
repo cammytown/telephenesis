@@ -154,12 +154,21 @@ function createComment(req, res, next) {
 	return api.createComment(
 		req.user,
 		parseInt(req.body['starID']),
-		req.body['commentText']
+		req.body['commentText'],
+		req.body['replyingTo']
 	)
-		.then(commentID => {
+		.then(newComment => {
 			res.json({
 				errors: [],
-				commentID
+				newComment: {
+					//@REVISIT-2 probably create Comment class with export() method:
+					publicID: newComment.publicID,
+					starID: newComment.starID,
+					text: newComment.text,
+					timestamp: new Date(), //@REVISIT sort of hacky
+					user: newComment.user,
+					replyingTo: newComment.replyingTo,
+				},
 			});
 			//return commentID;
 			//next();

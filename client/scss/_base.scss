@@ -34,6 +34,10 @@ h1, h2, h3, h4, h5, h6 {
 	margin: 0;
 }
 
+.center-text {
+	text-align: center;
+}
+
 .clearfix { /// placement
 	&:after { /// placement
 		display: block;

@@ -1,3 +1,6 @@
+$inputPaddingY: 17px;
+$inputPaddingX: 17px;
+
 form {
 	.errors {
 		label {
@@ -19,7 +22,7 @@ textarea {
 	border: 0;
 	font-size: 1.35em;
 	font-family: 'Strait', sans-serif;
-	text-align: center;
+	//text-align: center;
 
 	&:hover, textarea:hover {
 		background-color: #ddd;
@@ -35,6 +38,9 @@ textarea {
 		background: #beb5be;
 	}
 }
+
+//input[type="text"],
+//input[type="password"]
 
 //input[type='radio'] {
 //    display: inline-block;

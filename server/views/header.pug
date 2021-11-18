@@ -66,7 +66,7 @@ header#galaxy-ui
 			div#playingComments
 				//-button + Add Comment
 
-				form#commentText.ajax(
+				form.ajax(
 					method='POST'
 					action='/create-comment'
 					data-ajax-action='/ajax/create-comment'
@@ -76,7 +76,7 @@ header#galaxy-ui
 						name='starID'
 					)
 
-					textarea.comment-entry(
+					textarea.comment-text(
 						placeholder="Something positive..."
 						name='commentText'
 					)
