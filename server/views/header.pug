@@ -58,29 +58,31 @@ header#galaxy-ui
 			div#playbackProgressBar
 			// div#playbackProgressAccent
 
-		div#playingStarInfo
-			h2#playingStarTitle Song Title
-			h3#playingCreatorName Artist Name
-			a#playingCreatorLink artistwebsite.com
-			a#togglePlayingComments Comments
-			div#playingComments
-				//-button + Add Comment
+//-move into own file probably:
+div#playingStarInfo
+	h2#playingStarTitle Song Title
+	h3#playingCreatorName Artist Name
+	a#playingCreatorLink artistwebsite.com
+	a#togglePlayingComments Comments
+	div#playingComments
+		//-button + Add Comment
 
-				form.ajax(
-					method='POST'
-					action='/create-comment'
-					data-ajax-action='/ajax/create-comment'
-				)
-					input.playing-star-id(
-						type='hidden'
-						name='starID'
-					)
+		form#createCommentForm.ajax(
+			method='POST'
+			action='/create-comment'
+			data-ajax-action='/ajax/create-comment'
+		)
+			input.playing-star-id(
+				type='hidden'
+				name='starID'
+			)
 
-					textarea.comment-text(
-						placeholder="Something positive..."
-						name='commentText'
-					)
+			textarea.comment-text(
+				placeholder="Something positive..."
+				name='commentText'
+				rows='1'
+			)
 
-					button(type='submit') + Add Comment
+			button(type='submit' class='btn green text-left') + Add Comment
 
-				ul.comments
+		ul.comments

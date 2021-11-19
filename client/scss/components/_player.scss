@@ -47,38 +47,48 @@ header#playingStarHeader { ///placement
 			content: "";
 		}
 	}
+}
 
-	#playingStarInfo {
-		position: absolute;
-		max-width: 480px;
-		//max-width: 50%;
-		margin-left: 20px;
-		background: $uiBackground;
+#playingStarInfo {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	z-index: 1;
+	box-sizing: border-box;
+	max-width: 640px;
+	max-height: 100%;
+	//@TODO this is meant to offset by the height of galaxy-ui but I don't like this solution
+	padding-top: 80px;
+	//max-width: 50%;
+	margin-left: 20px;
+	background: $uiBackground;
+	overflow: hidden;
 
-		h2, h3 {
-			margin: 5px 0;
+	h2, h3 {
+		margin: 5px 0;
+	}
+
+	a#togglePlayingComments {
+		&::after {
+			content: " \25B2";
 		}
 
-		a#togglePlayingComments {
-			&::after {
-				content: " \25B2";
-			}
+		.show-comments &::after {
+			content: " \25BC";
+		}
+	}
 
-			.show-comments &::after {
-				content: " \25BC";
-			}
+	#playingComments {
+		display: none;
+		overflow-y: scroll;
+		padding-right: 20px;
+
+		.show-comments & {
+			display: block;
 		}
 
-		#playingComments {
-			display: none;
+		//max-width: 465px;
 
-			.show-comments & {
-				display: block;
-			}
-
-			//max-width: 465px;
-
-		}
 	}
 }
 

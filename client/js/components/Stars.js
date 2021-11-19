@@ -501,7 +501,6 @@ function ClientStarsAPI() {
 	 * @todo Rename, probably.
 	 **/
 	this.drawLineStep = function(currentMS = performance.now(), animating = true) {
-		console.log("drawLineStep");
 
 		effects.context.clearRect(0, 0, effects.canvas.width, effects.canvas.height);
 

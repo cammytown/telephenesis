@@ -1,3 +1,7 @@
+import 'core-js';
+import 'whatwg-fetch';
+import './polyfills';
+
 import cor from './libs/minlab/cor';
 // import Spc from './libs/minlab/spc';
 // import navigate from "./navigate";
@@ -18,7 +22,7 @@ import Creator from "./components/Creator";
 
 // import "./constellations.scss";
 
-export { TelepClient };
+export default { TelepClient };
 
 window.addEventListener('load', function() { ///DOMonload?
 	new TelepClient().init(); /// change architecture after pondering on it some more
