@@ -1,4 +1,4 @@
-import cor from '../libs/minlab/cor';
+import COR from '../libs/minlab/cor';
 import spc from '../libs/minlab/spc'; //// ultimately whatever spc becomes probably won't output a singleton
 import Anm from '../libs/minlab/anm';
 import Upl from '../libs/minlab/upl';
@@ -57,23 +57,23 @@ function Creator() {
 	var colorwheelSelect;
 
 	this.init = function() {
-		// accessSettingInput = cor._('#accessSetting')
-		// publicGameButton = cor._('#publicGameButton');
-		// privateGameButton = cor._('#privateGameButton');
+		// accessSettingInput = COR._('#accessSetting')
+		// publicGameButton = COR._('#publicGameButton');
+		// privateGameButton = COR._('#privateGameButton');
 
 		// publicGameButton.addEventListener('click', onPublicGameButtonClick);
 		// privateGameButton.addEventListener('click', onPrivateGameButtonClick);
 
-		cor._('#create-page').addEventListener('submit', onCreateSubmit);
-		cor._('#recreate-page').addEventListener('submit', onCreateSubmit);
+		COR._('#create-page').addEventListener('submit', onCreateSubmit);
+		COR._('#recreate-page').addEventListener('submit', onCreateSubmit);
 		///REVISIT removed because we're only doing links atm:
-		// cor._('#submission').addEventListener('change', uploadCreation);
+		// COR._('#submission').addEventListener('change', uploadCreation);
 
-		for(var recreateLink of cor._('.createStar')) {
+		for(var recreateLink of COR._('.createStar')) {
 			recreateLink.addEventListener('click', onCreateStarClick);
 		}
 
-		for(var recreateLink of cor._('.recreateStar')) {
+		for(var recreateLink of COR._('.recreateStar')) {
 			recreateLink.addEventListener('click', onRecreateStarClick);
 		}
 
@@ -82,9 +82,9 @@ function Creator() {
 		colorShiftSelect = document.getElementById('colorShiftSelect');
 		colorwheelSelect = document.getElementById('colorwheelSelect');
 
-		cor.al(colorwheelSelect, 'mousemove', getColorFromWheelPosition);
-		cor.al(colorwheelSelect, 'click', function() {
-			cor.rl(colorwheelSelect, 'mousemove', getColorFromWheelPosition);
+		colorwheelSelect.addEventListener('mousemove', getColorFromWheelPosition);
+		colorwheelSelect.addEventListener('click', function() {
+			colorwheelSelect.removeEventListener('mousemove', getColorFromWheelPosition);
 
 			me.workingStar.color = me.workingStar.linkElement.style.backgroundColor.substr(4).slice(0, -1); /// bad code / maybe unreliable
 			Anm.fadeOut(colorwheelSelect);
@@ -150,8 +150,8 @@ function Creator() {
 		me.workingStar.title = formEle.getElementsByClassName('star-title')[0].value;
 		me.workingStar.fileURL = formEle.getElementsByClassName('file-url')[0].value;
 		me.workingStar.element.style.display = null; ///REVISIT best method?
-		//me.workingStar.title = cor._('#genesis-star-title').value;
-		//me.workingStar.fileURL = cor._('#genesis-file-url').value;
+		//me.workingStar.title = COR._('#genesis-star-title').value;
+		//me.workingStar.fileURL = COR._('#genesis-file-url').value;
 
 		if(me.workingStar.hostType == 'upload') {
 			////REVISIT
@@ -171,22 +171,22 @@ function Creator() {
 	// }
 
 	// function onPublicGameButtonClick(event) {
-	// 	// cor._('#privateGameSelect');
+	// 	// COR._('#privateGameSelect');
 	// 	accessSetting.value = 'public';
-	// 	cor.ac(publicGameButton, 'active');
-	// 	cor.rc(privateGameButton, 'active');
-	// 	var timeSettingsEl = cor._('#timeSettings');
-	// 	cor.ac(timeSettingsEl, 'public');
-	// 	cor.rc(timeSettingsEl, 'private');
+	// 	COR.ac(publicGameButton, 'active');
+	// 	COR.rc(privateGameButton, 'active');
+	// 	var timeSettingsEl = COR._('#timeSettings');
+	// 	COR.ac(timeSettingsEl, 'public');
+	// 	COR.rc(timeSettingsEl, 'private');
 	// }
 
 	// function onPrivateGameButtonClick(event) {
 	// 	accessSetting.value = 'private';
-	// 	cor.ac(privateGameButton, 'active');
-	// 	cor.rc(publicGameButton, 'active');
-	// 	var timeSettingsEl = cor._('#timeSettings');
-	// 	cor.ac(timeSettingsEl, 'private');
-	// 	cor.rc(timeSettingsEl, 'public');
+	// 	COR.ac(privateGameButton, 'active');
+	// 	COR.rc(publicGameButton, 'active');
+	// 	var timeSettingsEl = COR._('#timeSettings');
+	// 	COR.ac(timeSettingsEl, 'private');
+	// 	COR.rc(timeSettingsEl, 'public');
 	// }
 
 	///REVISIT maybe rename this to be more specific to event handling since
@@ -249,7 +249,7 @@ function Creator() {
 			//validPlacementZone.style.display = 'block';
 			Anm.fadeIn(validPlacementZone);
 
-			cor.al(validPlacementZone, 'mousemove', moveWorkingStarToMouse);
+			validPlacementZone.addEventListener('mousemove', moveWorkingStarToMouse);
 			validPlacementZone.addEventListener('mousedown', onPlacementMouseDown);
 			validPlacementZone.addEventListener('mouseup', onPlacementMouseUp);
 
@@ -335,11 +335,11 @@ function Creator() {
 			me.workingStar.element.appendChild(colorShiftSelect);
 
 			Anm.fadeIn(colorShiftSelect, 250, function() {
-				cor.al(colorShiftSelect, 'mouseover', function(e) {
+				colorShiftSelect.addEventListener('mouseover', function(e) {
 					me.workingStar.linkElement.style.background = e.target.style.background;
 				});
 
-				cor.al(colorShiftSelect, 'click', function(e) { // (finish)
+				colorShiftSelect.addEventListener('click', function(e) { // (finish)
 					me.workingStar.color = e.target.style.backgroundColor.substr(4).slice(0, -1);
 					me.workingStar.linkElement.style.background = e.target.style.background;
 

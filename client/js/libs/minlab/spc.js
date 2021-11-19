@@ -10,8 +10,8 @@
 export default new Spc();
 // export default Spc;
 
-import cor from './cor';
-import Anm from './anm';
+//import cor from './cor';
+//import Anm from './anm';
 
 function Spc(elementID = "spc") {
 	/// a blurred animation for going to a point over space that isn't loaded
@@ -43,11 +43,9 @@ function Spc(elementID = "spc") {
 		me.map = document.getElementById('map'); ///
 		lyr = document.getElementsByClassName('lyr'); /// ByClassName
 
-		cor.al(me.element, 'mousedown', grb);
-		//cor.al(me.element, 'mouseup', rls);
-		cor.al(window, 'mouseup', rls);
-		cor.al(window, 'dragend', rls);
-		//al(window, 'mouseout', rls);
+		me.element.addEventListener('mousedown', grb);
+		window.addEventListener('mouseup', rls);
+		window.addEventListener('dragend', rls);
 
 		me.s = 1;
 		me.x = me.map.offsetLeft;
@@ -245,12 +243,12 @@ function Spc(elementID = "spc") {
 		lastX = e.clientX;
 		lastY = e.clientY;
 
-		cor.al(me.element, 'mousemove', drg);
+		me.element.addEventListener('mousemove', drg);
 		me.element.className = 'act';
 	}
 
 	function rls(e) {
-		cor.rl(me.element, 'mousemove', drg);
+		me.element.removeEventListener('mousemove', drg);
 		me.element.removeAttribute('class');
 	}
 
