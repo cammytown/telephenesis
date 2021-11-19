@@ -1,6 +1,6 @@
 ///TODO convert to ES6 class
 
-import cor from '../libs/minlab/cor';
+import COR from '../libs/minlab/cor';
 // import ajx from '../libs/minlab/ajx';
 import spc from '../libs/minlab/spc';
 import HistoryTime from '../libs/history-time';
@@ -48,14 +48,18 @@ function Interface() {
 	this.init = function() {
 		messageElement = document.getElementById('notification');
 
-		document.querySelectorAll('a.close').forEach(closeLink => {
-			closeLink.addEventListener('click', function(event) {
-				event.preventDefault();
-				navigation.navigate('/');
-			});
-		});
+		//document.querySelectorAll('a.close').forEach(closeLink => {
+		//    closeLink.addEventListener('click', function(event) {
+		//        event.preventDefault();
+		//        navigation.navigate('/');
+		//    });
+		//});
+
 
 		spc.moveCallbacks.push(stars.drawLineStep);
+
+		//@REVISIT belongs in Navigation.js?:
+		COR.addClassListener('sort', 'click', onSortClick);
 
 		window.addEventListener('mousedown', onMouseDown);
 		window.addEventListener('mousemove', onMouseMove);
@@ -76,97 +80,13 @@ function Interface() {
 		// currentOrderLink = document.getElementsByClassName('sort active')[0]; ///REVISIT naming/architecture
 
 		// Open header menu when button is clicked
-		cor.al(menuToggleElement, 'click', toggleMenu);
-		function toggleMenu(e) {
-			var menu = document.getElementById('menu');
-			var isActive = cor.cc(menu, 'active');
-			if(isActive) {
-				e.target.innerHTML = '|||';
-				cor.rc(e.target, 'active');
-				cor.rc(menu, 'active');
-			} else {
-				e.target.innerHTML = '&rarr;';
-				cor.ac(e.target, 'active');
-				cor.ac(menu, 'active');
-			}
-		}
+		menuToggleElement.addEventListener('click', toggleMenu);
 
-		/* SHORTCUTS */
-		window.addEventListener('keydown', function(e) {
-			// Ignore key presses with modifier keys:
-			if(e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) {
-				return true;
-			}
+		window.addEventListener('keydown', onKeyDown);
 
-			///REVISIT better way to check if it's a form element?
-			if(["INPUT", "TEXTAREA"].includes(e.target.tagName.toUpperCase())) { // .toUpperCase() out of paranoia
-				return true;
-			}
-
-			switch(e.keyCode) {
-				// Left arrow:
-				case 37: {
-					e.preventDefault();
-
-					// If a star is currently active in the media player:
-					if(clientState.playingStar) {
-						// If there's a previous star:
-						if(clientState.playingStar.originStarID != -1) {
-							var previousStar = stars.clientStars[clientState.playingStar.originStarID];
-							mediaPlayer.playStar(previousStar);
-						}
-					}
-				} break;
-
-				// Right arrow:
-				case 39: {
-					e.preventDefault();
-
-					if(clientState.playingStar) {
-						///TODO better solution:
-						var nsid = parseInt(clientState.playingStar.element.getAttribute('data-next'));
-						/// if next star isn't loaded? if there is no next star?
-						var nextStar = stars.clientStars[nsid];
-						if(!nextStar) {
-							///REVISIT
-							return false;
-						}
-
-						mediaPlayer.playStar(nextStar);
-					}
-				} break;
-
-				// Spacebar:
-				case 32: {
-					if(!clientState.activeWindow) {
-						e.preventDefault();
-
-						mediaPlayer.audio.element.paused ? mediaPlayer.audio.play() : mediaPlayer.audio.pause();
-					}
-				} break;
-
-				// ESC / Escape:
-				case 27: {
-					///@TODO probably come up with prettier check:
-					if(creator.workingStar) {
-						creator.cancel();
-					} else {
-						if(HistoryTime.state.url != '/') {
-							navigation.navigate('/'); //// page title
-
-							if(me.view != CONSTS.VIEW.GALAXY) {
-								me.sort(CONSTS.VIEW.GALAXY);
-							}
-						}
-					}
-				} break;
-			}
-		});
-
-		/* SORTING */
-		for(var sortLinks of cor._('.sort')) {
-			cor.al(sortLinks, 'click', onSortClick);
-		}
+		//for(var sortLink of COR._('.sort')) {
+		//    sortLink.addEventListener('click', onSortClick);
+		//}
 	}
 
 	/**
@@ -251,6 +171,9 @@ function Interface() {
 		me.displayMessage(errorMessage, "error");
 	}
 
+	function onClick(event) {
+	}
+
 	function onMouseDown(event) {
 		draggingMouse = true;
 		lastMousePos = new Vector(event.clientX, event.clientY);
@@ -269,6 +192,91 @@ function Interface() {
 
 	function onMouseUp(event) {
 		draggingMouse = false;
+	}
+
+	function onKeyDown(e) {
+		// Ignore key presses with modifier keys:
+		if(e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) {
+			return true;
+		}
+
+		///REVISIT better way to check if it's a form element?
+		if(["INPUT", "TEXTAREA"].includes(e.target.tagName.toUpperCase())) { // .toUpperCase() out of paranoia
+			return true;
+		}
+
+		switch(e.keyCode) {
+			// Left arrow:
+			case 37: {
+				e.preventDefault();
+
+				// If a star is currently active in the media player:
+				if(clientState.playingStar) {
+					// If there's a previous star:
+					if(clientState.playingStar.originStarID != -1) {
+						var previousStar = stars.clientStars[clientState.playingStar.originStarID];
+						mediaPlayer.playStar(previousStar);
+					}
+				}
+			} break;
+
+			// Right arrow:
+			case 39: {
+				e.preventDefault();
+
+				if(clientState.playingStar) {
+					///TODO better solution:
+					var nsid = parseInt(clientState.playingStar.element.getAttribute('data-next'));
+					/// if next star isn't loaded? if there is no next star?
+					var nextStar = stars.clientStars[nsid];
+					if(!nextStar) {
+						///REVISIT
+						return false;
+					}
+
+					mediaPlayer.playStar(nextStar);
+				}
+			} break;
+
+			// Spacebar:
+			case 32: {
+				if(!clientState.activeWindow) {
+					e.preventDefault();
+
+					mediaPlayer.audio.element.paused ? mediaPlayer.audio.play() : mediaPlayer.audio.pause();
+				}
+			} break;
+
+			// ESC / Escape:
+			case 27: {
+				///@TODO probably come up with prettier check:
+				if(creator.workingStar) {
+					creator.cancel();
+				} else {
+					if(HistoryTime.state.url != '/') {
+						navigation.navigate('/'); //// page title
+
+						if(me.view != CONSTS.VIEW.GALAXY) {
+							me.sort(CONSTS.VIEW.GALAXY);
+						}
+					}
+				}
+			} break;
+		}
+	};
+
+	function toggleMenu(e) {
+		var menu = document.getElementById('menu');
+		var isActive = COR.cc(menu, 'active');
+		if(isActive) {
+			e.target.innerHTML = '|||';
+			COR.rc(e.target, 'active');
+			COR.rc(menu, 'active');
+		} else {
+			e.target.innerHTML = '&rarr;';
+			COR.ac(e.target, 'active');
+			COR.ac(menu, 'active');
+		}
 	}
 
 	function onSortClick(event) {
@@ -307,11 +315,11 @@ function Interface() {
 		if(order) {
 			// If there's an order already, remove its class from document.body:
 			if(me.order) {
-				cor.rc(document.body, me.order.toLowerCase() + '-order'); ////
+				COR.rc(document.body, me.order.toLowerCase() + '-order'); ////
 			}
 
 			// Add the new order's class to document.body:
-			cor.ac(document.body, order.toLowerCase() + '-order'); ////
+			COR.ac(document.body, order.toLowerCase() + '-order'); ////
 
 			// If the order is GALAXY or CONSTELLATIONS, so is the view:
 			if(order == CONSTS.ORDER.GALAXY || order == CONSTS.ORDER.CONSTELLATIONS) {
@@ -343,11 +351,11 @@ function Interface() {
 		if(view && view != me.view) {
 			// If there's already a view, remove its class from document.body:
 			if(me.view) {
-				cor.rc(document.body, me.view.toLowerCase() + '-view'); ////
+				COR.rc(document.body, me.view.toLowerCase() + '-view'); ////
 			}
 
 			// Add the new view's class to document.body:
-			cor.ac(document.body, view.toLowerCase() + '-view'); ////
+			COR.ac(document.body, view.toLowerCase() + '-view'); ////
 
 			// Convert to upper in case of user input:
 			me.view = view.toUpperCase();

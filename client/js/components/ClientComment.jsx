@@ -119,7 +119,7 @@ function ClientComment(commentData, createResponsePromise = null) { ///REVISIT e
 							<span class='comment-user'>
 								by
 								&nbsp;
-								<a href={'/user/' + me.user.publicID}>
+								<a href={'/user/' + me.user.publicID} class='nav user-link'>
 									{ me.user.displayName
 										? me.user.displayName : "Anonymous" }
 								</a>

@@ -1,5 +1,4 @@
-import cor from './cor';
-
+import COR from './cor';
 
 /**
  * Simple class that wraps around an HTML5 audio element to 
@@ -52,15 +51,14 @@ class Aud {
 		this.minuteLength = null;
 		this.secondLength = null;
 
-		cor.al(this.element, 'canplay', () => {
+		this.element.addEventListener('canplay', () => {
 			if(this.autoplaying) {
 				this.play();
 			}
 		});
 
-		cor.al(this.element, 'error', () => this.elementError());
-		// cor.rl(this.element, 'canplay', this.pl);
-		cor.al(this.element, 'timeupdate', () => this.update());
+		this.element.addEventListener('error', () => this.elementError());
+		this.element.addEventListener('timeupdate', () => this.update());
 	}
 
 	/** Play the active media. **/
@@ -125,7 +123,7 @@ class Aud {
 	 * @param {Event} event - The click event.
 	 **/
 	onSeekbarClick(event) {
-		var mousePos = cor.relativeToElement(
+		var mousePos = COR.relativeToElement(
 			this.options.seekbar,
 			{
 				x: event.clientX,

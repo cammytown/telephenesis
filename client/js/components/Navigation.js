@@ -1,4 +1,4 @@
-import cor from '../libs/minlab/cor';
+import COR from '../libs/minlab/cor';
 import spc from '../libs/minlab/spc'; /// relying on implied singleton
 import Anm from '../libs/minlab/anm';
 //import anime from 'animejs/lib/anime.es';
@@ -52,22 +52,15 @@ function ClientNavigation() {
 		HistoryTime.bindPathToCallback('*', observePath);
 
 		// Add listeners to internal navigation links:
-		var navLinks = document.getElementsByClassName('nav'); ///REVISIT not really into this class name; something more descriptive?
-		for(var navLinkIndex = 0; navLinkIndex < navLinks.length; navLinkIndex++) {
-			var navLink = navLinks[navLinkIndex];
-			navLink.addEventListener('click', onNavLinkClick);
-		}
-
-		var ajaxLinks = document.querySelectorAll('a.ajax'); ///REVISIT architecture
-		for(var ajaxLinkIndex = 0; ajaxLinkIndex < ajaxLinks.length; ajaxLinkIndex++) {
-			var ajaxLink = ajaxLinks[ajaxLinkIndex];
-			ajaxLink.addEventListener('click', onAjaxLinkClick);
-		}
+		COR.addClassListener('nav', 'click', onNavLinkClick);
+		COR.addClassListener('ajax', 'click', onAjaxLinkClick);
+		COR.addClassListener('close', 'click', onCloseClick);
 
 		// Close context menus when outer space is clicked:
-		cor.al(spc.element, 'click', function(event) {
+		spc.element.addEventListener('click', function(event) {
 			closeContextMenu();
 
+			// Close open boxes if clicking outside of page area:
 			//if(event.target.parentNode.id == 'spc' && HistoryTime.state.path != '/') { ///
 			//        // state.updating = true;
 			//        me.navigate('/'); //// page title
@@ -75,7 +68,7 @@ function ClientNavigation() {
 		});
 
 		// Open context menu on right click
-		cor.al(spc.element, 'contextmenu', onContextMenu);
+		spc.element.addEventListener('contextmenu', onContextMenu);
 	}
 
 	this.ready = function() {
@@ -103,7 +96,7 @@ function ClientNavigation() {
 
 		me.navigate(event.target.pathname); ///// make page titles
 
-		// if(cor.cc(this.parentNode, 'star')) {
+		// if(COR.cc(this.parentNode, 'star')) {
 		// 	navigate(path);
 		// } else {
 		// 	if(state.path == path) navigate('/');
@@ -128,7 +121,7 @@ function ClientNavigation() {
 
 		closeContextMenu();
 
-		var isStarClick = cor.cc(event.target.parentNode, 'star'); ///REVISIT weird architecture?
+		var isStarClick = COR.cc(event.target.parentNode, 'star'); ///REVISIT weird architecture?
 		if(isStarClick) {
 			var starEle = event.target.parentNode;
 			var starID = parseInt(starEle.id.split('s')[1]);
@@ -411,8 +404,8 @@ function ClientNavigation() {
 
 		///:
 		// menuToggleElement.innerHTML = '|||';
-		// cor.rc(menuToggleElement, 'active');
-		// cor.rc(document.getElementById('menu'), 'active');
+		// COR.rc(menuToggleElement, 'active');
+		// COR.rc(document.getElementById('menu'), 'active');
 
 		if(page) {
 			switch(page) {
@@ -451,6 +444,11 @@ function ClientNavigation() {
 				///REVISIT client error handling
 				console.error(err);
 			});
+	}
+
+	function onCloseClick(event) {
+		event.preventDefault();
+		navigation.navigate('/');
 	}
 }
 

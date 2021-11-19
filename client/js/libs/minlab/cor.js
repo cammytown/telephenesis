@@ -4,8 +4,9 @@ export default {
 	_,
 	relativeToElement,
 	relativeToEventTarget,
-	al,
-	rl,
+	addClassListener,
+	//al,
+	//rl,
 	ac,
 	rc,
 	cc,
@@ -13,6 +14,8 @@ export default {
 };
 
 export { POST };
+
+var classListeners = {};
 
 function _(selector) {
 	if(selector[0] == '#') {
@@ -56,17 +59,39 @@ function relativeToEventTarget(event) {
 	);
 }
 
-function al(ele, eve, fnc) {
-	if(!ele) return false;
-	if(ele.addEventListener) ele.addEventListener(eve, fnc, false);
-	else if(ele.attachEvent) ele.attachEvent('on'+eve, fnc)
+function addClassListener(className, eventName, eventCallback) {
+	if(!classListeners[eventName]) {
+		classListeners[eventName] = [];
+		document.body.addEventListener(eventName, (event) => onClassEvent(eventName, event));
+	}
+
+	//@REVISIT architecture:
+	classListeners[eventName].push([className, eventCallback]);
 }
 
-function rl(ele, eve, fnc) {
-	if(!ele) return false;
-	if(ele.removeEventListener) ele.removeEventListener(eve, fnc, false);
-	else if(ele.detachEvent) ele.detachEvent('on'+eve, fnc)
+//@REVISIT naming:
+function onClassEvent(eventName, event) {
+	for(var eventListener of classListeners[eventName]) {
+		var className = eventListener[0];
+		var eventCallback = eventListener[1];
+
+		if(event.target.classList.contains(className)) {
+			eventCallback(event);
+		}
+	}
 }
+
+//function al(ele, eve, fnc) {
+//    if(!ele) return false;
+//    if(ele.addEventListener) ele.addEventListener(eve, fnc, false);
+//    else if(ele.attachEvent) ele.attachEvent('on'+eve, fnc)
+//}
+
+//function rl(ele, eve, fnc) {
+//    if(!ele) return false;
+//    if(ele.removeEventListener) ele.removeEventListener(eve, fnc, false);
+//    else if(ele.detachEvent) ele.detachEvent('on'+eve, fnc)
+//}
 
 function ac(ele, cls) {
 	if((' '+ele.className+' ').indexOf(' '+cls+' ') !== -1) return false;
