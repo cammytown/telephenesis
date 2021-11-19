@@ -4,6 +4,11 @@ import cor from '../libs/minlab/cor';
 // import ajx from '../libs/minlab/ajx';
 import spc from '../libs/minlab/spc';
 import HistoryTime from '../libs/history-time';
+
+import CONSTS from '../../../abstract/constants.js';
+import locale from '../../../locale/en_us.json'; ///REVISIT
+import Vector from '../../../abstract/Vector';
+
 import navigation from './Navigation';
 
 import clientState from './ClientState';
@@ -11,8 +16,7 @@ import mediaPlayer from './MediaPlayer';
 import creator from './Creator';
 //import effects from './ClientEffects';
 import stars from './Stars';
-import CONSTS from '../../../abstract/constants.js';
-import locale from '../../../locale/en_us.json'; ///REVISIT
+
 
 /**
  * Telephenesis class for user interface methods.
@@ -35,18 +39,27 @@ function Interface() {
 	 **/
 	var messageTimerID = null;
 
+	/** Whether or not the mouse is being click-dragged. **/
+	var draggingMouse = false;
+
+	/** The last saved position of the mouse. **/
+	var lastMousePos = null;
+
 	this.init = function() {
 		messageElement = document.getElementById('notification');
 
-		// var closes = document.getElementsByClassName('close');
-		// if(closes.length) for(var i=0, j=closes.length; i<j; i++) {
-		// 	cor.al(closes[i], 'click', function(event) {
-		// 		event.preventDefault();
-		// 		navigate('/');
-		// 	});
-		// }
+		document.querySelectorAll('a.close').forEach(closeLink => {
+			closeLink.addEventListener('click', function(event) {
+				event.preventDefault();
+				navigation.navigate('/');
+			});
+		});
 
 		spc.moveCallbacks.push(stars.drawLineStep);
+
+		window.addEventListener('mousedown', onMouseDown);
+		window.addEventListener('mousemove', onMouseMove);
+		window.addEventListener('mouseup', onMouseUp);
 
 		window.addEventListener('scroll', function(eve) {
 			window.requestAnimationFrame(stars.drawLineStep);
@@ -59,7 +72,6 @@ function Interface() {
 			window.requestAnimationFrame(stars.drawLineStep);
 		});
 
-		/* NAVIGATION */
 		var menuToggleElement = document.getElementsByClassName('menuToggle')[0]; ////
 		// currentOrderLink = document.getElementsByClassName('sort active')[0]; ///REVISIT naming/architecture
 
@@ -237,6 +249,26 @@ function Interface() {
 		}
 
 		me.displayMessage(errorMessage, "error");
+	}
+
+	function onMouseDown(event) {
+		draggingMouse = true;
+		lastMousePos = new Vector(event.clientX, event.clientY);
+	}
+
+	function onMouseMove(event) {
+		// If dragging the mouse on a non-galaxy view:
+		if(draggingMouse && me.view != CONSTS.VIEW.GALAXY) {
+			// Scroll the window by mouse delta:
+			var currentMousePos = new Vector(event.clientX, event.clientY);
+			var difference = currentMousePos.subtract(lastMousePos);
+			window.scrollBy(-difference.x, -difference.y);
+			lastMousePos = currentMousePos;
+		}
+	}
+
+	function onMouseUp(event) {
+		draggingMouse = false;
 	}
 
 	function onSortClick(event) {

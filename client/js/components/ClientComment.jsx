@@ -1,7 +1,5 @@
-import ReactDOM from 'react-dom'; //@REVISIT-3
 //import Navigation from './Navigation';
 //import 'nano-jsx';
-//import React from 'react';
 export default ClientComment;
 
 /**
@@ -9,7 +7,7 @@ export default ClientComment;
  * @param {object} commentData
  * @constructor
  */
-function ClientComment(commentData) { ///REVISIT element not in use atm
+function ClientComment(commentData, createResponsePromise = null) { ///REVISIT element not in use atm
 	const me = this;
 
 	const identityProps = [
@@ -33,35 +31,27 @@ function ClientComment(commentData) { ///REVISIT element not in use atm
 	/** The time at which the comment was created. **/
 	this.timestamp = null;
 
-	//@REVISIT-3:
-	var reactWrapper = null;
-
 	/** The HTML Element which represents the comment. **/
 	this.element = null;
+
+	var isPosting = false;
 
 	function init() {
 		if(commentData) {
 			me.loadData(commentData);
 		}
 
-		//@TODO-3 hopefully remove when we remove react dependency:
-		initializeReactness();
+		if(createResponsePromise) {
+			isPosting = true;
+
+			createResponsePromise.then(result => {
+				isPosting = false;
+				me.loadData(result.newComment);
+				me.render();
+			});
+		}
 
 		me.render();
-	}
-
-	function initializeReactness() {
-		reactWrapper = document.createElement('li');
-		reactWrapper.id = 'comment_' + me.publicID;
-		reactWrapper.className = 'comment-list-item';
-
-		var commentsUL = document.body.querySelector('div#playingComments ul.comments');
-		if(me.replyingTo) { // Is a reply.
-			var repliesUL = commentsUL.querySelector('#comment_' + me.replyingTo + ' ul.replies');
-			repliesUL.prepend(reactWrapper);
-		} else {
-			commentsUL.prepend(reactWrapper);
-		}
 	}
 
 	//function onSubmitComment(event) {
@@ -86,7 +76,7 @@ function ClientComment(commentData) { ///REVISIT element not in use atm
 	//            console.error(err);
 	//        });
 	//}
-	
+
 	function onReplyClick(event) {
 		event.preventDefault();
 
@@ -115,78 +105,75 @@ function ClientComment(commentData) { ///REVISIT element not in use atm
 		// Save reference to old element (may not exist):
 		var oldElement = me.element;
 
-		me.element = (
-			//<li id={'comment_' + me.publicID} class='comment-list-item'>
-			<div>
-				<div className='comment'>
-					<div className='comment-text'>
-						{ me.text }
-					</div>
+		if(isPosting) {
+			me.element = <div>Posting comment...</div>
+		} else {
+			me.element = (
+				<li id={'comment_' + me.publicID} class='comment-list-item'>
+					<div class='comment'>
+						<div class='comment-text'>
+							{ me.text }
+						</div>
 
-					<div className='comment-meta'>
-						<span className='comment-user'>
-							by
+						<div class='comment-meta'>
+							<span class='comment-user'>
+								by
+								&nbsp;
+								<a href='#'>
+									{ me.user.displayName
+										? me.user.displayName : "Anonymous" }
+								</a>
+							</span>
+
 							&nbsp;
-							<a href='#'>
-								{ me.user.displayName
-									? me.user.displayName : "Anonymous" }
-							</a>
-						</span>
 
-						&nbsp;
+							<span class='comment-date'>
+								{ new Date(me.timestamp).toLocaleDateString() }
+							</span>
 
-						<span className='comment-date'>
-							{ new Date(me.timestamp).toLocaleDateString() }
-						</span>
+							<div class='comment-controls'>
+								<a class='open-reply-panel' onClick={onReplyClick} href='#'>&#11178; Reply</a>
 
-						<div className='comment-controls'>
-							<a className='open-reply-panel' onClick={onReplyClick} href='#'>&#11178; Reply</a>
-
-							<form
-								className='ajax comment-reply-form'
-								method='POST'
-								data-ajax-action='/ajax/create-comment'
-							>
-								<textarea
-									name='commentText'
-									className='comment-text'
-									placeholder="Type your reply here..."
-								></textarea>
-								<input type='hidden' name='starID' value={me.starID} />
-								<input type='hidden' name='replyingTo' value={me.publicID} />
-								<button type='submit'>Post Reply</button>
-							</form>
+								<form
+									class='ajax comment-reply-form'
+									method='POST'
+									data-ajax-action='/ajax/create-comment'
+								>
+									<textarea
+										name='commentText'
+										class='comment-text'
+										placeholder="Type your reply here..."
+									></textarea>
+									<input type='hidden' name='starID' value={me.starID} />
+									<input type='hidden' name='replyingTo' value={me.publicID} />
+									<button type='submit'>Post Reply</button>
+								</form>
+							</div>
 						</div>
 					</div>
-				</div>
 
-				<ul className='replies'></ul>
-			</div>
-			//</li>
-		);
+					<ul class='replies'></ul>
+				</li>
+			);
+		}
 
-		//@TODO-3 choose one:
-		if(reactWrapper) {
-			ReactDOM.render(me.element, reactWrapper);
+		if(oldElement) {
+			// Already in the DOM; replace previous manifestation:
+			oldElement.replaceWith(me.element);
 		} else {
-			if(oldElement) {
-				// Already in the DOM; replace previous manifestation:
-				oldElement.replaceWith(me.element);
-			} else {
-				//@REVISIT naming:
-				var commentsUL = document.body.querySelector('div#playingComments ul.comments');
+			//@REVISIT naming:
+			var commentsUL = document.body.querySelector('div#playingComments ul.comments');
 
-				// Not yet in the DOM; add it:
-				if(me.replyingTo) { // Is a reply.
-					//var parentComment = document.getElementById('comment_' + me.replyingTo);
-					var repliesUL = commentsUL.querySelector('#comment_' + me.replyingTo + ' ul.replies');
+			// Not yet in the DOM; add it:
+			if(me.replyingTo) { // Is a reply.
+				//var parentComment = document.getElementById('comment_' + me.replyingTo);
+				var repliesUL = commentsUL.querySelector('#comment_' + me.replyingTo + ' ul.replies');
 
-					//repliesUL.prepend(me.element);
+				repliesUL.prepend(me.element);
 
-				} else { // Is not a reply.
-					// Add to root comments node:
-					commentsUL.prepend(me.element); ////TODO IE compatibility for prepend
-				}
+			} else { // Is not a reply.
+				// Add to root comments node:
+				commentsUL.prepend(me.element); ////TODO IE compatibility for prepend
 			}
 		}
 	}

@@ -69,12 +69,12 @@ function TelepAPI(server) {
 	me.auth = function(level) {
 		return function(req, res, next) {
 			if(!req.user) {
-				res.json({ error: "not logged in" });
+				res.json({ errors: ["not logged in"] });
 				return false; ///
 			}
 
 			if(!req.user.lv) {
-				res.json({ error: "no creator credentials" });
+				res.json({ errors: ["no creator credentials"] });
 				return false; ///
 			}
 

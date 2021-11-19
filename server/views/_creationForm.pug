@@ -21,17 +21,34 @@ section.starTitle
 	h3 Star Title 
 		small (optional)
 
-	input(type="text" class="star-title" name="star-title" placeholder="Star #0028")
+	input(
+		type="text"
+		class="star-title"
+		name="star-title"
+		placeholder="Star #0028"
+	)
 
 section.fileUpload
 	h3 MP3 File URL
 	em We recommend 
 		a(href="https://archive.org/" target="_blank") archive.org
 
-	input(type="text" class="file-url" name="file-url" class="file-url" placeholder="Enter the URL of an MP3 file.")
+	input(
+		type="url"
+		class="file-url"
+		name="file-url"
+		class="file-url"
+		placeholder="Enter the URL of an MP3 file."
+		required
+	)
 
 label.rightsAgreement
-	input(type="checkbox" name="rights-confirmation" class="rights-confirmation")
+	input(
+		type="checkbox"
+		name="rights-confirmation"
+		class="rights-confirmation"
+		required
+	)
 	| I have the rights to post this and permit others to use it in their recreations.
 
 //- This constellation is set to public. All recreations follow the same license.

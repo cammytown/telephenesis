@@ -78,10 +78,19 @@ function Comments() {
 
 	/**
 	 * Toggles display of comments in the interface.
+	 * @param {null|bool} [visibleInput]
 	 **/
-	this.toggleComments = function() {
-		// Toggle visible:
-		visible = !visible;
+	this.toggleComments = function(visibleInput = null) {
+		if(typeof visibleInput == 'boolean') {
+			if(visibleInput == visible) {
+				return true;
+			}
+
+			visible = visibleInput;
+		} else {
+			// Toggle visible:
+			visible = !visible;
+		}
 
 		if(!visible) {
 			///REVISIT architecture of using body classes for everything:

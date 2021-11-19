@@ -69,6 +69,12 @@ function Pijin() {
 
 		var form = submitEvent.target;
 
+		var resolveCallback;
+		var responsePromise = new Promise((resolve, reject) => {
+			resolveCallback = resolve;
+			this.reject = reject;
+		});
+
 		// Build request object:
 		var request = generateRequest(form);
 
@@ -78,13 +84,13 @@ function Pijin() {
 		var selectorSubmitCallback = me.selectorCallbacks['submit'][selector];
 		if(typeof selectorSubmitCallback === 'function') {
 			///REVISIT should we make sure this returns before moving on?
-			selectorSubmitCallback(request, submitEvent);
+			selectorSubmitCallback(request, submitEvent, responsePromise);
 		}
 
 		// Run user-defined general submit callbacks:
 		for (var cbIndex = 0; cbIndex < me.callbacks.submit.length; cbIndex++) {
 			var submitCallback = me.callbacks.submit[cbIndex];
-			submitCallback(request, submitEvent);
+			submitCallback(request, submitEvent, responsePromise);
 		}
 
 		// Regenerate request in case user callbacks manipulated the form:
@@ -92,7 +98,6 @@ function Pijin() {
 		//there are no callbacks:
 		request = generateRequest(form);
 
-		console.log(form);
 		var actionURI = form.action;
 
 		// If form has user-defined action override attribute:
@@ -110,10 +115,10 @@ function Pijin() {
 					responseCallback(result, me.parseRequest(request), submitEvent);
 				}
 
+				resolveCallback(result);
+
 				var selector = '#' + form.id;
 				var selectorResponseCallback = me.selectorCallbacks['response'][selector];
-				// console.log(selectorCallback);
-
 				if(typeof selectorResponseCallback === 'function') {
 					// responsePromise = responsePromise.then(result => selectorResponseCallback);
 					selectorResponseCallback(

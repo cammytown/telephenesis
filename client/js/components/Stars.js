@@ -478,7 +478,7 @@ function ClientStarsAPI() {
 			}
 		});
 
-		window.requestAnimationFrame(me.drawLineStep);
+		me.drawLineStep();
 	}
 
 	/**
@@ -492,7 +492,8 @@ function ClientStarsAPI() {
 			line.endY = parseInt(line.starEle.style.top);
 		});
 
-		window.requestAnimationFrame(me.drawLineStep);
+		return me.drawLineStep();
+		//window.requestAnimationFrame(me.drawLineStep);
 	}
 
 	/**
@@ -565,7 +566,7 @@ function ClientStarsAPI() {
 
 		/// optimize
 		if(animatingLines.length && animating) {
-			window.requestAnimationFrame(me.drawLineStep); ////
+			return window.requestAnimationFrame(me.drawLineStep); ////
 		}
 	}
 

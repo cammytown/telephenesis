@@ -36,6 +36,8 @@ function Spc(elementID = "spc") {
 
 	me.moveCallbacks = [];
 
+	var animationUpdateCallback = false;
+
 	function init() {
 		me.element = document.getElementById(elementID);
 		me.map = document.getElementById('map'); ///
@@ -104,11 +106,13 @@ function Spc(elementID = "spc") {
 			return false;
 		}
 
+		//window.requestAnimationFrame(stepTowardsPos);
+		//me.set(me.x + 1, me.y + 1);
+		//return false;
+
 		var curPos = new me.Vec2(me.x, me.y); /// use globally later
 		var diff = targetCenter.subtract(curPos);
 		var distance = diff.getMagnitude();
-		// console.log(distance);
-		// var speed = 9;
 		var speed = Math.max(Math.min(distance / 25, 25), 1);
 
 		// If there's still distance to move after this frame:
@@ -121,17 +125,20 @@ function Spc(elementID = "spc") {
 			me.set(targetCenter.x, targetCenter.y);
 			animating = false;
 		}
+
+		if(animationUpdateCallback) {
+			animationUpdateCallback(ms);
+		}
 	}
 
-	/// requires anm
-	/// if ctr is called again before anm is finished, stop first anm and start a new one
-	me.ctr = function(x, y) {
+	me.ctr = function(x, y, callback = false) {
 		/// get rid of these / fix up architecture:
 		x = -x; y = -y;
 		x += window.innerWidth/2;
 		y += window.innerHeight/2;
 
 		targetCenter = new me.Vec2(x, y);
+		animationUpdateCallback = callback; //@TODO probably improve architecture
 
 		if(!animating) {
 			animating = true;
@@ -243,7 +250,6 @@ function Spc(elementID = "spc") {
 	}
 
 	function rls(e) {
-		console.log('spc release');
 		cor.rl(me.element, 'mousemove', drg);
 		me.element.removeAttribute('class');
 	}
