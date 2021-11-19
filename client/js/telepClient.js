@@ -1,13 +1,10 @@
 import 'core-js';
-import 'whatwg-fetch';
-import './polyfills';
 
-import cor from './libs/minlab/cor';
+//import cor from './libs/minlab/cor';
 // import Spc from './libs/minlab/spc';
 // import navigate from "./navigate";
 // import starSystem from "./starSystem";
-
-import admin from "./admin";
+//import admin from "./admin";
 
 import clientState from './components/ClientState';
 import Interface from './components/Interface';

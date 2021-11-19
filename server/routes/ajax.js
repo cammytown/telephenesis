@@ -81,7 +81,7 @@ function syncWithClient(req, res) {
 
 	return api.syncWithClient(serverUpdates)
 		.then(values => {
-			res.json({ error: false }); ///REVISIT do we really care to wait for server updates?
+			res.json({ errors: false }); ///REVISIT do we really care to wait for server updates?
 		})
 		.catch(err => {
 			throw new Error(err); ///
@@ -106,7 +106,7 @@ function updateProfile(req, res, next) {
 function bookmarkStar(req, res, next) {
 	// if(!req.user || (req.user.id != star.creatorId && req.user.lv !=
 	if(!req.user) {
-		res.json({ error: "not logged in" });
+		res.json({ errors: ["not logged in"] });
 		return false;
 	}
 
@@ -119,14 +119,14 @@ function bookmarkStar(req, res, next) {
 		.catch(err => {
 			///
 			console.error(err);
-			res.json({ error: "Couldn't bookmark." }); ///
+			res.json({ errors: ["Couldn't bookmark."] }); ///
 			return false;
 		});
 }
 
 function removeBookmarkStar(req, res) {
 	if(!req.user) { ///REFACTOR
-		res.json({ error: "not logged in" });
+		res.json({ errors: ["not logged in"] });
 		return false;
 	}
 
@@ -136,7 +136,7 @@ function removeBookmarkStar(req, res) {
 		})
 		.catch(err => {
 			console.error(err);
-			res.json({ error: "Couldn't remove bookmark." }); ///
+			res.json({ errors: ["Couldn't remove bookmark."] }); ///
 			return false;
 		});
 }
@@ -147,7 +147,7 @@ function removeBookmarkStar(req, res) {
 function createComment(req, res, next) {
 	if(!req.user) { ///TODO move somewhere general
 		///REVISIT:
-		res.json({ error: "Not logged in or not permitted." });
+		res.json({ errors: ["Not logged in or not permitted."] });
 		throw new Error("Not logged in or not permitted.");
 	}
 
@@ -199,7 +199,7 @@ function getComments(req, res, next) {
 function actualizeStar(req, res, next) { ///REVISIT move to a creation-specific set of routes?
 	if(!req.user || req.user.lv < config.creatorLevel) { ///TODO move somewhere general
 		///REVISIT:
-		res.json({ error: "Not logged in or not permitted." });
+		res.json({ errors: ["Not logged in or not permitted."] });
 		throw new Error("Not logged in or not permitted.");
 	}
 
@@ -222,14 +222,14 @@ function actualizeStar(req, res, next) { ///REVISIT move to a creation-specific 
 				})
 				.catch(err => {
 					//console.error(err); ///
-					//res.json({ error: "Could not create star." }); ///TODO improve error
+					//res.json({ errors: "Could not create star." }); ///TODO improve error
 					//throw new Error(err);
 					next(err);
 				});
 
 			// api.actualize(starData, function(err, result) {
 			// 	if(err) {
-			// 		res.json({ error: "did not place" });
+			// 		res.json({ errors: "did not place" });
 			// 		return false;
 			// 	}
 
@@ -265,12 +265,12 @@ function actualizeStar(req, res, next) { ///REVISIT move to a creation-specific 
 	// api.getStar(sid, function(err, star) {
 	// 	if(err) {
 	// 		///
-	// 		o.json({ error: "could not get source star" });
+	// 		o.json({ errors: "could not get source star" });
 	// 		return false;
 	// 	}
 
 	// 	if(!i.user || i.user.id != star.creator.uid) {
-	// 		o.json({ error: "not logged in" });
+	// 		o.json({ errors: "not logged in" });
 	// 		return false;
 	// 	}
 
@@ -280,7 +280,7 @@ function actualizeStar(req, res, next) { ///REVISIT move to a creation-specific 
 
 	// 	api.actualize(sid, x, y, rgb, function(err, result) {
 	// 		if(err) {
-	// 			o.json({ error: "did not place" });
+	// 			o.json({ errors: "did not place" });
 	// 			return false;
 	// 		}
 

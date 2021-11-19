@@ -31,17 +31,40 @@ function ClientForms() {
 		});
 	}
 
-	function onAjaxSubmit(request, event) {
+	function onAjaxSubmit(request, event, responsePromise) {
 		var form = event.target;
 		//var op = form.action.split('/').pop();
 		var op = form.getAttribute('data-ajax-action').split('/').pop();
 
-		///REVISIT I don't like this architecture. Perhaps solution would be to
+		//@REVISIT I don't like this architecture. Perhaps solution would be to
 		//have this class have a method that allows us to hook into this
 		//function; i.e. bindForm()
 		switch(op) {
 			case 'create-comment': {
 				commentingStar = clientState.playingStar;
+
+				// If user is still on the star they left a comment for:
+				if(clientState.playingStar == commentingStar) {
+					var requestProps = Object.fromEntries(request.body); //@REVISIT architecture
+					new ClientComment(requestProps, responsePromise);
+
+					responsePromise.then((result) => {
+						// If new comment is a reply:
+						if(result.newComment.replyingTo) {
+							// Close reply controls:
+							var activeControls = document.querySelector('.comment-controls.replying');
+							if(activeControls) { //@REVISIT necessary?
+								activeControls.classList.remove('replying');
+							}
+
+						// Comment is not a reply:
+						} else {
+							// Reset comment textarea:
+							form.querySelector('textarea.comment-text').value = '';
+						}
+					});
+				}
+
 			} break;
 		}
 
@@ -111,24 +134,7 @@ function ClientForms() {
 				} break;
 
 				case 'create-comment': {
-					// If user is still on the star they left a comment for:
-					if(clientState.playingStar == commentingStar) {
-						// If new comment is a reply:
-						if(result.newComment.replyingTo) {
-							// Close reply controls:
-							var activeControls = document.querySelector('.comment-controls.replying');
-							if(activeControls) { //@REVISIT necessary?
-								activeControls.classList.remove('replying');
-							}
-						// Comment is not a reply:
-						} else {
-							// Reset comment textarea:
-							form.querySelector('textarea.comment-text').value = '';
-						}
-
-						// Add new comment to interface:
-						new ClientComment(result.newComment);
-					}
+					// Nothing.
 				} break;
 
 				default: {

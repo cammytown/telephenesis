@@ -87,11 +87,11 @@ function TelepRouter() {
 		}
 
 		// src.on('error', function(err) {
-		// 	o.json({ error: 1 });
+		// 	o.json({ errors: 1 });
 		// });
 
 		// if(!$ajax->upload(i.user.id, i.params.starid, i.file))
-		// o.json({ error: "did not upload" });
+		// o.json({ errors: ["did not upload"] });
 		// break;
 	}
 
@@ -198,13 +198,13 @@ function TelepRouter() {
 
 					// if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
 					if(!i.user || i.user.lv != 7) {
-						o.json({ error: "not logged in" });
+						o.json({ errors: ["not logged in"] });
 						return false;
 					}
 
 					api.renameStar(starID, i.body.creatorName, function(err, result) {
 						if(err) {
-							o.json({ error: "couldn't move..." }); ///
+							o.json({ errors: ["couldn't move..."] }); ///
 							return false;
 						}
 
@@ -221,19 +221,19 @@ function TelepRouter() {
 				Stars.getStar(starID, function(err, star) {
 					if(err) {
 						///
-						o.json({ error: "couldn't get star" });
+						o.json({ errors: ["couldn't get star"] });
 						return false;
 					}
 
 					// if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
 					if(!i.user || i.user.lv != 7) {
-						o.json({ error: "not logged in" });
+						o.json({ errors: ["not logged in"] });
 						return false;
 					}
 
 					api.deleteStar(starID, function(err, result) {
 						if(err) {
-							o.json({ error: "couldn't delete" }); ///
+							o.json({ errors: ["couldn't delete"] }); ///
 							return false;
 						}
 
@@ -246,13 +246,13 @@ function TelepRouter() {
 
 			case 'settings': { /// naming (need to rename element id of form in current architecture)
 				if(!i.user) {
-					o.json({ error: "not logged in" });
+					o.json({ errors: ["not logged in"] });
 					return false;
 				}
 
 				api.updateProfile(i.user.id, i.body, function(err, result) {
 					if(err) {
-						o.json({ error: err }); ///
+						o.json({ errors: err }); ///
 						return false;
 					}
 
@@ -271,13 +271,13 @@ function TelepRouter() {
 
 					// if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
 					if(!i.user || i.user.lv != 7) {
-						o.json({ error: "not logged in" });
+						o.json({ errors: ["not logged in"] });
 						return false;
 					}
 
 					api.recolor(starID, i.body.rgb, function(err, result) {
 						if(err) {
-							o.json({ error: "couldn't move..." }); ///
+							o.json({ errors: ["couldn't move..."] }); ///
 							return false;
 						}
 
@@ -297,7 +297,7 @@ function TelepRouter() {
 
 					// if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
 					if(!i.user || i.user.lv != 7) {
-						o.json({ error: "not logged in" });
+						o.json({ errors: ["not logged in"] });
 						return false;
 					}
 
@@ -306,7 +306,7 @@ function TelepRouter() {
 
 					api.move(starID, x, y, function(err, result) {
 						if(err) {
-							o.json({ error: "couldn't move..." }); ///
+							o.json({ errors: ["couldn't move..."] }); ///
 							return false;
 						}
 
@@ -318,7 +318,7 @@ function TelepRouter() {
 			default: {
 				/// log something maybe
 
-				o.json({ error: "unhandled ajax operation: " +  i.params.operation}); /// safe to let people know?
+				o.json({ errors: ["unhandled ajax operation: " +  i.params.operation] }); /// safe to let people know?
 			}
 		}
 	}

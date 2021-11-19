@@ -1,10 +1,12 @@
 import cor from '../libs/minlab/cor';
 import spc from '../libs/minlab/spc'; /// relying on implied singleton
 import Anm from '../libs/minlab/anm';
+//import anime from 'animejs/lib/anime.es';
 import HistoryTime from '../libs/history-time';
 
 import clientState from './ClientState';
 import Interface from './Interface';
+import comments from './Comments';
 import Stars from './Stars';
 import Creator from './Creator';
 import CONSTS from '../../../abstract/constants';
@@ -269,12 +271,13 @@ function ClientNavigation() {
 		// If this is not initial page load (and thus we cannot rely on the
 		// server having rendered certain things):
 		if(!pageInitialization) {
-			closeContextMenu(); ///REVISIT always?
+			closeContextMenu();
 
 			preparePathChange(newPage);
 
 			// Open the UI for the page if there is one:
 			if(boxPages.includes(newPage)) {
+				comments.toggleComments(false);
 				open(newPage);
 			}
 
@@ -309,9 +312,24 @@ function ClientNavigation() {
 					///TODO change spc over to Vectors probably
 
 					// Center screen around focused star:
+					//var obj = { ///@TODO temporary solution
+					//    x: spc.x,
+					//    y: spc.y
+					//};
+					//anime({
+					//    targets: obj,
+					//    x: Stars.clientStars[starID].position.x,
+					//    y: Stars.clientStars[starID].position.y,
+					//    update: function() {
+					//        spc.set(obj.x, obj.y);
+					//        Stars.drawLineStep();
+					//    }
+					//});
+
 					spc.ctr(
 						Stars.clientStars[starID].position.x,
-						Stars.clientStars[starID].position.y
+						Stars.clientStars[starID].position.y,
+						Stars.updateConstellationLines //@TODO-2 revisit hacky solution
 					);
 				}
 
