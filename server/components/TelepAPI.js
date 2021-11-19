@@ -142,24 +142,27 @@ function TelepAPI(server) {
 	me.register = function(email, password, displayName, creatorName, ip) {
 		return usr.rg(email, password, ip)
 			.then(usrDoc => {
-				var userMetaObject = {
-					displayName,
-					creatorName,
-					creationTickets: 1,
-					recreationTickets: 3,
-					bookmarks: [],
-				};
+				generatePublicID(usrMeta)
+					.then(publicID => {
+						var userMetaObject = {
+							publicID,
+							displayName,
+							creatorName,
+							creationTickets: 1,
+							recreationTickets: 3,
+							bookmarks: [],
+						};
 
-				console.log(userMetaObject);
-				var newUser = new TelepUser(usrDoc, userMetaObject);
+						var newUser = new TelepUser(usrDoc, userMetaObject);
 
-				return usrMeta.insertOne(newUser.export('usrMeta'))
-					.then(result => {
-						return newUser;
-					})
-					.catch(err => {
-						throw err;
-					});
+						return usrMeta.insertOne(newUser.export('usrMeta'))
+							.then(result => {
+								return newUser;
+							})
+							.catch(err => {
+								throw err;
+							});
+					}); // generatePublicID()
 			})
 			.catch(err => {
 				// o.render('register', { p: req.body, errors: err });
@@ -254,19 +257,19 @@ function TelepAPI(server) {
 	 * Generate a unique comment ID that is safe to expose.
 	 * @returns Promise<string> The unique ID.
 	 **/
-	function generatePublicID() {
+	function generatePublicID(testCollection) {
 		//var unique = false;
 
 		//@REVISIT should we prefer the non-secure nanoid()? I'm not sure it
 		//allows async but if it's fast enough maybe it doesn't matter??
 		return nanoid(6).then(publicID => {
-			return dbComments.findOne({ publicID })
+			return testCollection.findOne({ publicID })
 				.then(doc => {
 					//@REVISIT kinda weird architecture; maybe better to use await:
 					if(!doc) {
 						return publicID;
 					} else {
-						return generatePublicID();
+						return generatePublicID(testCollection);
 					}
 				});
 		});
@@ -282,7 +285,7 @@ function TelepAPI(server) {
 	 * @returns {Promise<object>} The database _id of the new comment.
 	 **/
 	this.createComment = function(telepUser, starID, commentText, replyingTo) {
-		return generatePublicID().then(publicID => {
+		return generatePublicID(dbComments).then(publicID => {
 			var newComment = {
 				//@TODO consider creating a library that automatically increases
 				//size of nanoid based on number of collisions:

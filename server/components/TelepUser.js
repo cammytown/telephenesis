@@ -8,7 +8,8 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 
 	const exportLists = {
 		identity: [
-			'id',
+			'id', //@TODO replacing with publicID
+			'publicID',
 			'email',
 			'lv',
 			'sessionCode',
@@ -20,7 +21,7 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 		],
 
 		usrMeta: [
-			'userID', ///REVISIT weird architecture relies on converting id to userID sometimes
+			'publicID',
 			'email',
 			'displayName',
 			'creatorName',
@@ -30,6 +31,7 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 		],
 
 		client: [
+			'publicID',
 			'email',
 			'lv',
 			'displayName',
@@ -39,7 +41,7 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 		],
 
 		commentCache: [
-			'id',
+			'publicID',
 			'displayName',
 		]
 	};
@@ -58,9 +60,9 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 		//me.loadData(usrDoc);
 
 		if(userMeta) {
-			if(userMeta['id']) {
-				userMeta['id'] = userMeta.userID; ///REVISIT architecture
-			}
+			//if(userMeta['id']) {
+			//    userMeta['id'] = userMeta.userID; ///REVISIT architecture
+			//}
 
 			me.loadData(userMeta);
 		}
