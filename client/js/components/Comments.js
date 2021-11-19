@@ -16,14 +16,40 @@ function Comments() {
 
 	//var commentsEle = document.querySelector('#playingComments');
 	
+	/** The textarea for creating a new comment (not a reply). **/
+	var createCommentTextarea;
+
 	/** The element that holds comments. **/
 	var commentsListEle;
 
 	this.init = function() {
+		createCommentTextarea = document.querySelector('#createCommentForm textarea.comment-text');
+
+		createCommentTextarea.addEventListener('input', resizeCommentTextarea);
+
 		var commentToggleEle = document.querySelector('#togglePlayingComments');
 		commentToggleEle.addEventListener('click', me.toggleComments);
 
 		commentsListEle = document.querySelector('#playingComments ul.comments');
+	}
+
+	//this.ready = function() {
+	//    // Initialize comment textarea height:
+	//    resizeCommentTextarea();
+	//}
+
+	/**
+	 * Resize the textarea for creating a comment based on its content.
+	 **/
+	function resizeCommentTextarea() {
+		console.log(createCommentTextarea.scrollHeight);
+
+		// Reset height:
+		createCommentTextarea.style.height = 0;
+
+
+		// Set to content height:
+		createCommentTextarea.style.height = createCommentTextarea.scrollHeight + 'px';
 	}
 
 	/**
@@ -54,7 +80,6 @@ function Comments() {
 	 * Toggles display of comments in the interface.
 	 **/
 	this.toggleComments = function() {
-
 		// Toggle visible:
 		visible = !visible;
 
@@ -65,6 +90,12 @@ function Comments() {
 		} else {
 			// Add comments class to body:
 			document.body.classList.add('show-comments');
+
+			//@TODO-2 ensure this attempt to set the height of an empty
+			//textarea works across browsers:
+			//@REVISIT-1 I don't like this solution but I'm at my wits end for
+			//trying to get CSS to behave as I would expect it to:
+			resizeCommentTextarea();
 		}
 	}
 }

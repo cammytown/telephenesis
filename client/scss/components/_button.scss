@@ -24,10 +24,6 @@
 	cursor: pointer;
 	transition: background-color 0.25s, color 0.5s;
 
-	&.text-left { ///
-		text-align: left;
-	}
-
 	&.main {
 		width: 98%;
 		margin: 2px auto;
@@ -46,6 +42,10 @@
 			color: #222;
 			background-color: #999;
 		}
+	}
+
+	&.text-left { ///
+		text-align: left;
 	}
 }
 

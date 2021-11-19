@@ -162,45 +162,46 @@ function Spc(elementID = "spc") {
 
 			tickFrame();
 
-			function tickFrame(ms) {
-				var msSinceStart = performance.now() - fltStartTime;
+		}
+	}
 
-				/// optimization:
-				if(msSinceStart < 1000) {
-					var v = msSinceStart / 1000;
+	function tickFrame(ms) {
+		var msSinceStart = performance.now() - fltStartTime;
+
+		/// optimization:
+		if(msSinceStart < 1000) {
+			var v = msSinceStart / 1000;
+			fltVelocity.x = fltDirection * v;
+			fltVelocity.y = fltDirection * v;
+		} else {
+			fltVelocity.x = fltDirection;
+			fltVelocity.y = fltDirection;
+
+			if(msSinceStart > 19000) {
+				if(msSinceStart < 20000) {
+					var v = (1000 - (msSinceStart % 19000)) / 1000;
 					fltVelocity.x = fltDirection * v;
 					fltVelocity.y = fltDirection * v;
 				} else {
-					fltVelocity.x = fltDirection;
-					fltVelocity.y = fltDirection;
-
-					if(msSinceStart > 19000) {
-						if(msSinceStart < 20000) {
-							var v = (1000 - (msSinceStart % 19000)) / 1000;
-							fltVelocity.x = fltDirection * v;
-							fltVelocity.y = fltDirection * v;
-						} else {
-							fltDirection *= -1;
-							fltStartTime = new Date();
-						}
-
-					}
+					fltDirection *= -1;
+					fltStartTime = new Date();
 				}
 
-				var x = me.x += fltVelocity.x;
-				var y = me.y += fltVelocity.y;
-				me.x = x;
-				me.y = y;
-
-				me.set(x, y);
-
-				if(me.s == 'flt') {
-					window.requestAnimationFrame(tickFrame);
-				}
-
-				// if(me.s == 'flt') setTimeout(l, 50);
 			}
 		}
+
+		var x = me.x += fltVelocity.x;
+		var y = me.y += fltVelocity.y;
+		me.x = x;
+		me.y = y;
+
+		me.set(x, y);
+
+		if(me.s == 'flt') {
+			window.requestAnimationFrame(tickFrame);
+		}
+
+		// if(me.s == 'flt') setTimeout(l, 50);
 	}
 
 	/// wip

@@ -46,5 +46,8 @@ ul.comments {
 }
 
 textarea.comment-text {
+	//height: 57px;
+	background: $uiBackgroundLightSolid;
 	text-align: left;
+	resize: both; //@TODO-3 ensure IE support
 }
