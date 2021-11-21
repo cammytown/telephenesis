@@ -11,6 +11,7 @@
     "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
+    "ibm-cos-sdk": "^1.11.0",
     "mongodb": "^3.7.3",
     "multer": "^1.4.3",
     "nano-jsx": "^0.0.21",

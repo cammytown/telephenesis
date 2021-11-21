@@ -326,6 +326,8 @@ function ClientNavigation() {
 					);
 				}
 
+				console.log(Stars.clientStars);
+
 				Stars.clientStars[starID].play();
 			} break;
 

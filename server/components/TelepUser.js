@@ -1,6 +1,6 @@
 /**
  * User class for server use.
- * @param [usrDoc] {Object} - Entry in Usr collection which represents this user.
+ * @param [usrDoc] {object} - Entry in Usr collection which represents this user.
  * @constructor
  */
 function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta architecture
@@ -92,7 +92,7 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 
 	/**
 	 * Convert properties to object for use with database.
-	 * @returns {Object}
+	 * @returns {object}
 	 **/
 	this.export = function(exportType = 'identity') {
 		var returnObject = {};

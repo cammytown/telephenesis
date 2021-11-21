@@ -5,10 +5,10 @@
 
 	#map
 		each starData, i in stars
-			- var className = (user && user.bookmarks.indexOf(starData.id) != -1) ? ' bookmarked' : ''
+			- var className = (user && user.bookmarks.indexOf(starData.publicID) != -1) ? ' bookmarked' : ''
 			- className += starData.tier == 0 ? ' origin' : ''
 			+star(starData)(
-				id = 's' + starData.id
+				id = 's' + starData.publicID
 				data-prev = starData.originStarID
 				data-originStarID = starData.originStarID
 				data-tier = starData.tier

@@ -73,7 +73,7 @@ function TelepRouter() {
 					originStar,
 					multerFile: req.file,
 					callback: function(star) {
-						res.json({ errors: false, starID: star.id });
+						res.json({ errors: false, starID: star.publicID });
 					}
 				});
 			});
@@ -81,7 +81,7 @@ function TelepRouter() {
 			api.createStar(req.user, {
 				multerFile: req.file,
 				callback: function(star) {
-					res.json({ errors: false, starID: star.id });
+					res.json({ errors: false, starID: star.publicID });
 				}
 			});
 		}

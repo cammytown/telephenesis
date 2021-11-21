@@ -9,28 +9,29 @@
 //-    input#typeSetting(type="hidden" name="art-type" value="music")
 
 
-//- div.double
-//- 	.btn.green
-//- 		| File URL
+div.double
+	input.host-type-input(type="hidden" name="host-type" value="upload")
 
-//- 	.btn.green.upload
-//- 		input#submission(name="submission" type="file")
-//- 		| Upload <small>(mp3)</small>
+	.btn.green.upload.active
+		input.submission-file-input(name="submission" type="file")
+		| Upload <small>(mp3)</small>
+
+	.btn.green
+		| File URL
 
 section.starTitle
-	h3 Star Title 
+	h3 Star Title
 		small (optional)
 
-	input(
+	input.star-title(
 		type="text"
-		class="star-title"
 		name="star-title"
 		placeholder="Star #0028"
 	)
 
 section.fileUpload
 	h3 MP3 File URL
-	em We recommend 
+	em We recommend
 		a(href="https://archive.org/" target="_blank") archive.org
 
 	input(
@@ -54,7 +55,7 @@ label.rightsAgreement
 //- This constellation is set to public. All recreations follow the same license.
 
 //- .btn.green.upload
-//- 	input#submission(name="submission" type="file")
+//- 	input.submission-file-input(name="submission" type="file")
 //- 	| Upload <small>(mp3)</small>
 
 //- .btn.green Public

@@ -80,7 +80,7 @@ function TelepAdmin() {
 
 	function clickStarMove(eve) {
 		COR.POST('/ajax/admin/moveStar', {
-			starID: clientState.actingStar.id,
+			starID: clientState.actingStar.publicID,
 			x: me.targetStar.position.x,
 			y: me.targetStar.position.y,
 		});
@@ -98,7 +98,7 @@ function TelepAdmin() {
 	function confirmDelete() {
 		if(confirm("Delete the star?")) { ///FUTURE revisit admin ui some day
 			COR.POST('/ajax/admin/deleteStar', {
-				starID: clientState.actingStar.id,
+				starID: clientState.actingStar.publicID,
 			});
 		}
 	}

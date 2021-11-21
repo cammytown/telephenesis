@@ -14,7 +14,7 @@ function Star() {
 	 * @type {Array}
 	 */
 	this.identityProps = [
-		'id',
+		'publicID',
 		'originStarID',
 		'title',
 		// 'x',
@@ -27,11 +27,6 @@ function Star() {
 		'hostType',
 		'fileURL',
 		'timestamp'
-	];
-
-	this.serverProps = [
-		'active',
-		'deleted',
 	];
 
 	this.objectProps = [

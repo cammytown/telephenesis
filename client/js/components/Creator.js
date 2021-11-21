@@ -7,10 +7,11 @@ import ColorTool from '../libs/minlab/colorTool.js';
 // import HistoryTime from '../libs/history-time';
 
 import navigation from './Navigation';
-import clientState from './ClientState.js';
-import ClientStar from './ClientStar.js';
-import Stars from './Stars.js';
-import Interface from './Interface.js';
+import clientState from './ClientState';
+import ClientStar from './ClientStar';
+import Stars from './Stars';
+import Interface from './Interface';
+//import uploads from './Uploads';
 
 import Vector from '../../../abstract/Vector.js';
 import * as CONSTS from '../../../abstract/constants.js';
@@ -66,8 +67,7 @@ function Creator() {
 
 		COR._('#create-page').addEventListener('submit', onCreateSubmit);
 		COR._('#recreate-page').addEventListener('submit', onCreateSubmit);
-		///REVISIT removed because we're only doing links atm:
-		// COR._('#submission').addEventListener('change', uploadCreation);
+		COR.addClassListener('submission-file-input', 'change', onUploadFileSelect);
 
 		for(var recreateLink of COR._('.createStar')) {
 			recreateLink.addEventListener('click', onCreateStarClick);
@@ -83,21 +83,7 @@ function Creator() {
 		colorwheelSelect = document.getElementById('colorwheelSelect');
 
 		colorwheelSelect.addEventListener('mousemove', getColorFromWheelPosition);
-		colorwheelSelect.addEventListener('click', function() {
-			colorwheelSelect.removeEventListener('mousemove', getColorFromWheelPosition);
-
-			me.workingStar.color = me.workingStar.linkElement.style.backgroundColor.substr(4).slice(0, -1); /// bad code / maybe unreliable
-			Anm.fadeOut(colorwheelSelect);
-
-			me.workingStar.isPlaced = true;
-			actualizeCreation();
-
-			// if(!me.workingStar.isUploaded) {
-			// 	me.workingStar.isPlaced = true;
-			// } else {
-			// 	actualizeCreation();
-			// }
-		});
+		colorwheelSelect.addEventListener('click', onColorwheelChoice);
 	}
 
 	/** Cancel creation process. **/
@@ -119,7 +105,7 @@ function Creator() {
 		event.preventDefault();
 
 		navigation.navigate(event.target.pathname
-			+ '/' + clientState.actingStar.id);
+			+ '/' + clientState.actingStar.publicID);
 	}
 
 	/**
@@ -130,8 +116,8 @@ function Creator() {
 		me.workingStar = new ClientStar();
 
 		me.workingStar.element.style.display = 'none';
-		me.workingStar.id = "placeholder"; ///REVISIT architecture
-		me.workingStar.originStarID = originStar ? originStar.id : -1;
+		me.workingStar.publicID = "placeholder"; ///REVISIT architecture
+		me.workingStar.originStarID = originStar ? originStar.publicID : -1;
 		me.workingStar.tier = originStar ? originStar.tier + 1 : 0;
 
 		if(originStar) {
@@ -146,7 +132,6 @@ function Creator() {
 
 		var formEle = event.target;
 
-		me.workingStar.hostType = 'external'; ////
 		me.workingStar.title = formEle.getElementsByClassName('star-title')[0].value;
 		me.workingStar.fileURL = formEle.getElementsByClassName('file-url')[0].value;
 		me.workingStar.element.style.display = null; ///REVISIT best method?
@@ -160,9 +145,9 @@ function Creator() {
 			////TODO validate the file
 
 			me.workingStar.fileReady = true;
-
-			initializePlacement();
 		}
+
+		initializePlacement();
 
 	}
 
@@ -352,14 +337,14 @@ function Creator() {
 					// document.body.removeAttribute('class');
 					// spc.on = true;
 					me.workingStar.isPlaced = true;
-					actualizeCreation();
+					actualizeStar();
 
-					// if(!me.workingStar.isUploaded) {
+					// if(!me.workingStar.fileReady) {
 					// 	me.workingStar.isPlaced = true;
 					// 	Anm.fadeOut(colorShiftSelect);
 					// 	// console.log(me.workingStar.color);
 					// } else {
-					// 	actualizeCreation()
+					// 	actualizeStar()
 					// }
 				});
 			});
@@ -387,25 +372,45 @@ function Creator() {
 		me.workingStar.linkElement.style.backgroundColor = 'hsl('+selectedhue+', 45%, 80%)';
 	}
 
-	function uploadCreation() {
+	function onColorwheelChoice(event) {
+		colorwheelSelect.removeEventListener('mousemove', getColorFromWheelPosition);
+
+		/// bad code / maybe unreliable
+		me.workingStar.color = me.workingStar.linkElement.style.backgroundColor.substr(4).slice(0, -1);
+		Anm.fadeOut(colorwheelSelect);
+
+		me.workingStar.isPlaced = true;
+		actualizeStar();
+
+		// if(!me.workingStar.fileReady) {
+		// 	me.workingStar.isPlaced = true;
+		// } else {
+		// 	actualizeStar();
+		// }
+	}
+
+	function onUploadFileSelect(event) {
 		/// create back and forth navigation
 		/// could use some attention
 
 		// state.updating = false;
-		navigation.navigate('/');
+		//navigation.navigate('/');
 		// document.body.className = null;
 		//spc.ctr(0, 0);
 
-		var originStarID = workingOriginStar ? workingOriginStar.id : -1;
-		var file = document.getElementById('submission');
-		var upl = new Upl('/ajax/upload/'+originStarID, file, onUploadProgress, onUploadComplete);
+		//var originStarID = workingOriginStar ? workingOriginStar.publicID : -1;
+		var fileEle = event.target;
 
-		initializePlacement();
+		initializeStar().then(() => {
+			console.log('star initialized');
+			console.log(me.workingStar);
+			var upl = new Upl(me.workingStar.uploadURL, fileEle, onUploadProgress, onUploadComplete);
+		});
 
 		function onUploadProgress(e) {
 			if (e.lengthComputable) {
 				var progress = e.loaded / e.total;
-				me.workingStar.textElement.innerHTML = Math.floor(progress*100) + '% uploaded';
+				me.workingStar.titleElement.innerHTML = Math.floor(progress*100) + '% uploaded';
 
 				if(progress == 1) { /// safe?
 					// complete();
@@ -418,25 +423,42 @@ function Creator() {
 		}
 
 		function onUploadComplete(e) {
-			uploaded = true;
+			me.workingStar.fileReady = true;
 
-			var d = e.target.responseText;
-			var response = JSON.parse(d);
+			//var d = e.target.responseText;
+			//var result = JSON.parse(d);
 
-			if(response.error) {
-				console.log(response.error); ////
-				throw(response.error);
-			}
+			//console.log(result);
+			//if(response.error) {
+			//    console.log(response.error); ////
+			//    throw(response.error);
+			//}
 
-			me.workingStar.id = response.sid;
-			me.workingStar.element.id = 's'+me.workingStar.id;
-			me.workingStar.element.setAttribute('data-prev', originStarID);
+			//me.workingStar.publicID = response.sid;
+			//me.workingStar.element.id = 's'+me.workingStar.publicID;
+			//me.workingStar.element.setAttribute('data-prev', originStarID);
 
-			actualizeCreation();
+			actualizeStar();
 		}
 	}
 
-	function actualizeCreation() {
+	function initializeStar() {
+		return COR.POST('/ajax/initialize-star', {
+			hostType: 'upload',
+			originStarID: me.workingStar.originStarID
+		})
+			.then(response => response.json())
+			.then(result => {
+				console.log('initialize response');
+				console.log(result);
+				me.workingStar.loadData(result.newStar, ['uploadURL']);
+			});
+
+		//uploads.requestuploadurl(me.workingstar).then(uploadurl => {
+			//console.log(uploadurl);
+	}
+
+	function actualizeStar() {
 		window.onbeforeunload = false;
 
 		if(!me.workingStar.fileReady || !me.workingStar.isPlaced) {
@@ -446,17 +468,18 @@ function Creator() {
 
 		Interface.hideMessage();
 
-		var formData = me.workingStar.export('FormData');
+		//var formData = me.workingStar.export('FormData');
 
-		var request = {
-			method: "POST",
-			body: formData
-		};
+		//var request = {
+		//    method: "POST",
+		//    body: formData
+		//};
 
-		fetch('/ajax/actualize', request) ///REVISIT old browser compatability?
+		//fetch('/ajax/actualize', request) ///REVISIT old browser compatability?
+		return COR.POST('/ajax/actualize-star', me.workingStar.export())
 			.then(response => response.json())
 			.then(result => {
-				if(result.errors) {
+				if(result.errors.length) {
 					throw result.errors;
 				}
 
@@ -466,7 +489,7 @@ function Creator() {
 
 				console.log(result);
 				// Update star element attributes:
-				me.workingStar.id = result.newStarID;
+				me.workingStar.publicID = result.newStarPublicID;
 				me.workingStar.titleElement.className = 'text name';
 				me.workingStar.titleElement.innerText = me.workingStar.title;
 				me.workingStar.timestamp = result.timestamp;
@@ -481,6 +504,8 @@ function Creator() {
 				} else {
 					clientState.act(CONSTS.ACTION.USE_RECREATION_TICKET);
 				}
+
+				console.log(result);
 
 				// Shift stars around according to server instructions:
 				for(var starID in result.starMovements) {

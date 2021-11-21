@@ -20,7 +20,7 @@ function ClientStarsAPI() {
 	var me = this;
 
 	/** Active stars currently loaded on the client. **/
-	me.clientStars = [];
+	me.clientStars = {};
 
 	/** Enforced margin between stars. **/
 	var starSpacing = 50; ///REVISIT placement; in a central config file maybe?
@@ -58,8 +58,7 @@ function ClientStarsAPI() {
 
 			// Load HTML element into a ClientStar:
 			var clientStar = new ClientStar(starElement);
-
-			me.clientStars[clientStar.id] = clientStar;
+			me.clientStars[clientStar.publicID] = clientStar;
 		}
 
 		// Convert all styleVar properties to ints (from i.e. "20px" to 20)
@@ -76,8 +75,12 @@ function ClientStarsAPI() {
 	// }
 
 	me.addStar = function(newStar) {
+		if(!newStar.publicID) {
+			throw "addStar(): no publicID on ClientStar";
+		}
+
 		// me.attemptPosition(newStar, newStar.position);
-		me.clientStars[newStar.id] =  newStar;
+		me.clientStars[newStar.publicID] =  newStar;
 	}
 
 	// /**
@@ -118,18 +121,18 @@ function ClientStarsAPI() {
 		// me.position = newPosition;
 		// var movingStars = []; ///REVISIT architecture
 
-		// if(starMovements[targetStar.id]) { ////DEBUGGING
+		// if(starMovements[targetStar.publicID]) { ////DEBUGGING
 		// 	return;
 		// }
 
-		starMovements[targetStar.id] = newPosition; ///REVISIT
-		// starMovements[targetStar.id] = newPosition;
+		starMovements[targetStar.publicID] = newPosition; ///REVISIT
+		// starMovements[targetStar.publicID] = newPosition;
 
 		// for(var clientStar of me.clientStars) {
 		// for (var starIndex = 0; starIndex < me.clientStars.length; starIndex++) {
 		// 	var clientStar = me.clientStars[starIndex];
-		me.clientStars.forEach((clientStar, starIndex) => {
-			if(clientStar.id == targetStar.id) { ///REVISIT best check?
+		Object.values(me.clientStars).forEach((clientStar, starIndex) => {
+			if(clientStar.publicID == targetStar.publicID) { ///REVISIT best check?
 				console.log('skipping self');
 				return; //continue;
 			}
@@ -137,8 +140,8 @@ function ClientStarsAPI() {
 			var checkPosition = clientStar.position;
 
 			// Check if we're already planning to move this star:
-			if(starMovements.hasOwnProperty(clientStar.id)) {
-				checkPosition = starMovements[clientStar.id];
+			if(starMovements.hasOwnProperty(clientStar.publicID)) {
+				checkPosition = starMovements[clientStar.publicID];
 			}
 
 			// Get distance between stars:
@@ -167,11 +170,11 @@ function ClientStarsAPI() {
 		});
 
 		///REVISIT should this wait until the root attemptPosition resolves?:
-		// console.log('actualize ' + targetStar.id);
-		// console.log(starMovements[targetStar.id]);
-		targetStar.position = starMovements[targetStar.id];
+		// console.log('actualize ' + targetStar.publicID);
+		// console.log(starMovements[targetStar.publicID]);
+		targetStar.position = starMovements[targetStar.publicID];
 		// for(var movingStar of movingStars) {
-		// 	movingStar.position = starMovements[movingStar.id];
+		// 	movingStar.position = starMovements[movingStar.publicID];
 		// }
 	}
 
@@ -208,7 +211,7 @@ function ClientStarsAPI() {
 			case CONSTS.ORDER.CONSTELLATIONS: {
 				var constellations = {};
 
-				me.clientStars.forEach(star => {
+				Object.values(me.clientStars).forEach(star => {
 					if(!constellations[star.constellationID]) {
 						constellations[star.constellationID] = [];
 					}
@@ -267,7 +270,7 @@ function ClientStarsAPI() {
 
 				// for (var starIndex = 0; starIndex < me.clientStars.length; starIndex++) {
 				// 	var starEle = me.clientStars[starIndex].element;
-				me.clientStars.forEach((clientStar, starIndex) => {
+				Object.values(me.clientStars).forEach((clientStar, starIndex) => {
 					cor.rc(document.body, 'sorting'); ////
 
 					anime({
@@ -417,7 +420,7 @@ function ClientStarsAPI() {
 	}
 
 	function deleteStar(starElement) {
-		var starID = clientState.actingStar.id;
+		var starID = clientState.actingStar.publicID;
 		var p = "starID="+starID;
 		ajx('/ajax/deleteStar', p, function(d) {
 			var r = JSON.parse(d);
@@ -446,17 +449,17 @@ function ClientStarsAPI() {
 		var lineIndex = 0;
 		// for (var starIndex = 0; starIndex < me.clientStars.length; starIndex++) {
 		// 	var clientStar = me.clientStars[starIndex];
-		me.clientStars.forEach((clientStar, starIndex) => {
+		Object.values(me.clientStars).forEach((clientStar, starIndex) => {
 			var starEle = clientStar.element;
 
 			if(clientStar.originStarID != -1) { // If this is not an origin star
 				var originStarEle = document.getElementById('s' + clientStar.originStarID);
 				if(!originStarEle) {
-					console.error('root star not loaded for ' + clientStar.id);
+					console.error('root star not loaded for ' + clientStar.publicID);
 					throw false;
 				}
 
-				originStarEle.setAttribute('data-next', clientStar.id); ///TODO figure out what "next" means when there are multiple child stars; also this shouldn't be here if it were being used
+				originStarEle.setAttribute('data-next', clientStar.publicID); ///TODO figure out what "next" means when there are multiple child stars; also this shouldn't be here if it were being used
 
 				// We use the star's style.left and .top in case we're in list/grid view:
 				constellationLines.push({
