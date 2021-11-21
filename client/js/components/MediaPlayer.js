@@ -58,11 +58,11 @@ function MediaPlayer() {
 			// me.audio.load('/music/'+sid+'.mp3');
 
 			if(activeMediaState) {
-				mediaStates[clientStar.id] = activeMediaState;
+				mediaStates[clientStar.publicID] = activeMediaState;
 			}
 
-			if(mediaStates[clientStar.id]) {
-				activeMediaState = mediaStates[clientStar.id];
+			if(mediaStates[clientStar.publicID]) {
+				activeMediaState = mediaStates[clientStar.publicID];
 			} else {
 				activeMediaState = {
 					lastUpdateMediaTime: 0,
@@ -103,7 +103,7 @@ function MediaPlayer() {
 				// If played long enough to flag partial play:
 				if(activeMediaState.totalMediaPlaySeconds >= playerConfig.partialPlaySeconds) {
 					activeMediaState.flags.partialPlay = true;
-					pendingServerUpdates.push({ type: 'partialPlay', starID: clientState.playingStar.id });
+					pendingServerUpdates.push({ type: 'partialPlay', starID: clientState.playingStar.publicID });
 				}
 			}
 
@@ -111,7 +111,7 @@ function MediaPlayer() {
 			var totalPlayTimeFloat = activeMediaState.totalMediaPlaySeconds / me.audio.element.duration;
 			if(totalPlayTimeFloat >= playerConfig.longPlayPercent / 100) {
 				activeMediaState.flags.longPlay = true;
-				pendingServerUpdates.push({ type: 'longPlay', starID: clientState.playingStar.id });
+				pendingServerUpdates.push({ type: 'longPlay', starID: clientState.playingStar.publicID });
 			}
 		}
 	}

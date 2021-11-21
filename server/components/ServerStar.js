@@ -3,70 +3,93 @@ const Vector = require('../../abstract/Vector.js');
 
 /**
  * Star data structure for server use.
- * 
- * @param [starData] {Object} - Initialization properties.
+ * @param {object} [starData] - Initialization properties.
+ * @param {"client"|"server"} [dataFilter] - Where starData is coming from
  * @extends Star
  * @constructor
  */
-function ServerStar(starData) {
+//@REVISIT maybe "dataFilter" can just be "trusted" true or false
+function ServerStar(starData, dataFilter) {
 	var me = this;
 
-	function init(starData) {
+	//@REVISIT quick-fix because I don't want it to be in identity props;
+	//change once we have different property sets functioning:
+	me.uploadURL = null;
+
+	const serverProps = [
+		'active',
+		'deleted'
+	];
+
+	function init(starData, dataFilter) {
 		Star.call(me);
 
-		// Add serverProps to identityProps:
-		me.identityProps = me.identityProps.concat(me.serverProps);
+		if(starData) { 
+			if(!dataFilter) {
+				throw "No dataFilter provided to ServerStar() constructor";
+			}
 
-		me.loadData(starData);
+			me.loadData(starData, dataFilter);
+		}
+
 	}
 
-	me.loadData = function(data, flag = 'client') { ///REVISIT flag architecture
+	///REVISIT dataFilter architecture
+	me.loadData = function(data, dataFilter = 'client') {
 		if(!data) {
 			return false;
 		}
 
-		// if(flag == 'client') {
-		// Remove keys that the client isn't allowed to modify:
+		//@TODO-4 Remove keys that the client isn't allowed to modify.
 
-		///TODO maybe more value and type validation? log when bad values/props are used
+		var intProps = ['tier'];
 
-		// var filteredData = {};
-		var intProps = ['id', 'originStarID', 'tier'];
+		var importProps = me.identityProps;
 
-		for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
-			var identityProp = me.identityProps[propIndex];
+		switch(dataFilter) {
+			case 'client': {
+			} break;
 
-			// If property is an object, convert from string:
-			if(me.objectProps.indexOf(identityProp) != -1) {
-				if(data[identityProp] instanceof Object == false) {
-					data[identityProp] = JSON.parse(data[identityProp]);
-				}
-			}
+			case 'server': {
+				importProps = importProps.concat(serverProps);
+			} break;
 
-			if(intProps.indexOf(identityProp) != -1) {
-				me[identityProp] = parseInt(data[identityProp]);
-			} else if(identityProp == 'position') {
-				me.position = new Vector(data.position.x, data.position.y);
-			} else {
-				me[identityProp] = data[identityProp];
+			default: {
+				throw "Unhandled ServerStar data filter '" + dataFilter + '"';
 			}
 		}
 
-		// data = filteredData;
-		// }
+		for(var importProp of importProps) {
+			// If property value is an object, convert from presumed string:
+			if(me.objectProps.indexOf(importProp) != -1) {
+				if(data[importProp] instanceof Object == false) {
+					data[importProp] = JSON.parse(data[importProp]);
+				}
+			}
+
+			if(intProps.indexOf(importProp) != -1) {
+				me[importProp] = parseInt(data[importProp]);
+			} else if(importProp == 'position') {
+				me.position = new Vector(data.position.x, data.position.y);
+			} else {
+				me[importProp] = data[importProp];
+			}
+		}
 	}
 
-	this.export = function() {
+	//@TODO probably replace additionalProps w/ something like dataFilter
+	this.export = function(additionalProps = []) {
 		var exportObject = {};
 
-		for(var identityProp of me.identityProps) {
-			exportObject[identityProp] = me[identityProp];
+		var exportProps = me.identityProps.concat(additionalProps);
+		for(var exportProp of exportProps) {
+			exportObject[exportProp] = me[exportProp];
 		}
 
 		return exportObject;
 	}
 
-	init(starData);
+	init(starData, dataFilter);
 }
 
 module.exports = ServerStar;

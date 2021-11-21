@@ -6,6 +6,9 @@ const MongoClient = require('mongodb').MongoClient;
 const MongoStore = require('connect-mongo')(session);
 const bcrypt = require('bcrypt-nodejs'); /// best?
 const validator = require('validator'); /// best?
+//@REVISIT non-secure because we don't care in this context, right?
+//const nanoid = require('nanoid/non-secure').nanoid;
+const nanoid = require('nanoid/async').nanoid;
 
 const Usr = require('../libs/Usr.js'); ///REVISIT Usr or usr? changes between files...
 
@@ -27,6 +30,8 @@ function TelepServer() {
 	this.db;
 	this.usr;
 	this.persistorDoc;
+	this.serverConfig = serverConfig;
+
 	//this.api;
 	var components = [];
 
@@ -161,6 +166,41 @@ function TelepServer() {
 			() => console.log('telephenesis: listening on port ' + serverConfig.port)
 		);
 	}
+
+	/**
+	 * Generate a unique comment ID that is safe to expose.
+	 * @param {MongoCollection} testCollection
+	 * @returns Promise<string> The unique ID.
+	 **/
+	//@REVISIT placement:
+	this.generatePublicID = function(testCollection) {
+		if(!testCollection) {
+			//@REVISIT
+			throw "No testCollection provided to generatePublicID.";
+		}
+
+		//var unique = false;
+
+		//@TODO consider creating a library that automatically increases
+		//size of nanoid based on number of collisions:
+
+		//@REVISIT should we prefer the non-secure nanoid()? I'm not sure it
+		//allows async but if it's fast enough maybe it doesn't matter??
+		return nanoid(6).then(publicID => {
+			return testCollection.findOne({ publicID })
+				.then(doc => {
+					//@REVISIT kinda weird architecture; maybe better to use await:
+					if(!doc) {
+						return publicID;
+					} else {
+						return me.generatePublicID(testCollection);
+					}
+				});
+		});
+
+		//return publicID;
+	}
+
 }
 
 module.exports = new TelepServer();

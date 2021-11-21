@@ -2,7 +2,6 @@
 // requires cor.js
 
 /*
-i : input
 d : data
 r : request
 u : url
@@ -16,25 +15,26 @@ s : stop
 
 export default Upl;
 
-import cor from './cor';
-
-function Upl(u, i, progressCallback, completeCallback) {
-	/// ie>=10 only
+function Upl(u, inputEle, progressCallback, completeCallback, method = "PUT") {
+	if(!inputEle) {
+		console.log(inputEle);
+		throw "Upl(): no valid inputEle provided";
+	}
 
 	var me = this;
 
 	window.onbeforeunload = function() { return "You're in the middle of an upload."; }
 
 	var d = new FormData();
-	d.append(i.name, i.files[0]); /// should we use getAttribute('name') ?
+	d.append(inputEle.name, inputEle.files[0]); /// should we use getAttribute('name') ?
 	var r = new XMLHttpRequest();
 
-	cor.al(r.upload, "progress", progressCallback);
-	cor.al(r, "load", completeCallback);
-	cor.al(r, "error", defaultErrorCallback);
-	cor.al(r, "abort", me.s);
+	r.upload.addEventListener("progress", progressCallback);
+	r.addEventListener("load", completeCallback);
+	r.addEventListener("error", defaultErrorCallback);
+	r.addEventListener("abort", me.s);
 
-	r.open('POST', u);
+	r.open(method, u);
 	r.send(d);
 
 	function defaultErrorCallback(e) {

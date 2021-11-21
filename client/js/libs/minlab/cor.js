@@ -122,6 +122,7 @@ function POST(url, body = {}) {
 	};
 
 	if(typeof body == 'object') {
+		//@TODO this should be configurable:
 		request.body = JSON.stringify(body);
 		request.headers['Content-Type'] = 'application/json';
 	//} else if(body instanceof FormData) {

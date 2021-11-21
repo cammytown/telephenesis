@@ -1,8 +1,8 @@
 mixin star(starData = {})
 	.star&attributes(attributes)
 		a(
-			href='/star/' + starData.id
-			data-mediaURL=starData.fileURL
+			href='/star/' + starData.publicID
+			data-mediaURL=starData.fileURL + '.mp3'
 			style='background-color: rgb(' + starData.color + ')'
 		)
 

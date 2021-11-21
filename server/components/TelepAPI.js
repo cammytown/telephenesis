@@ -1,6 +1,3 @@
-//@REVISIT non-secure because we don't care in this context, right?
-//const nanoid = require('nanoid/non-secure').nanoid;
-const nanoid = require('nanoid/async').nanoid;
 const Lame = require('node-lame').Lame;
 const fs = require('fs');
 
@@ -15,8 +12,11 @@ const CONSTS = require('../../abstract/constants.js');
  * Base Telephenesis methods.
  * @constructor
  **/
-function TelepAPI(server) {
+function TelepAPI() {
 	var me = this;
+
+	//@REVISIT architecture:
+	var server = null;
 
 	/** Instance of Usr. **/
 	var usr;
@@ -39,8 +39,9 @@ function TelepAPI(server) {
 	/** A path to where uploaded art will be stored on the server. **/
 	var musicPath = __dirname + "/../public/music/"; ///MOVE to config
 
-	this.initialize = function(server) {
-		api = server.api;
+	this.initialize = function(serverInput) {
+		server = serverInput;
+
 		usr = server.usr;
 		db = server.db;
 		// me.grr = false;
@@ -50,7 +51,6 @@ function TelepAPI(server) {
 		usrMeta = db.collection('usrMeta'); /// do we need to filter MLMeta?
 		dbComments = db.collection('starComments');
 	}
-
 
 	me.syncWithClient = function(serverUpdates) {
 		return Promise.all([
@@ -142,7 +142,7 @@ function TelepAPI(server) {
 	me.register = function(email, password, displayName, creatorName, ip) {
 		return usr.rg(email, password, ip)
 			.then(usrDoc => {
-				generatePublicID(usrMeta)
+				server.generatePublicID(usrMeta)
 					.then(publicID => {
 						var userMetaObject = {
 							publicID,
@@ -162,7 +162,7 @@ function TelepAPI(server) {
 							.catch(err => {
 								throw err;
 							});
-					}); // generatePublicID()
+					}); // server.generatePublicID()
 			})
 			.catch(err => {
 				// o.render('register', { p: req.body, errors: err });
@@ -254,30 +254,6 @@ function TelepAPI(server) {
 	}
 
 	/**
-	 * Generate a unique comment ID that is safe to expose.
-	 * @returns Promise<string> The unique ID.
-	 **/
-	function generatePublicID(testCollection) {
-		//var unique = false;
-
-		//@REVISIT should we prefer the non-secure nanoid()? I'm not sure it
-		//allows async but if it's fast enough maybe it doesn't matter??
-		return nanoid(6).then(publicID => {
-			return testCollection.findOne({ publicID })
-				.then(doc => {
-					//@REVISIT kinda weird architecture; maybe better to use await:
-					if(!doc) {
-						return publicID;
-					} else {
-						return generatePublicID(testCollection);
-					}
-				});
-		});
-
-		//return publicID;
-	}
-
-	/**
 	 * Create a new comment for a star by a user.
 	 * @param {TelepUser} telepUser - The user creating the comment.
 	 * @param {number} starID - ID of star.
@@ -285,10 +261,8 @@ function TelepAPI(server) {
 	 * @returns {Promise<object>} The database _id of the new comment.
 	 **/
 	this.createComment = function(telepUser, starID, commentText, replyingTo) {
-		return generatePublicID(dbComments).then(publicID => {
+		return server.generatePublicID(dbComments).then(publicID => {
 			var newComment = {
-				//@TODO consider creating a library that automatically increases
-				//size of nanoid based on number of collisions:
 				publicID,
 				user: telepUser.export('commentCache'),
 				starID,
@@ -341,19 +315,6 @@ function TelepAPI(server) {
 				//return commentsObject;
 			});
 	}
-
-	// me.actualize = function(starData, callback) {
-	// 	///TODO maybe validate starData structure
-
-	// 	starData.initialized = true;
-	// 	// starData.placed = true;
-
-	// 	stars.updateOne(
-	// 		{ id: starId },
-	// 		{ $set: starData },
-	// 		callback
-	// 	);
-	// }
 }
 
 module.exports = new TelepAPI();

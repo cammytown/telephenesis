@@ -38,6 +38,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	//this.state = ;
 	this.fileReady = false;
 	this.isPlaced = false;
+	this.isUploaded = false;
 	this.isBookmarked = false;
 
 	function init(element = false) {
@@ -93,7 +94,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		///REVISIT me.isPlaced feels kinda hacky:
 		if(me.isPlaced) {
 			//me.play();
-			Navigation.navigate("/star/" + me.id);
+			Navigation.navigate("/star/" + me.publicID);
 		} else {
 			return false;
 		}
@@ -147,7 +148,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 		var playingStarInputs = document.querySelectorAll('.playing-star-id');
 		for(var playingStarInput of playingStarInputs) {
-			playingStarInput.value = me.id;
+			playingStarInput.value = me.publicID;
 		}
 
 		Comments.loadStarComments(me);
@@ -199,18 +200,32 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	}
 
 	/**
+	 * Load properties into the star from an object (e.g. from the server).
+	 * @param {object} starData
+	 **/
+	this.loadData = function(starData, additionalProps = []) {
+		var importProps = me.identityProps.concat(additionalProps);
+
+		for(var identityProp of importProps) {
+			//@REVISIT only updating if value is not falsey; always? use flag?:
+			if(starData[identityProp]) {
+				me[identityProp] = starData[identityProp];
+			}
+		}
+	}
+
+	/**
 	 * Set properties according to HTML element attribute values.
 	 **/
 	this.observeAttributes = function() {
 		// Function-scoped variable so we can use getter/setter with same name.
 		var positionValue;
 
-		for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
-			var property = me.identityProps[propIndex];
-
+		for(var property of me.identityProps) {
 			switch(property) {
 				case 'position': {
-					Object.defineProperty(me, 'position', { ///REVISIT architecture
+					///REVISIT architecture
+					Object.defineProperty(me, 'position', {
 						get: function() {
 							return positionValue;
 						},
@@ -229,8 +244,8 @@ function ClientStar(element) { ///REVISIT element not in use atm
 					// console.log(me.position);
 				} break;
 
-				case 'id': {
-					me.id = parseInt(me.element.id.split('s')[1]); ///ARCHITECTURE
+				case 'publicID': {
+					me.publicID = me.element.id.split('s')[1]; ///ARCHITECTURE
 				} break;
 
 				case 'originStarID':
@@ -257,8 +272,8 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 			switch(property) {
 				case 'id': {
-					me.element.id = 's' + me.id;
-					me.linkElement.href = '/star/' + me.id;
+					me.element.id = 's' + me.publicID;
+					me.linkElement.href = '/star/' + me.publicID;
 				} break;
 
 				case 'position': {
@@ -293,26 +308,38 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	 * Convert identity properties to exportable data structure.
 	 * @param dataType {string} - Type of data structure to return.
 	 */
-	this.export = function(dataType = "FormData") {
+	//@REVISIT dataType not currently in use
+	this.export = function(dataType = "object") {
 		switch(dataType) {
-			case 'FormData': {
-				var formData = new FormData();
+			case 'object': {
+				var exportObject = {};
 
 				for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
 					var identityProp = me.identityProps[propIndex];
-
-					// If property is an object:
-					if(me.objectProps.indexOf(identityProp) != -1) { ///probably keep array of which properties are objects in Star class
-						formData.append(identityProp, JSON.stringify(me[identityProp]));
-
-					// Property is a literal value; no need to stringify:
-					} else {
-						formData.append(identityProp, me[identityProp]);
-					}
+					exportObject[identityProp] = me[identityProp];
 				}
 
-				return formData;
+				return exportObject;
 			} break;
+
+			//case 'FormData': {
+			//    var formData = new FormData();
+
+			//    for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
+			//        var identityProp = me.identityProps[propIndex];
+
+			//        // If property is an object:
+			//        if(me.objectProps.indexOf(identityProp) != -1) { ///probably keep array of which properties are objects in Star class
+			//            formData.append(identityProp, JSON.stringify(me[identityProp]));
+
+			//        // Property is a literal value; no need to stringify:
+			//        } else {
+			//            formData.append(identityProp, me[identityProp]);
+			//        }
+			//    }
+
+			//    return formData;
+			//} break;
 
 			default: {
 				var error = "ClientStar.export(): Unhandled dataType '" + dataType + "'";

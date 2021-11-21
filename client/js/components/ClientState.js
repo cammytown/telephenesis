@@ -183,7 +183,7 @@ function ClientState() {
 
 	/**
 	 * Adds a new components to the client.
-	 * @param {Object} component - The component to be added. Requires an .init function.
+	 * @param {object} component - The component to be added. Requires an .init function.
 	 */
 	this.addComponent = function(component) {
 		components.push(component);

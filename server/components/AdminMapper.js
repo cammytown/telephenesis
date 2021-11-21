@@ -37,9 +37,9 @@ function AdminMapper() {
 							//that if set true will remove them:
 
 							// Load data into a ServerStar to initialize data structure:
-							var serverStar = new ServerStar(star);
+							var serverStar = new ServerStar(star, 'server');
 							dbStars.updateOne(
-								{ id: star.id },
+								{ id: star.publicID },
 								// Simply set all properties of the star to the newly crafted ServerStar's:
 								{ $set: serverStar.export('identity') },
 							);
