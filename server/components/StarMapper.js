@@ -124,6 +124,15 @@ function StarMapper() {
 		var serverStar = new ServerStar();
 		serverStar.originStarID = starData.originStarID;
 		serverStar.hostType = starData.hostType;
+		serverStar.file = starData.file;
+
+		if(serverStar.file.type != 'audio/mpeg') {
+			//@REVISIT
+			throw "Sorry, only MP3 files are supported, for now.";
+		} else {
+			//@TODO move somewhere else; or at least create a method probably:
+			serverStar.file.extension = 'mp3';
+		}
 
 		return server.generatePublicID(dbStars)
 			.then(publicID => {
@@ -216,7 +225,7 @@ function StarMapper() {
 				if(serverStar.hostType == 'upload') {
 					serverStar.uploadURL = null;
 					serverStar.fileURL = server.serverConfig.storage.servingUrl
-						+ 'star-' + serverStar.publicID;
+						+ 'star-' + serverStar.publicID + '.mp3';
 
 					//@TODO-4 ensure user is authorized to manipulate star...
 					// Star should have been initialized in the database when

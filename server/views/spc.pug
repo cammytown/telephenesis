@@ -8,7 +8,8 @@
 			- var className = (user && user.bookmarks.indexOf(starData.publicID) != -1) ? ' bookmarked' : ''
 			- className += starData.tier == 0 ? ' origin' : ''
 			+star(starData)(
-				id = 's' + starData.publicID
+				id = 'star_' + starData.publicID
+				data-public-id = starData.publicID
 				data-prev = starData.originStarID
 				data-originStarID = starData.originStarID
 				data-tier = starData.tier

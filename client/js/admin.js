@@ -1,3 +1,4 @@
+///ARCHAIC, NON-FUNCTIONAL CODE
 
 	/***
 	** ADMIN FUNCTIONS
@@ -24,7 +25,7 @@
 			var newrgb = starLink.style.backgroundColor.substr(4).slice(0, -1); /// bad code / maybe unreliable
 			Anm.fadeOut(colorwheelSelect);
 
-			var p = 'rgb='+newrgb+'&sid='+acting_star.publicID.split('s')[1];
+			var p = 'rgb='+newrgb+'&sid='+acting_star.getAttribute('data-public-id');
 			ajx('/ajax/recolor', p, function(d) {
 				var r = JSON.parse(d);
 			});
@@ -66,7 +67,7 @@
 		function clickStarMove(e) {
 			var x = e.clientX - spc.map.offsetLeft;
 			var y = e.clientY - spc.map.offsetTop;
-			var p = 'x='+x+'&y='+y+'&sid='+acting_star.publicID.split('s')[1];
+			var p = 'x='+x+'&y='+y+'&sid='+acting_star.publicID
 			ajx('/ajax/move', p, function(d) {
 				var r = JSON.parse(d);
 			}); /// could be confused with place
