@@ -124,7 +124,7 @@ function ClientNavigation() {
 		var isStarClick = COR.cc(event.target.parentNode, 'star'); ///REVISIT weird architecture?
 		if(isStarClick) {
 			var starEle = event.target.parentNode;
-			var starID = parseInt(starEle.id.split('s')[1]);
+			var starID = starEle.id.split('s')[1];
 			console.log(Stars.clientStars);
 			var clientStar = Stars.clientStars[starID];
 
@@ -201,7 +201,7 @@ function ClientNavigation() {
 			} break;
 
 			case 'recreate': {
-				var starID = parseInt(pathParts[2]);
+				var starID = pathParts[2];
 
 				// Check if user has recreation tickets:
 				if(!clientState.recreationTickets) {
@@ -298,7 +298,7 @@ function ClientNavigation() {
 		// Do page-specific things:
 		switch(newPage) {
 			case 'star': {
-				var starID = parseInt(pathParts[2]);
+				var starID = pathParts[2];
 
 				if(pageInitialization) { ///REVISIT only on pageInit ?
 					///REVISIT probably do this on server side; though maybe it's cool
@@ -327,7 +327,7 @@ function ClientNavigation() {
 				}
 
 				console.log(Stars.clientStars);
-
+				console.log(starID);
 				Stars.clientStars[starID].play();
 			} break;
 
@@ -336,7 +336,7 @@ function ClientNavigation() {
 			} break;
 
 			case 'recreate': {
-				var starID = parseInt(pathParts[2]);
+				var starID = pathParts[2];
 				Creator.initializeCreation(Stars.clientStars[starID]);
 			} break;
 

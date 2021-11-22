@@ -60,7 +60,7 @@ function StarMapper() {
 	 * @param {number} starID
 	 **/
 	me.getStar = function(starID) {
-		return dbStars.findOne({ id: starID })
+		return dbStars.findOne({ publicID: starID })
 			.then(doc => {
 				if(!doc) {
 					throw "Couldn't get star with ID: " + starID;
@@ -278,7 +278,7 @@ function StarMapper() {
 		if(typeof y !== 'number') throw "No y provided.";
 
 		return dbStars.updateOne(
-			{ id: starID },
+			{ publicID: starID },
 			{ $set: { position: { x, y } } } ///REVISIT ugly
 		);
 	}
@@ -289,12 +289,12 @@ function StarMapper() {
 		// what should we do?
 
 		return dbStars.updateOne(
-			{ id: starID },
+			{ publicID: starID },
 			{ $set: { deleted: true } } ///TODO some process of clearing phantoms that will never be used/seen again
 		);
 
 		//return dbStars.deleteOne(
-			//{ id: starID },
+			//{ publicID: starID },
 		//);
 	}
 
@@ -319,7 +319,7 @@ function StarMapper() {
 				///ARCHITECURE/OPTIMIZATION:
 
 				// Write movements to the server:
-				for(starID in starMovements) {
+				for(var starID in starMovements) {
 					if(starID == targetStar.publicID) {
 						///// this assumes that the star we've passed in has
 						//not yet been created in the database. rework,
@@ -330,7 +330,7 @@ function StarMapper() {
 					var newPosition = starMovements[starID];
 
 					dbStars.updateOne(
-						{ id: parseInt(starID) },
+						{ publicID: starID },
 						{ $set: { "position": newPosition } }
 					)
 						.then(result => {

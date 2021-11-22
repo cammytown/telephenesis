@@ -64,7 +64,7 @@ function TelepRouter() {
 
 		return false; ///REVISIT uploading not currently allowed
 
-		var starId = parseInt(req.params.starid);
+		var starId = req.params.starid;
 
 		///:
 		if(starId != -1) { ///
@@ -127,7 +127,7 @@ function TelepRouter() {
 		if(
 			req.params.page !== undefined ///REVISIT best check?
 			&& realPages.indexOf(req.params.page) == -1
-			&& isNaN(parseInt(req.params.page))
+			//&& isNaN(parseInt(req.params.page))
 		) { /// isNaN necessary?
 			res.status(404).send("Sorry, no page exists there."); ///
 		} else {
@@ -189,7 +189,7 @@ function TelepRouter() {
 		switch(i.params.operation) {
 			case 'renameStar': {
 				/// consolidate:
-				var starID = parseInt(i.body.starID);
+				var starID = i.body.starID;
 				Stars.getStar(starID, function(err, star) {
 					if(err) {
 						///
@@ -215,7 +215,7 @@ function TelepRouter() {
 
 			case 'deleteStar': {
 				/// consolidate:
-				var starID = parseInt(i.body.starID);
+				var starID = i.body.starID;
 				console.log(starID);
 
 				Stars.getStar(starID, function(err, star) {
@@ -262,7 +262,7 @@ function TelepRouter() {
 
 			case 'recolor': {
 				/// consolidate:
-				var starID = parseInt(i.body.starID);
+				var starID = i.body.starID;
 				Stars.getStar(starID, function(err, star) {
 					if(err) {
 						///
@@ -288,7 +288,7 @@ function TelepRouter() {
 
 
 			case 'move': {
-				var starID = parseInt(i.body.starID);
+				var starID = i.body.starID;
 				Stars.getStar(starID, function(err, star) {
 					if(err) {
 						///
