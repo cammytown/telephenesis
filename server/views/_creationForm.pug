@@ -13,7 +13,6 @@ div.double
 	input.host-type-input(type="hidden" name="host-type" value="upload")
 
 	.btn.green.upload.active
-		input.submission-file-input(name="submission" type="file")
 		| Upload <small>(mp3)</small>
 
 	.btn.green
@@ -30,18 +29,19 @@ section.starTitle
 	)
 
 section.fileUpload
-	h3 MP3 File URL
-	em We recommend
-		a(href="https://archive.org/" target="_blank") archive.org
+	input.submission-file-input(name="submission" type="file")
 
-	input(
-		type="url"
-		class="file-url"
-		name="file-url"
-		class="file-url"
-		placeholder="Enter the URL of an MP3 file."
-		required
-	)
+	//-h3 MP3 File URL
+	//-em We recommend
+	//-    a(href="https://archive.org/" target="_blank") archive.org
+
+	//-input(
+	//-    type="url"
+	//-    class="file-url"
+	//-    name="file-url"
+	//-    class="file-url"
+	//-    placeholder="Enter the URL of an MP3 file."
+	//-)
 
 label.rightsAgreement
 	input(

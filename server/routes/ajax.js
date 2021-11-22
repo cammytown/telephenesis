@@ -113,7 +113,7 @@ function bookmarkStar(req, res, next) {
 		return false;
 	}
 
-	//var starID = parseInt(req.body.starID); /// do we need to parseInt now that we pass json??
+	//var starID = req.body.starID;
 
 	return api.bookmark(req.body.starID, req.user.id)
 		.then(result => {
@@ -156,7 +156,7 @@ function createComment(req, res, next) {
 
 	return api.createComment(
 		req.user,
-		parseInt(req.body['starID']),
+		req.body['starID'],
 		req.body['commentText'],
 		req.body['replyingTo']
 	)
@@ -186,7 +186,7 @@ function createComment(req, res, next) {
 function getComments(req, res, next) {
 	return api.getComments(
 		req.user.id,
-		parseInt(req.body['starID']),
+		req.body['starID'],
 	)
 		.then(comments => {
 			res.json({

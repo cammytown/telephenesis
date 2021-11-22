@@ -24,7 +24,7 @@ function ServerStar(starData, dataFilter) {
 	function init(starData, dataFilter) {
 		Star.call(me);
 
-		if(starData) { 
+		if(starData) {
 			if(!dataFilter) {
 				throw "No dataFilter provided to ServerStar() constructor";
 			}

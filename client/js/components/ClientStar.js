@@ -248,7 +248,6 @@ function ClientStar(element) { ///REVISIT element not in use atm
 					me.publicID = me.element.id.split('s')[1]; ///ARCHITECTURE
 				} break;
 
-				case 'originStarID':
 				case 'constellationID':
 				case 'tier': {
 					me[property] = parseInt(me.element.getAttribute('data-' + property));
