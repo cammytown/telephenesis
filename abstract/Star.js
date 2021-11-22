@@ -25,8 +25,12 @@ function Star() {
 		'creator',
 		'constellationID',
 		'hostType',
+		'file',
 		'fileURL',
 		'timestamp'
+	];
+
+	this.clientProps = [
 	];
 
 	this.objectProps = [

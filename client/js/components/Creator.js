@@ -115,10 +115,12 @@ function Creator() {
 	this.initializeCreation = function(originStar = false) {
 		me.workingStar = new ClientStar();
 
-		me.workingStar.element.style.display = 'none';
 		me.workingStar.publicID = "placeholder"; ///REVISIT architecture
+		me.workingStar.element.style.display = 'none';
 		me.workingStar.originStarID = originStar ? originStar.publicID : -1;
 		me.workingStar.tier = originStar ? originStar.tier + 1 : 0;
+		//@TODO doesn't feel like this belongs here:
+		me.workingStar.hostType = 'upload';
 
 		if(originStar) {
 			workingOriginStar = originStar;
@@ -135,6 +137,7 @@ function Creator() {
 		me.workingStar.title = formEle.getElementsByClassName('star-title')[0].value;
 		me.workingStar.fileURL = formEle.getElementsByClassName('file-url')[0].value;
 		me.workingStar.element.style.display = null; ///REVISIT best method?
+
 		//me.workingStar.title = COR._('#genesis-star-title').value;
 		//me.workingStar.fileURL = COR._('#genesis-file-url').value;
 
@@ -400,53 +403,68 @@ function Creator() {
 
 		//var originStarID = workingOriginStar ? workingOriginStar.publicID : -1;
 		var fileEle = event.target;
+		me.workingStar.file = {
+			name: fileEle.files[0].name,
+			type: fileEle.files[0].type,
+			size: fileEle.files[0].size,
+			lastModified: fileEle.files[0].lastModified,
+		}
 
 		initializeStar().then(() => {
 			console.log('star initialized');
 			console.log(me.workingStar);
-			var upl = new Upl(me.workingStar.uploadURL, fileEle, onUploadProgress, onUploadComplete);
+			var upl = new Upl( //@TODO get rid of or improve Upl
+				me.workingStar.uploadURL,
+				fileEle,
+				onUploadProgress,
+				onUploadComplete,
+				'PUT',
+				true
+			);
+
+			//fetch(me.workingStar.uploadURL, { ///REVISIT
+			//    method: 'PUT',
+			//    body: fileEle.files[0]
+			//}).then(onUploadComplete);
 		});
+	}
 
-		function onUploadProgress(e) {
-			if (e.lengthComputable) {
-				var progress = e.loaded / e.total;
-				me.workingStar.titleElement.innerHTML = Math.floor(progress*100) + '% uploaded';
+	function onUploadProgress(e) {
+		if (e.lengthComputable) {
+			var progress = e.loaded / e.total;
+			me.workingStar.titleElement.innerHTML = Math.floor(progress*100) + '% uploaded';
 
-				if(progress == 1) { /// safe?
-					// complete();
-				}
-
-				//me.workingStar.linkElement.style.background = 'rgba(100, 255, 100', '+progress+')';
-			} else {
-				//console.log('total size is unknown');
+			if(progress == 1) { /// safe?
+				// complete();
 			}
-		}
 
-		function onUploadComplete(e) {
-			me.workingStar.fileReady = true;
-
-			//var d = e.target.responseText;
-			//var result = JSON.parse(d);
-
-			//console.log(result);
-			//if(response.error) {
-			//    console.log(response.error); ////
-			//    throw(response.error);
-			//}
-
-			//me.workingStar.publicID = response.sid;
-			//me.workingStar.element.id = 's'+me.workingStar.publicID;
-			//me.workingStar.element.setAttribute('data-prev', originStarID);
-
-			actualizeStar();
+			//me.workingStar.linkElement.style.background = 'rgba(100, 255, 100', '+progress+')';
+		} else {
+			//console.log('total size is unknown');
 		}
 	}
 
+	function onUploadComplete(e) {
+		me.workingStar.fileReady = true;
+
+		//var d = e.target.responseText;
+		//var result = JSON.parse(d);
+
+		//console.log(result);
+		//if(response.error) {
+		//    console.log(response.error); ////
+		//    throw(response.error);
+		//}
+
+		//me.workingStar.publicID = response.sid;
+		//me.workingStar.element.id = 's'+me.workingStar.publicID;
+		//me.workingStar.element.setAttribute('data-prev', originStarID);
+
+		actualizeStar();
+	}
+
 	function initializeStar() {
-		return COR.POST('/ajax/initialize-star', {
-			hostType: 'upload',
-			originStarID: me.workingStar.originStarID
-		})
+		return COR.POST('/ajax/initialize-star', me.workingStar.export())
 			.then(response => response.json())
 			.then(result => {
 				console.log('initialize response');

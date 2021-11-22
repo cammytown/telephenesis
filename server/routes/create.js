@@ -26,7 +26,7 @@ function initializeStar(req, res, next) {
 		.then(newServerStar => {
 			res.json({
 				errors: [],
-				newStar: newServerStar.export(['uploadURL'])
+				newStar: newServerStar.export(['uploadURL', 'file'])
 			});
 		})
 		.catch(err => {

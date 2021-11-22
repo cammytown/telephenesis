@@ -9,14 +9,14 @@
 //-    input#typeSetting(type="hidden" name="art-type" value="music")
 
 
-div.double
-	input.host-type-input(type="hidden" name="host-type" value="upload")
+//-div.double
+//-    input.host-type-input(type="hidden" name="host-type" value="upload")
 
-	.btn.green.upload.active
-		| Upload <small>(mp3)</small>
+//-    .btn.green.upload.active
+//-        | Upload <small>(mp3)</small>
 
-	.btn.green
-		| File URL
+//-    .btn.green
+//-        | File URL
 
 section.starTitle
 	h3 Star Title
@@ -35,13 +35,14 @@ section.fileUpload
 	//-em We recommend
 	//-    a(href="https://archive.org/" target="_blank") archive.org
 
-	//-input(
-	//-    type="url"
-	//-    class="file-url"
-	//-    name="file-url"
-	//-    class="file-url"
-	//-    placeholder="Enter the URL of an MP3 file."
-	//-)
+	input(
+		type="url"
+		class="file-url"
+		name="file-url"
+		class="file-url"
+		placeholder="Enter the URL of an MP3 file."
+		style="display: none;"
+	)
 
 label.rightsAgreement
 	input(

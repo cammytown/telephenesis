@@ -1,21 +1,9 @@
-// v0.01
-// requires cor.js
-
-/*
-d : data
-r : request
-u : url
-p : progress
-c : completion
-f : failure
-s : stop
-*/
-
-/// add support for multiple files
+//TODO add support for multiple files
 
 export default Upl;
 
-function Upl(u, inputEle, progressCallback, completeCallback, method = "PUT") {
+//@TODO convert to params object:
+function Upl(url, inputEle, progressCallback, completeCallback, method = "PUT", binary = false) {
 	if(!inputEle) {
 		console.log(inputEle);
 		throw "Upl(): no valid inputEle provided";
@@ -25,8 +13,6 @@ function Upl(u, inputEle, progressCallback, completeCallback, method = "PUT") {
 
 	window.onbeforeunload = function() { return "You're in the middle of an upload."; }
 
-	var d = new FormData();
-	d.append(inputEle.name, inputEle.files[0]); /// should we use getAttribute('name') ?
 	var r = new XMLHttpRequest();
 
 	r.upload.addEventListener("progress", progressCallback);
@@ -34,8 +20,16 @@ function Upl(u, inputEle, progressCallback, completeCallback, method = "PUT") {
 	r.addEventListener("error", defaultErrorCallback);
 	r.addEventListener("abort", me.s);
 
-	r.open(method, u);
-	r.send(d);
+	r.open(method, url);
+
+	if(binary) {
+		r.send(inputEle.files[0]);
+	} else {
+		var data = new FormData();
+		data.append(inputEle.name, inputEle.files[0]);
+		r.send(data);
+	}
+
 
 	function defaultErrorCallback(e) {
 		console.log("An error occurred while transferring the file.");

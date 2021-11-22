@@ -124,8 +124,7 @@ function ClientNavigation() {
 		var isStarClick = COR.cc(event.target.parentNode, 'star'); ///REVISIT weird architecture?
 		if(isStarClick) {
 			var starEle = event.target.parentNode;
-			var starID = starEle.id.split('s')[1];
-			console.log(Stars.clientStars);
+			var starID = starEle.getAttribute('data-public-id');
 			var clientStar = Stars.clientStars[starID];
 
 			//document.getElementById('download').href = '/f/'+starID+'.mp3';
@@ -326,8 +325,6 @@ function ClientNavigation() {
 					);
 				}
 
-				console.log(Stars.clientStars);
-				console.log(starID);
 				Stars.clientStars[starID].play();
 			} break;
 

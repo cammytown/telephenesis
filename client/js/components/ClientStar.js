@@ -49,8 +49,8 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 			///@TODO I think we should have a more semantically-clear way of
 			//expressing that setting these to true is safe:
-			///@REVISIT for now, we just assume that if we're passing in an element,
-			//it's a completed star...
+			///@REVISIT for now, we just assume that if we're passing in an
+			//element, it's a completed star...
 			me.fileReady = true;
 			me.isPlaced = true;
 
@@ -245,7 +245,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 				} break;
 
 				case 'publicID': {
-					me.publicID = me.element.id.split('s')[1]; ///ARCHITECTURE
+					me.publicID = me.element.getAttribute('data-public-id');
 				} break;
 
 				case 'constellationID':
@@ -313,8 +313,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 			case 'object': {
 				var exportObject = {};
 
-				for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
-					var identityProp = me.identityProps[propIndex];
+				for(var identityProp of me.identityProps) {
 					exportObject[identityProp] = me[identityProp];
 				}
 
