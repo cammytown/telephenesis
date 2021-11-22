@@ -9,5 +9,7 @@
 	"LIST": "List",
 	"GRID": "Grid",
 	"BOOKMARKS": "Bookmarks",
-	"SORT-BY-BOOKMARKS": "Your bookmarks"
+	"SORT-BY-BOOKMARKS": "Your bookmarks",
+	"CREATE-A-NEW-STAR": "Create a new star",
+	"RECREATE-A-STAR": "Recreate a star"
 }

@@ -42,7 +42,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "sass": "sass client/scss/constellations.scss public/constellations.css",
     "sasswatch": "sass client/scss/constellations.scss public/constellations.css --watch",
-    "jsdoc": "jsdoc ./ -c docs/telephenesis-jsdoc.config.json -r -d ./docs"
+    "jsdoc": "jsdoc ./ -c config/telephenesis-jsdoc.config.json -r -d ./docs"
   },
   "author": "Cameron Steele",
   "license": "ISC"
