@@ -21,6 +21,12 @@ function ClientState() {
 	this.user = new ClientUser();
 
 	/**
+	 * The star which currently has interface focus.
+	 * @type {ClientStar}
+	 **/
+	this.focusedStar = null;
+
+	/**
 	 * The star being created or interacted with by the user.
 	 * @type {ClientStar}
 	 **/

@@ -8,6 +8,7 @@ const api = require('../components/TelepAPI');
 const Stars = require('../components/StarMapper');
 const CONSTS = require('../../abstract/constants.js');
 const config = require('../../abstract/telep.config.js');
+const telepCommon = require('../../abstract/telepCommon');
 
 const authRouter = require('./auth');
 const ajaxRouter = require('./ajax');
@@ -53,7 +54,7 @@ function TelepRouter() {
 		// me.app.post('/login', login);
 
 		me.app.get('/:page?', main);
-		me.app.get('/:page/:starID', main); ////REVISIT architecture
+		me.app.get('/:page/:starID', observeStarID, main); ////REVISIT architecture
 		//me.app.get('/star/:starID', main);
 		//me.app.get('/recreate/:starID', main);
 	}
@@ -110,7 +111,6 @@ function TelepRouter() {
 			'recreate',
 		];
 
-
 		var className = '';
 		if(req.user) {
 			className += ' in';
@@ -137,8 +137,9 @@ function TelepRouter() {
 						CONSTS: CONSTS,
 						page: req.params.page,
 						user: req.user,
-						pageTitle: 'telephenesis : '
-							+ (req.params.page ? req.params.page : 'a game of musical echoes'),
+						pageTitle: telepCommon.getPageTitle(req.params.page, req.star),
+						//pageTitle: 'telephenesis : '
+						//    + (req.params.page ? req.params.page : 'a game of musical echoes'),
 						className,
 						stars,
 						// popularitySort: JSON.stringify(),
@@ -184,6 +185,16 @@ function TelepRouter() {
 		}
 	}
 
+	function observeStarID(req, res, next) {
+		Stars.getStar(req.params.starID)
+			.then(star => {
+				req.star = star;
+				next();
+			})
+			.catch(err => {
+				next(err);
+			});
+	}
 
 	function ajaxOp(i, o) {
 		switch(i.params.operation) {

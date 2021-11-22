@@ -10,6 +10,9 @@ import comments from './Comments';
 import Stars from './Stars';
 import Creator from './Creator';
 import CONSTS from '../../../abstract/constants';
+import telepCommon from '../../../abstract/telepCommon';
+
+import locale from '../../../locale/en_us.json'; //@TODO scaffolding
 
 export default new ClientNavigation();
 
@@ -194,28 +197,30 @@ function ClientNavigation() {
 			case 'create': {
 				// Check if user has creation tickets:
 				if(!clientState.creationTickets) {
+					// No creation tickets; display error:
 					Interface.displayError(CONSTS.ERROR.NO_CREATION_TICKETS);
 					return false;
 				}
 			} break;
 
 			case 'recreate': {
-				var starID = pathParts[2];
+				const starID = pathParts[2];
 
 				// Check if user has recreation tickets:
 				if(!clientState.recreationTickets) {
+					// No recreation tickets; display error:
 					Interface.displayError(CONSTS.ERROR.NO_RECREATION_TICKETS);
 					return false;
 				}
 			} break;
+
+			case 'star': {
+				const starID = pathParts[2];
+				clientState.focusedStar = Stars.clientStars[starID];
+			} break;
 		}
 
-		// Change page title:
-		var pageTitle = "telephenesis";
-		if(newPage) {
-			////TODO
-			pageTitle += ' : ' + newPage;
-		}
+		const pageTitle = telepCommon.getPageTitle(newPage, clientState.focusedStar);
 
 		// Pass state handling to HistoryTime:
 		HistoryTime.navigateTo(path, pageTitle);
@@ -236,9 +241,12 @@ function ClientNavigation() {
 		} else {
 			switch(oldPage) {
 				case '':
-				case 'star':
 				{
 					// Nothing.
+				} break;
+
+				case 'star': {
+					clientState.focusedStar = null;
 				} break;
 
 				default: {

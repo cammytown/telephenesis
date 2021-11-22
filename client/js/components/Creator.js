@@ -90,6 +90,7 @@ function Creator() {
 	this.cancel = function() {
 		console.log('star creation cancelled');
 		me.workingStar.delete();
+		me.workingStar = null;
 		Interface.hideMessage();
 		endCreationStep();
 		navigation.navigate('/');
