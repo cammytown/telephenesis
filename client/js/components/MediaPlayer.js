@@ -54,7 +54,8 @@ function MediaPlayer() {
 			cor.ac(clientStar.element, "active");
 
 			// Load the new star's media:
-			me.audio.load(clientStar.linkElement.getAttribute('data-mediaURL'));
+			//me.audio.load(clientStar.linkElement.getAttribute('data-mediaURL'));
+			me.audio.load(clientStar.fileURL);
 			// me.audio.load('/music/'+sid+'.mp3');
 
 			if(activeMediaState) {
@@ -120,7 +121,7 @@ function MediaPlayer() {
 		cor.rc(clientState.playingStar.element, 'active');
 
 		if(clientState.playingStar.element.getAttribute('data-next')) {
-			var star = document.getElementById('s' + clientState.playingStar.element.getAttribute('data-next'));
+			var star = document.getElementById('star_' + clientState.playingStar.element.getAttribute('data-next'));
 			load(star);
 		} else {
 			clientState.playingStar = false;

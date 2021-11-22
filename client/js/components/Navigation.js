@@ -447,7 +447,7 @@ function ClientNavigation() {
 
 	function onCloseClick(event) {
 		event.preventDefault();
-		navigation.navigate('/');
+		me.navigate('/');
 	}
 }
 

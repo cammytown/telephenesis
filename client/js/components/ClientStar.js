@@ -34,6 +34,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	this.linkElement;
 	this.titleElement;
 	this.dateElement;
+	this.uploadProgressElement;
 
 	//this.state = ;
 	this.fileReady = false;
@@ -270,8 +271,8 @@ function ClientStar(element) { ///REVISIT element not in use atm
 			var property = me.identityProps[propIndex];
 
 			switch(property) {
-				case 'id': {
-					me.element.id = 's' + me.publicID;
+				case 'publicID': {
+					me.element.id = 'star_' + me.publicID;
 					me.linkElement.href = '/star/' + me.publicID;
 				} break;
 
@@ -294,7 +295,17 @@ function ClientStar(element) { ///REVISIT element not in use atm
 					me.dateElement.innerText = new Date(me.timestamp).toLocaleDateString();
 				} break;
 
+				case 'title': {
+					me.titleElement.innerText = me[property];
+				} // No break. Allow data-* attribute.
+
+				case 'creator': {
+					// Nothing.
+				} break;
+
 				default: {
+					//@TODO all properties should probably be accounted for and this should perhaps error:
+					console.warn('ClientElement.observeProperties unhandled prop: ' + property);
 					me.element.setAttribute('data-' + property, me[property]);
 				}
 			}

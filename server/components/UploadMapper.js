@@ -53,12 +53,10 @@ function requestUploadURL(serverStar) {
 		throw "requestUploadURL(): No serverStar.file";
 	}
 
-	console.log(serverStar.file.type);
 	const params = {
 		Bucket: 'telep-art-2021-11',
-		Key: 'star-' + serverStar.publicID + '.' + serverStar.file.extension,
-		//ContentDisposition: 'inline',
-		ContentType: 'audio/mpeg',
+		Key: 'star-' + serverStar.publicID + serverStar.file.extension,
+		ContentType: serverStar.file.type, //@REVISIT necessary?
 	};
 
 	return s3.getSignedUrlPromise('putObject', params);
