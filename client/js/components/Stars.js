@@ -453,7 +453,7 @@ function ClientStarsAPI() {
 			var starEle = clientStar.element;
 
 			if(clientStar.originStarID != -1) { // If this is not an origin star
-				var originStarEle = document.getElementById('s' + clientStar.originStarID);
+				var originStarEle = document.getElementById('star_' + clientStar.originStarID);
 				if(!originStarEle) {
 					console.error('root star not loaded for ' + clientStar.publicID);
 					throw false;

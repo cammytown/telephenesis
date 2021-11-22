@@ -116,6 +116,7 @@ function Creator() {
 		me.workingStar = new ClientStar();
 
 		me.workingStar.publicID = "placeholder"; ///REVISIT architecture
+		//me.workingStar.element.classList.add(
 		me.workingStar.element.style.display = 'none';
 		me.workingStar.originStarID = originStar ? originStar.publicID : -1;
 		me.workingStar.tier = originStar ? originStar.tier + 1 : 0;
@@ -393,22 +394,19 @@ function Creator() {
 	}
 
 	function onUploadFileSelect(event) {
-		/// create back and forth navigation
-		/// could use some attention
-
-		// state.updating = false;
-		//navigation.navigate('/');
-		// document.body.className = null;
-		//spc.ctr(0, 0);
-
-		//var originStarID = workingOriginStar ? workingOriginStar.publicID : -1;
 		var fileEle = event.target;
+
 		me.workingStar.file = {
 			name: fileEle.files[0].name,
 			type: fileEle.files[0].type,
 			size: fileEle.files[0].size,
 			lastModified: fileEle.files[0].lastModified,
 		}
+
+		//@TODO make pretty (jsx?):
+		me.workingStar.uploadProgressElement = document.createElement('div');
+		me.workingStar.uploadProgressElement.classList.add('upload-progress');
+		me.workingStar.element.appendChild(me.workingStar.uploadProgressElement);
 
 		initializeStar().then(() => {
 			console.log('star initialized');
@@ -421,31 +419,36 @@ function Creator() {
 				'PUT',
 				true
 			);
-
-			//fetch(me.workingStar.uploadURL, { ///REVISIT
-			//    method: 'PUT',
-			//    body: fileEle.files[0]
-			//}).then(onUploadComplete);
 		});
 	}
 
 	function onUploadProgress(e) {
 		if (e.lengthComputable) {
 			var progress = e.loaded / e.total;
-			me.workingStar.titleElement.innerHTML = Math.floor(progress*100) + '% uploaded';
+			var progressText = Math.floor(progress*100) + '% uploaded';
 
-			if(progress == 1) { /// safe?
-				// complete();
+			me.workingStar.uploadProgressElement.innerText = progressText;
+
+			if(me.workingStar.isPlaced) {
+				// Show upload progress as galaxy message:
+				Interface.displayMessage(progressText);
 			}
 
 			//me.workingStar.linkElement.style.background = 'rgba(100, 255, 100', '+progress+')';
 		} else {
+			//@REVISIT
 			//console.log('total size is unknown');
 		}
 	}
 
 	function onUploadComplete(e) {
 		me.workingStar.fileReady = true;
+
+		//@TODO improve architecture:
+		Anm.fadeOut(me.workingStar.uploadProgressElement, 1000, () => {
+			//@REVISIT this breaks if they place their star before fade out occurs:
+			//me.workingStar.uploadProgressElement.remove();
+		});
 
 		//var d = e.target.responseText;
 		//var result = JSON.parse(d);
@@ -501,18 +504,10 @@ function Creator() {
 					throw result.errors;
 				}
 
-				///REVISIT improve architecture, probably; maybe just
-				//have server return the whole new star and call
-				//loadData on workingStar:
-
-				console.log(result);
-				// Update star element attributes:
-				me.workingStar.publicID = result.newStarPublicID;
-				me.workingStar.titleElement.className = 'text name';
-				me.workingStar.titleElement.innerText = me.workingStar.title;
-				me.workingStar.timestamp = result.timestamp;
 				me.workingStar.element.classList.remove('placementSymbol');
-				//me.workingStar.setAttribute('data-prev',
+
+				// Load server data into star:
+				me.workingStar.loadData(result.actualizedStar);
 
 				Stars.addStar(me.workingStar);
 
@@ -522,8 +517,6 @@ function Creator() {
 				} else {
 					clientState.act(CONSTS.ACTION.USE_RECREATION_TICKET);
 				}
-
-				console.log(result);
 
 				// Shift stars around according to server instructions:
 				for(var starID in result.starMovements) {

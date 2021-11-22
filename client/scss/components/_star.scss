@@ -197,9 +197,6 @@ $inactiveBorderWidth: 1px;
 			&.playbackTime {
 				display: none;
 			}
-
-			//&.name {
-			//}
 		}
 
 		.creationTime {
@@ -212,7 +209,8 @@ $inactiveBorderWidth: 1px;
 		// &:hover .name, &.active .playbackTime {
 	}
 
-	&.active, &:hover {
+	&.active,
+	&:hover {
 		.meta {
 			display: inline-block;
 		}

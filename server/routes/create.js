@@ -64,9 +64,10 @@ function actualizeStar(req, res, next) {
 		.then(result => {
 			res.json({
 				errors: [],
+				actualizedStar: result.newStar,
 				creatorName: req.user.creatorName,
-				newStarPublicID: result.newStar.publicID,
-				timestamp: result.newStar.timestamp,
+				//newStarPublicID: result.newStar.publicID,
+				//timestamp: result.newStar.timestamp,
 				starMovements: result.starMovements,
 			});
 

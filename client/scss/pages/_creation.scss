@@ -96,14 +96,15 @@ form#create {
 	cursor: none;
 }
 
-.star .progress {
+.star .upload-progress {
 	position: absolute;
+	width: 250px;
 	left: 40px;
 	top: -15px;
 	font-size: 1.9em;
 	background: rgba(0, 0, 0, 0.5);
 }
-.inverse .star .progress {
+.inverse .star .upload-progress {
 	background: none;
 }
 
