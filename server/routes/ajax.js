@@ -25,7 +25,7 @@ function generate(telepServer) {
 	ajaxRouter.post('/bookmark', bookmarkStar);
 	ajaxRouter.post('/remove-bookmark', removeBookmarkStar);
 	ajaxRouter.post('/create-comment', createComment);
-	ajaxRouter.post('/get-comments', getComments);
+	ajaxRouter.post('/get-star-comments', getStarComments);
 
 	//ajaxRouter.post('/request-upload-url', createRoutes.requestUploadURL);
 	ajaxRouter.post('/initialize-star', createRoutes.initializeStar);
@@ -183,9 +183,8 @@ function createComment(req, res, next) {
 }
 
 /** Router handler for retrieving star comments. **/
-function getComments(req, res, next) {
-	return api.getComments(
-		req.user.id,
+function getStarComments(req, res, next) {
+	return api.getStarComments(
 		req.body['starID'],
 	)
 		.then(comments => {

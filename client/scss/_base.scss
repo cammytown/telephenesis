@@ -38,6 +38,17 @@ h1, h2, h3, h4, h5, h6 {
 	text-align: center;
 }
 
+.floatBeside {
+	$labelWidth: 200px;
+	padding: 3px 0;
+	position: absolute;
+	left: -$labelWidth;
+	display: block;
+	width: $labelWidth;
+	background: $uiBackground;
+	text-align: right;
+}
+
 .clearfix { /// placement
 	&:after { /// placement
 		display: block;

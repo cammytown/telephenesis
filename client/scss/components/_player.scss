@@ -1,5 +1,4 @@
-header#playingStarHeader { ///placement
-	// display: none;
+@mixin showOnPlay {
 	opacity: 0;
 	height: 0; ///REVISIT does this always work?
 	transition: height 500ms, opacity 500ms;
@@ -9,7 +8,12 @@ header#playingStarHeader { ///placement
 		opacity: 1;
 		height: auto; ///TODO auto doesn't work for transitions
 	}
+}
 
+header#playingStarHeader { ///placement
+	@include showOnPlay;
+
+	// display: none;
 	a {
 		font-size: 0.8rem;
 	}
@@ -50,6 +54,8 @@ header#playingStarHeader { ///placement
 }
 
 #playingStarInfo {
+	@include showOnPlay;
+
 	position: absolute;
 	display: flex;
 	flex-direction: column;

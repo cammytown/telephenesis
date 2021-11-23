@@ -184,7 +184,11 @@ function ClientNavigation() {
 	 * @param {string} path - The path to navigate to.
 	 **/
 	this.navigate = function(path) {
-		var pathParts = path.split('/');
+		//@REVISIT redundant w/ observePath; revisit architecture of these page
+		//change methods...
+
+		var url = new URL(path, window.location.origin); ///@TODO ensure IE support for URL
+		var pathParts = url.pathname.split('/');
 		var newPage = pathParts[1];
 
 		//if(clientState.currentPage == newPage) {
@@ -220,7 +224,7 @@ function ClientNavigation() {
 			} break;
 		}
 
-		const pageTitle = telepCommon.getPageTitle(newPage, clientState.focusedStar);
+		const pageTitle = telepCommon.getPageTitle(newPage, clientState.focusedStar, url.searchParams);
 
 		// Pass state handling to HistoryTime:
 		HistoryTime.navigateTo(path, pageTitle);
@@ -334,6 +338,11 @@ function ClientNavigation() {
 				}
 
 				Stars.clientStars[starID].play();
+			} break;
+
+			case 'user': {
+				var userID = pathParts[2];
+				//@TODO anything?
 			} break;
 
 			case 'create': {

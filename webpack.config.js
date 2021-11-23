@@ -19,6 +19,7 @@ module.exports = [{
 				include: [
 					//path.resolve(__dirname, 'node_modules/nano-jsx/'),
 					path.resolve(__dirname, 'abstract/'),
+					//path.resolve(__dirname, 'locale/'),
 					path.resolve(__dirname, 'client/js/'),
 				],
 				loader: "babel-loader",

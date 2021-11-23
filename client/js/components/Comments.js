@@ -63,7 +63,7 @@ function Comments() {
 			commentsListEle.removeChild(commentsListEle.firstChild);
 		}
 
-		POST('/ajax/get-comments', { starID: clientStar.publicID })
+		POST('/ajax/get-star-comments', { starID: clientStar.publicID })
 			.then(response => response.json())
 			.then(result => {
 				result.comments.forEach(comment => {

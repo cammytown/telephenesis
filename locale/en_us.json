@@ -11,5 +11,12 @@
 	"BOOKMARKS": "Bookmarks",
 	"SORT-BY-BOOKMARKS": "Your bookmarks",
 	"CREATE-A-NEW-STAR": "Create a new star",
-	"RECREATE-A-STAR": "Recreate a star"
+	"RECREATE-A-STAR": "Recreate a star",
+	"[POSITIVE-COMMENT]": [
+		"Great sound!",
+		"Wow, that's cool!",
+		"Now THAT's dope.",
+		"Wild sound!!",
+		"I didn't even know this kind of sound was possible."
+	]
 }

@@ -78,7 +78,7 @@ div#playingStarInfo
 			)
 
 			textarea.comment-text(
-				placeholder="Something positive..."
+				placeholder=L['[POSITIVE-COMMENT]'][Date.now() % L['[POSITIVE-COMMENT]'].length]
 				name='commentText'
 				rows='1'
 			)

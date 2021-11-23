@@ -7,6 +7,7 @@ const ServerStar = require('../components/ServerStar.js');
 const api = require('../components/TelepAPI');
 const Stars = require('../components/StarMapper');
 const CONSTS = require('../../abstract/constants.js');
+const LOCALE = require('../../locale/en_us.json'); //@REVISIT architecture
 const config = require('../../abstract/telep.config.js');
 const telepCommon = require('../../abstract/telepCommon');
 
@@ -54,7 +55,9 @@ function TelepRouter() {
 		// me.app.post('/login', login);
 
 		me.app.get('/:page?', main);
-		me.app.get('/:page/:starID', observeStarID, main); ////REVISIT architecture
+		me.app.get('/user/:userPublicID', singleUserView); //@TODO pick between this and below architecture
+		me.app.get('/star/:starID', observeStarID, main); ////REVISIT architecture
+		me.app.get('/recreate/:starID', observeStarID, main); ////REVISIT architecture
 		//me.app.get('/star/:starID', main);
 		//me.app.get('/recreate/:starID', main);
 	}
@@ -97,10 +100,13 @@ function TelepRouter() {
 	}
 
 	function main(req, res) {
+		//renderPage(req.params.page);
+
 		var realPages = [
 			'star',
 			'about',
 			'help',
+			'user',
 
 			'login',
 			'register',
@@ -135,9 +141,12 @@ function TelepRouter() {
 				.then(stars => { /// consolidate
 					me.app.render('main', {
 						CONSTS: CONSTS,
+						L: LOCALE,
 						page: req.params.page,
 						user: req.user,
-						pageTitle: telepCommon.getPageTitle(req.params.page, req.star),
+						viewingUser: req.viewingUser ? req.viewingUser : {}, //@RE
+						//viewingArtist: req.viewingArtist,
+						pageTitle: telepCommon.getPageTitle(req.params.page, req.star, req.query),
 						//pageTitle: 'telephenesis : '
 						//    + (req.params.page ? req.params.page : 'a game of musical echoes'),
 						className,
@@ -193,6 +202,23 @@ function TelepRouter() {
 			})
 			.catch(err => {
 				next(err);
+			});
+	}
+
+	function singleUserView(req, res, next) {
+		//api.getUserByPublicID(req.params.userPublicID)
+		api.getUserByPublicID(req.params.userPublicID)
+			.then(singleUser => {
+				if(!singleUser) {
+					//@REVISIT
+					res.status(404).send("User does not exist.");
+					return false;
+				}
+
+				//@REVISIT ugly architecture:
+				req.viewingUser = singleUser;
+				req.params.page = 'user'; //@TODO especially bad architecture
+				main(req, res, next);
 			});
 	}
 
