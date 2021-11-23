@@ -1,9 +1,12 @@
+const locale = require('../locale/en_us.json');
+
 /**
  * Get window/page title from page name.
  * @param {string} pageName
  * @param {Star} star
+ * @param {object} queryParams
  **/
-function getPageTitle(pageName, star) {
+function getPageTitle(pageName, star, queryParams) {
 	var siteTitle = "Telephenesis";
 	var pageTitle = "";
 

@@ -110,6 +110,24 @@ function TelepAPI() {
 			});
 	}
 
+	/**
+	 * Retrieve a user by their public ID.
+	 * @param userPublicID
+	 * @param [fullProfile=true]
+	 **/
+	//@REVISIT fullProfile not currently in use
+	this.getUserByPublicID = function(userPublicID, fullProfile = true) {
+		return usrMeta.findOne({ publicID: userPublicID })
+			.then(userMeta => {
+				return me.getUserComments(userPublicID).then(userComments => {
+					userMeta.comments = userComments;
+
+					return userMeta;
+				});
+			});
+	}
+
+	//@TODO revisit naming and get rid of callback param
 	this.getUserMeta = function(userID, callback) {
 		return usrMeta.findOne({ userID })
 			.then(doc => {
@@ -197,7 +215,7 @@ function TelepAPI() {
 
 		// Update references to the user document:
 		//stars.updateMany(
-		//    { creatorId: userID },
+		//    { creatorId: userPublicID },
 		//    { $set: { "creator.creatorName": post.creatorName }}
 		//);
 
@@ -284,12 +302,18 @@ function TelepAPI() {
 	}
 
 	/**
-	 * Get comments for a star.
-	 * @param {number} userID - ID of user retrieving comments.
-	 * @param {number} starID - ID of star to retrieve comments for.
+	 * Retrieve comments made by user.
+	 * @param {string} userPublicID
 	 **/
-	this.getComments = function(userID, starID) {
-		///TODO do something with userID or remove it from params
+	this.getUserComments = function(userPublicID) {
+		return dbComments.find({ "user.publicID": userPublicID }).toArray();
+	}
+
+	/**
+	 * Get comments for a star.
+	 * @param {string} starID - ID of star to retrieve comments for.
+	 **/
+	this.getStarComments = function(starID) {
 
 		return dbComments.find({ starID })
 			.toArray() ///REVISIT speed?
@@ -309,7 +333,7 @@ function TelepAPI() {
 					//commentsObject.push(doc);
 				});
 
-				return docArray
+				return docArray;
 
 				//@TODO filter values; prob by having a class with export()
 				//return commentsObject;

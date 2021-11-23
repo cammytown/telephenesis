@@ -282,14 +282,16 @@ function Interface() {
 	function onSortClick(event) {
 		event.preventDefault();
 
-		if(event.currentTarget.classList.contains('disabled')) {
+		var sortLinkEle = event.target;
+
+		if(event.target.classList.contains('disabled')) {
 			return false;
 		}
 
 		me.sort(
-			event.currentTarget.getAttribute('data-order'),
-			event.currentTarget.getAttribute('data-view'),
-			event.currentTarget
+			event.target.getAttribute('data-order'),
+			event.target.getAttribute('data-view'),
+			event.target
 		);
 
 		// Update the URI:

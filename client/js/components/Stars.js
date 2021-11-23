@@ -194,14 +194,20 @@ function ClientStarsAPI() {
 			case CONSTS.ORDER.MOST_RECENT: {
 				//me.cachedSorts[order] = [...me.clientStars] ///REVISIT not working
 
-				// Make a copy of the array:
-				me.cachedSorts[order] = me.clientStars.slice()
+				// // Make a copy of the array:
+				//me.cachedSorts[order] = me.clientStars.slice()
+
+				// Convert clientStars object to array:
+				me.cachedSorts[order] = Object.values(me.clientStars)
 					// Sort by newest:
 					.sort((a, b) => {
 						// If B is more recent than A, return true
 						return parseInt(b.element.getAttribute('data-timestamp'))
 							- parseInt(a.element.getAttribute('data-timestamp'));
+
+					// Abandon star object and just store it's element:
 					}).map(star => star.element)
+
 					// Remove null/false elements:
 					.filter(starEle => starEle); ///REVISIT is this readable?
 
@@ -235,8 +241,8 @@ function ClientStarsAPI() {
 			} break;
 
 			case CONSTS.ORDER.MOST_POPULAR: {
-				///REVISIT we rely on the server to have output the stars in popularity order.
-				/// we should at the very least make this semantically clearer... or just leave a comment
+				//TODO-2 we rely on the server to have output the stars in
+				//popularity order. Just a quick-fix.
 				return document.getElementsByClassName('star');
 			} break;
 

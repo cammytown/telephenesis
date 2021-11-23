@@ -48,19 +48,11 @@ textarea {
 //    width: 50%;
 //}
 
+label.floatBeside {
+	padding: $inputPaddingY 0;
+}
 //label {
 	//&.floatBeside {
-	.floatBeside {
-		$labelWidth: 200px;
-
-		position: absolute;
-		left: -$labelWidth;
-		display: block;
-		width: $labelWidth;
-		padding: $inputPaddingY 0;
-		background: $uiBackground;
-		text-align: right;
-	}
 //}
 
 // form {
