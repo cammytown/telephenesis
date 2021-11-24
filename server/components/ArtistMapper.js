@@ -1,3 +1,5 @@
+const ServerArtist = require('./ServerArtist');
+
 class ArtistMapper {
 	constructor() {
 	}
@@ -18,20 +20,29 @@ class ArtistMapper {
 	/**
 	 * Create a new artist.
 	 * @param {TelepUser} user - The user creating new artist.
-	 * @param {string} name - Name of new artist.
+	 * @param {object} artistData - Data for new artist.
 	 **/
-	createArtist(user, name) {
+	createArtist(user, artistData) {
 		// Check if user already has an artist with matching name:
 		//@TODO-3
 
 		// Generate public ID for artist:
 		return this.server.generatePublicID(this.dbArtists).then(publicID => {
-			// Insert new artist into database:
-			return this.dbArtists.insertOne({
-				publicID,
-				userPublicID: user.publicID,
-				name
-			});
+			//@REVISIT architecture:
+			artistData.publicID = publicID;
+			artistData.userPublicID = user.publicID;
+
+			// Build an Artist object:
+			var newArtist = new ServerArtist(artistData);
+
+			// Insert new artist into database and return Promise<doc>:
+			return this.dbArtists.insertOne(newArtist.export('client'));
+
+			//return this.dbArtists.insertOne({
+			//    publicID,
+			//    userPublicID: user.publicID,
+			//    name
+			//});
 		});
 	}
 

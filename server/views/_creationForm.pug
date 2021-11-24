@@ -20,7 +20,7 @@
 
 section.starTitle
 	label.floatBeside
-		h3 Star Title&nbsp;
+		Star Title&nbsp;
 			small (optional)
 
 	input.star-title-input(
@@ -45,7 +45,7 @@ section.fileUpload
 	)
 
 section.artist-id-section
-	label.floatBeside Artist Identity:
+	label.floatBeside Artist Identity
 	select.artist-id-input(name="artist-id")
 		if user.artists.length
 			each artist in user.artists
@@ -56,10 +56,19 @@ section.artist-id-section
 		option(value="create_new_artist") [create a new artist identity]
 
 	div.artist-id-creation-section(style="display: none;")
+		label.floatBeside Artist Name
 		input.artist-name-input(
 			type="text"
 			placeholder="My Band's Name"
 			name="artist-name"
+		)
+
+		label.floatBeside Artist External Link&nbsp;
+			small (optional)
+		input.artist-external-link(
+			type="url"
+			placeholder="https://myband.com"
+			name="artist-external-link"
 		)
 
 label.rightsAgreement
