@@ -68,6 +68,14 @@ function Creator() {
 		COR._('#create-page').addEventListener('submit', onCreateSubmit);
 		COR._('#recreate-page').addEventListener('submit', onCreateSubmit);
 		COR.addClassListener('submission-file-input', 'change', onUploadFileSelect);
+		COR.addClassListener('artist-id-input', 'input', onArtistIDSelect);
+
+		document.querySelectorAll('.artist-id-input').forEach(artistIDInput => {
+			// Set all artist ID selects to their first value so that the
+			// artist ID creation shows up when selected:
+			//@REVISIT more of a quick-fix
+			artistIDInput.selectedIndex = 0;
+		});
 
 		for(var recreateLink of COR._('.createStar')) {
 			recreateLink.addEventListener('click', onCreateStarClick);
@@ -136,8 +144,24 @@ function Creator() {
 
 		var formEle = event.target;
 
-		me.workingStar.title = formEle.getElementsByClassName('star-title')[0].value;
-		me.workingStar.fileURL = formEle.getElementsByClassName('file-url')[0].value;
+		me.workingStar.title = formEle.querySelector('.star-title-input').value;
+		me.workingStar.fileURL = formEle.querySelector('.file-url-input').value;
+		me.workingStar.artist = {
+			publicID: formEle.querySelector('.artist-id-input').value,
+		};
+		console.log(me.workingStar);
+
+		if(me.workingStar.artist.publicID == 'create_new_artist') {
+			//@REVISIT this architecture; don't like it that much but don't
+			//want to rework anything right now... maybe it's not that bad
+			//though:
+
+			var artistName = formEle.querySelector('.artist-name-input').value;
+			me.workingStar.artist.name = artistName;
+			//me.workingStar.artistID = 'create_new_artist:'
+				//+ formEle.querySelector('.new-artist-name-input').value;
+		}
+
 		me.workingStar.element.style.display = null; ///REVISIT best method?
 
 		//me.workingStar.title = COR._('#genesis-star-title').value;
@@ -392,6 +416,24 @@ function Creator() {
 		// } else {
 		// 	actualizeStar();
 		// }
+	}
+
+	function onArtistIDSelect(event) {
+		var selectEle = event.target;
+
+		// If user chose option to create a new artist identity:
+		if(selectEle.value == 'create_new_artist') { //@TODO maybe a more obscure value
+			// Show artist identity creation fields:
+			document.querySelectorAll('.artist-id-creation-section')
+				.forEach(artistIDCreationEle => {
+					artistIDCreationEle.style.display = 'block';
+				});
+		} else {
+			document.querySelectorAll('.artist-id-creation-section')
+				.forEach(artistIDCreationEle => {
+					artistIDCreationEle.style.display = 'none';
+				});
+		}
 	}
 
 	function onUploadFileSelect(event) {

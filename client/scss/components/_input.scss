@@ -13,19 +13,30 @@ form {
 input[type="text"],
 input[type="password"],
 input[type="url"],
-textarea {
+input[type="file"],
+textarea,
+select {
 	display: block;
-	box-sizing: border-box;
 	width: 100%;
+	background-color: #e7e7e7;
+	box-sizing: border-box;
 	margin: 1px 0;
 	padding: $inputPaddingY $inputPaddingX;
-	background-color: #e7e7e7;
 	border: 0;
 	font-size: 1.35em;
 	font-family: 'Strait', sans-serif;
 	//text-align: center;
 
-	&:hover, textarea:hover {
+	&[type="file"] {
+		display: block;
+		background-color: $uiBackground;
+
+		&:hover {
+			background-color: rgba(50, 50, 50, 0.3);
+		}
+	}
+
+	&:hover {
 		background-color: #ddd;
 	}
 
@@ -38,6 +49,10 @@ textarea {
 	&:disabled {
 		background: #beb5be;
 	}
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
 }
 
 //input[type="text"],

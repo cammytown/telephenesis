@@ -19,30 +19,48 @@
 //-        | File URL
 
 section.starTitle
-	h3 Star Title
-		small (optional)
+	label.floatBeside
+		h3 Star Title&nbsp;
+			small (optional)
 
-	input.star-title(
+	input.star-title-input(
 		type="text"
 		name="star-title"
 		placeholder="Star #0028"
 	)
 
 section.fileUpload
+	label.floatBeside MP3 File
 	input.submission-file-input(name="submission" type="file")
 
 	//-h3 MP3 File URL
 	//-em We recommend
 	//-    a(href="https://archive.org/" target="_blank") archive.org
 
-	input(
+	input.file-url-input(
 		type="url"
-		class="file-url"
 		name="file-url"
-		class="file-url"
 		placeholder="Enter the URL of an MP3 file."
 		style="display: none;"
 	)
+
+section.artist-id-section
+	label.floatBeside Artist Identity:
+	select.artist-id-input(name="artist-id")
+		if user.artists.length
+			each artist in user.artists
+				option(
+					value=artist.publicID
+				)= artist.name
+		option(value="display_name")= user.displayName + " (profile name)"
+		option(value="create_new_artist") [create a new artist identity]
+
+	div.artist-id-creation-section(style="display: none;")
+		input.artist-name-input(
+			type="text"
+			placeholder="My Band's Name"
+			name="artist-name"
+		)
 
 label.rightsAgreement
 	input(
@@ -62,9 +80,10 @@ label.rightsAgreement
 //- .btn.green Public
 //- .btn.blue Private
 
-div.double
-	button.btn.green(type="submit")
-		| Create
-		//- | Finish and Place Star
+section
+	div.double
+		button.btn.green(type="submit")
+			| Create
+			//- | Finish and Place Star
 
-	a.btn.red.close cancel
+		a.btn.red.close Cancel

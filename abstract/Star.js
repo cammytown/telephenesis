@@ -22,7 +22,8 @@ function Star() {
 		'position',
 		'color',
 		'tier',
-		'creator',
+		'creator', //@TODO removing
+		'artist',
 		'constellationID',
 		'hostType',
 		'file',

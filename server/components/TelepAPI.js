@@ -1,9 +1,9 @@
-const Lame = require('node-lame').Lame;
-const fs = require('fs');
-
+//const Lame = require('node-lame').Lame;
+//const fs = require('fs');
 const TelepUser = require('./TelepUser.js');
-const ServerStar = require('./ServerStar.js');
-const Stars = require('./StarMapper.js');
+//const ServerStar = require('./ServerStar.js');
+//const stars = require('./StarMapper.js');
+const artists = require('./ArtistMapper');
 
 const CONSTS = require('../../abstract/constants.js');
 //const config = require('../../abstract/telep.config.js');
@@ -25,7 +25,7 @@ function TelepAPI() {
 	var db;
 
 	/** MongoCollection of stars. **/
-	var stars;
+	var dbStars;
 
 	/** MongoCollection of system meta-information. **/
 	var MLMeta;
@@ -46,7 +46,7 @@ function TelepAPI() {
 		db = server.db;
 		// me.grr = false;
 
-		stars = db.collection('MLstars');
+		dbStars = db.collection('MLstars');
 		MLMeta = db.collection('MLMeta'); /// do we need to filter MLMeta?
 		usrMeta = db.collection('usrMeta'); /// do we need to filter MLMeta?
 		dbComments = db.collection('starComments');
@@ -54,12 +54,12 @@ function TelepAPI() {
 
 	me.syncWithClient = function(serverUpdates) {
 		return Promise.all([
-			stars.updateMany(
+			dbStars.updateMany(
 				{ id: { $in: serverUpdates.partialPlay } },
 				{ $inc: { partialPlays: 1 } }
 			),
 
-			stars.updateMany(
+			dbStars.updateMany(
 				{ id: { $in: serverUpdates.longPlay } },
 				{ $inc: { longPlays: 1 } }
 			)
@@ -130,9 +130,16 @@ function TelepAPI() {
 	//@TODO revisit naming and get rid of callback param
 	this.getUserMeta = function(userID, callback) {
 		return usrMeta.findOne({ userID })
-			.then(doc => {
-				if(callback) callback(false, doc);
-				return doc;
+			.then(userMeta => {
+				if(callback) callback(false, userMeta);
+
+				//@TODO cache user artists in userMeta
+				return artists.getUserArtists(userMeta.publicID)
+					.then(artists => {
+						console.log(artists);
+						userMeta.artists = artists;
+						return userMeta;
+					});
 			})
 			.catch(err => {
 				console.error(err);
@@ -214,7 +221,7 @@ function TelepAPI() {
 		user.loadData(newValues);
 
 		// Update references to the user document:
-		//stars.updateMany(
+		//dbStars.updateMany(
 		//    { creatorId: userPublicID },
 		//    { $set: { "creator.creatorName": post.creatorName }}
 		//);
@@ -256,7 +263,7 @@ function TelepAPI() {
 	}
 
 	me.recolor = function(starId, rgb, callback) {
-		stars.updateOne(
+		dbStars.updateOne(
 			{ id: starId },
 			{ $set: { rgb } },
 			callback
@@ -264,7 +271,7 @@ function TelepAPI() {
 	}
 
 	me.renameStar = function(starId, creatorName, callback) {
-		stars.updateOne(
+		dbStars.updateOne(
 			{ id: starId },
 			{ $set: { creatorName } },
 			callback
