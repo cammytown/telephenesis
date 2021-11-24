@@ -149,7 +149,6 @@ function Creator() {
 		me.workingStar.artist = {
 			publicID: formEle.querySelector('.artist-id-input').value,
 		};
-		console.log(me.workingStar);
 
 		if(me.workingStar.artist.publicID == 'create_new_artist') {
 			//@REVISIT this architecture; don't like it that much but don't
@@ -158,6 +157,8 @@ function Creator() {
 
 			var artistName = formEle.querySelector('.artist-name-input').value;
 			me.workingStar.artist.name = artistName;
+			var externalLink = formEle.querySelector('.artist-external-link').value;
+			me.workingStar.artist.externalLink = externalLink;
 			//me.workingStar.artistID = 'create_new_artist:'
 				//+ formEle.querySelector('.new-artist-name-input').value;
 		}

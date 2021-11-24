@@ -195,7 +195,7 @@ function StarMapper() {
 			//@REVISIT architecture:
 			if(serverStar.artist.publicID == 'create_new_artist') {
 				//@TODO-2 validate name
-				return artists.createArtist(user, serverStar.artist.name);
+				return artists.createArtist(user, serverStar.artist);
 			} else {
 				//@TODO-4 ensure user owns artist
 				return artists.getArtist(serverStar.artist.publicID);
