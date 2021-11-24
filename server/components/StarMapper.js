@@ -8,6 +8,7 @@ const Star = require('../../abstract/Star');
 const Vector = require('../../abstract/Vector');
 const ServerStar = require('./ServerStar');
 const uploads = require('./UploadMapper');
+const artists = require('./ArtistMapper');
 
 /**
  * Set of methods for creating and editing stars.
@@ -141,11 +142,12 @@ function StarMapper() {
 				serverStar.fileURL = server.serverConfig.storage.servingUrl
 					+ publicID + serverStar.file.extension;
 
-				serverStar.creator = { //@TODO-2 move to .export architecture
-					_id: user._id,
-					creatorName: user.creatorName,
-					creatorLink: user.creatorLink,
-				};
+				//@TODO replacing with .artist:
+				//serverStar.creator = { //@TODO-2 move to .export architecture
+				//    _id: user._id,
+				//    creatorName: user.creatorName,
+				//    creatorLink: user.creatorLink,
+				//};
 
 				// Generate uploadURL if necessary:
 				return new Promise(resolve => { //@REVISIT architecture
@@ -158,7 +160,7 @@ function StarMapper() {
 						uploads.requestUploadURL(serverStar)
 							.then(uploadURL => {
 								serverStar.uploadURL = uploadURL;
-								resolve()
+								resolve();
 							});
 					} else {
 						resolve();
@@ -184,10 +186,26 @@ function StarMapper() {
 		};
 
 		//@TODO clean this block up by making an actualizePosition,
-		//actualizeInsertion
+		//actualizeInsertion, etc. probably?
 
-		// Actualize position of star and shift any nearby stars:
-		return me.attemptPlacement(serverStar)
+
+		// Get or create artist ID:
+		return (() => {
+			// If creating a new artist ID:
+			//@REVISIT architecture:
+			if(serverStar.artist.publicID == 'create_new_artist') {
+				//@TODO-2 validate name
+				return artists.createArtist(user, serverStar.artist.name);
+			} else {
+				//@TODO-4 ensure user owns artist
+				return artists.getArtist(serverStar.artist.publicID);
+			}
+		})()
+			.then(artist => {
+				serverStar.artist = artist;
+			})
+			// Actualize position of star and shift any nearby stars:
+			.then(() => me.attemptPlacement(serverStar))
 			.then(starMovements => {
 				///TODO move this block into a named function somewhere
 
@@ -224,6 +242,7 @@ function StarMapper() {
 						});
 				}
 			})
+			// Update star in the database:
 			.then(success => {
 				if(serverStar.hostType == 'upload') {
 					serverStar.uploadURL = null;
@@ -245,18 +264,16 @@ function StarMapper() {
 						}
 					);
 				} else {
-
 					// This should be the server's first encounter with the
-					// star; generate a publicID:
-					//return server.generatePublicID(dbStars)
+					// star; generate a publicID and other init concerns:
 					return me.initializeStar(user, serverStar)
 						.then(serverStar => {
 							dbStars.insertOne(serverStar.export(['active', 'deleted']))
 						});
 				}
 			})
+			// Update user creation tickets:
 			.then(result => {
-				// Update user creation tickets:
 				//@REVISIT expendUserTicket() is async-- do we want to make
 				//sure they happen before proceeding?:
 				if(serverStar.originStarID == -1) {
