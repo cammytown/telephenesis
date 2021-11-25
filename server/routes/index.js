@@ -8,7 +8,7 @@ const api = require('../components/TelepAPI');
 const Stars = require('../components/StarMapper');
 const CONSTS = require('../../abstract/constants.js');
 const LOCALE = require('../../locale/en_us.json'); //@REVISIT architecture
-const config = require('../../abstract/telep.config.js');
+const config = require('../../config/telep.config.js');
 const telepCommon = require('../../abstract/telepCommon');
 
 const authRouter = require('./auth');

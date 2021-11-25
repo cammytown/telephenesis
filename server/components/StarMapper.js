@@ -3,7 +3,7 @@
 const Lame = require('node-lame').Lame;
 const fs = require('fs');
 
-const config = require('../../abstract/telep.config')
+const config = require('../../config/telep.config')
 const Star = require('../../abstract/Star');
 const Vector = require('../../abstract/Vector');
 const ServerStar = require('./ServerStar');

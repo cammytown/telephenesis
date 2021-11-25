@@ -1,6 +1,6 @@
 //import mediaPlayer from './MediaPlayer';
 import CONSTS from '../../../abstract/constants';
-import config from '../../../abstract/telep.config.js';
+import config from '../../../config/telep.config.js';
 import Stars from './Stars';
 import ClientUser from './ClientUser';
 import profile from '../pages/Profile.jsx';

@@ -3,7 +3,7 @@ const express = require('express');
 const ServerStar = require('../components/ServerStar');
 //const uploads = require('../components/UploadMapper');
 const stars = require('../components/StarMapper');
-const config = require('../../abstract/telep.config');
+const config = require('../../config/telep.config');
 
 var usr;
 function generate(telepServer) {

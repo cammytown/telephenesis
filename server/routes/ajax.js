@@ -1,6 +1,6 @@
 const express = require('express');
 
-const config = require('../../abstract/telep.config.js');
+const config = require('../../config/telep.config.js');
 
 const Telep = require('../components/TelepServer');
 const Stars = require('../components/StarMapper');
