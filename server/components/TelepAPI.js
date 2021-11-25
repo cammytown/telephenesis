@@ -117,6 +117,7 @@ function TelepAPI() {
 	 **/
 	//@REVISIT fullProfile not currently in use
 	this.getUserByPublicID = function(userPublicID, fullProfile = true) {
+		//@TODO clean up architecture so we can probably say me.getUserMeta():
 		return usrMeta.findOne({ publicID: userPublicID })
 			.then(userMeta => {
 				return me.getUserComments(userPublicID).then(userComments => {
@@ -130,17 +131,16 @@ function TelepAPI() {
 	//@TODO revisit naming and get rid of callback param
 	this.getUserMeta = function(userID, callback) {
 		return usrMeta.findOne({ userID })
-			.then(userMeta => {
-				if(callback) callback(false, userMeta);
+			//.then(userMeta => {
+			//    if(callback) callback(false, userMeta);
 
-				//@TODO cache user artists in userMeta
-				return artists.getUserArtists(userMeta.publicID)
-					.then(artists => {
-						console.log(artists);
-						userMeta.artists = artists;
-						return userMeta;
-					});
-			})
+			//    //@TODO cache user artists in userMeta
+			//    return artists.getUserArtists(userMeta.publicID)
+			//        .then(artists => {
+			//            userMeta.artists = artists;
+			//            return userMeta;
+			//        });
+			//})
 			.catch(err => {
 				console.error(err);
 				///
@@ -172,10 +172,11 @@ function TelepAPI() {
 						var userMetaObject = {
 							publicID,
 							displayName,
-							creatorName,
+							//creatorName,
 							creationTickets: 1,
 							recreationTickets: 3,
 							bookmarks: [],
+							artists: [],
 						};
 
 						var newUser = new TelepUser(usrDoc, userMetaObject);
