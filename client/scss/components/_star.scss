@@ -1,7 +1,3 @@
-$starSize: 14px;
-$activeBorderWidth: 14px;
-$inactiveBorderWidth: 1px;
-
 @mixin border-radius($starWidth, $borderWidth) {
 }
 
@@ -222,7 +218,7 @@ $inactiveBorderWidth: 1px;
 
 		.meta {
 			left: 32px + $activeBorderWidth;
-			top: -22px;
+			top: -4px;
 
 			&:hover {
 				// opacity: 0;

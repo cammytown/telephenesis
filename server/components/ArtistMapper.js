@@ -44,7 +44,10 @@ class ArtistMapper {
 				{ $addToSet: { artists: artistExport } }
 			)
 				// Insert new artist into database:
-				.then(result => this.dbArtists.insertOne(artistExport));
+				.then(result => this.dbArtists.insertOne(artistExport))
+				.then(result => {
+					return newArtist;
+				});
 
 			//return this.dbArtists.insertOne({
 			//    publicID,

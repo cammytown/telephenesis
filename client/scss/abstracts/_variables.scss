@@ -48,6 +48,11 @@ $errorText: $lightRed;
 // SIZES
 $playerHeight: 28px;
 
+$starSize: 14px;
+$activeBorderWidth: 14px;
+$inactiveBorderWidth: 1px;
+
+
 $starGridWidth: 500px;
 $starGridSquareSize: 50px;
 $starGridMargin: 20px;
@@ -55,6 +60,7 @@ $starGridPaddingX: 200px;
 $starGridPaddingY: 200px;
 
 :export {
+	starSize: $starSize;
 	starGridWidth: $starGridWidth;
 	starGridSquareSize: $starGridSquareSize;
 	starGridMargin: $starGridMargin;

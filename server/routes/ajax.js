@@ -24,8 +24,12 @@ function generate(telepServer) {
 
 	ajaxRouter.post('/bookmark', bookmarkStar);
 	ajaxRouter.post('/remove-bookmark', removeBookmarkStar);
+
 	ajaxRouter.post('/create-comment', createComment);
+	//@TODO change to a .get request I think?:
 	ajaxRouter.post('/get-star-comments', getStarComments);
+
+	ajaxRouter.get('/user/:userPublicID', getSingleUser);
 
 	//ajaxRouter.post('/request-upload-url', createRoutes.requestUploadURL);
 	ajaxRouter.post('/initialize-star', createRoutes.initializeStar);
@@ -195,6 +199,17 @@ function getStarComments(req, res, next) {
 		})
 		.catch(err => {
 			next(err);
+		});
+}
+
+/** Router handler for retrieving single user. **/
+function getSingleUser(req, res, next) {
+	api.getUserByPublicID(req.params.userPublicID)
+		.then(singleUser => {
+			res.json({
+				errors: [],
+				user: singleUser.export('client')
+			});
 		});
 }
 
