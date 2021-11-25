@@ -8,7 +8,6 @@ import Vector from '../../../abstract/Vector.js';
 import MediaPlayer from './MediaPlayer';
 import clientState from './ClientState';
 import Navigation from './Navigation';
-import Comments from './Comments';
 
 export default ClientStar;
 
@@ -152,7 +151,6 @@ function ClientStar(element) { ///REVISIT element not in use atm
 			playingStarInput.value = me.publicID;
 		}
 
-		Comments.loadStarComments(me);
 		MediaPlayer.playStar(me);
 	}
 

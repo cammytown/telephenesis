@@ -43,7 +43,7 @@
 		}
 	}
 
-	header {
+	header#sorting-header {
 		position: absolute;
 		width: 500px; ////REVISIT bad solution
 		left: $starGridPaddingX - 25;
@@ -55,15 +55,17 @@
 		h2 {
 			display: none;
 		}
-	}
 
-	body.sorting & {
-		header {
+		body.sorting & {
 			opacity: 1;
 
 			h2 {
 				display: block;
 			}
+		}
+
+		body.playing & {
+			left: 50%;
 		}
 	}
 }

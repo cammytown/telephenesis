@@ -122,8 +122,8 @@ function TelepAPI() {
 			.then(userMeta => {
 				return me.getUserComments(userPublicID).then(userComments => {
 					userMeta.comments = userComments;
-
-					return userMeta;
+					console.log(userMeta.comments);
+					return new TelepUser(null, userMeta);
 				});
 			});
 	}

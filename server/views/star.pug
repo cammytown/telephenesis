@@ -5,16 +5,15 @@ mixin star(starData = {})
 			style='background-color: rgb(' + starData.color + ')'
 		)
 
-		//- div.gridBackground
-
 		div.meta
 			span.text.title= starData.title
 
-			if starData.creator && starData.creator.name
+			if starData.artist
 				| by
-				span.text.creator= starData.creator.creatorName
+				span.text.artist= starData.artist.name
+				//-span.text.creator= starData.creator.creatorName
 
-			///COMPAT check:
+			//-//@REVISIT check compatability:
 			div.text.creationTime= new Date(starData.timestamp).toLocaleDateString()
 
 			div.text.playbackTime

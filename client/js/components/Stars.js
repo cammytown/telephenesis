@@ -258,14 +258,14 @@ function ClientStarsAPI() {
 
 	/**
 	 * Sort the stars by order and display them according to view.
-	 * @param order {CONSTANTS.ORDER}
-	 * @param view {CONSTANTS.VIEW}
+	 * @param {CONSTANTS.ORDER} order
+	 * @param {CONSTANTS.VIEW} view
 	 **/
 	this.sort = function(order, view) { ///REVISIT maybe separate into its own component? probably rename when we better understand how we will architect things
 		// if(!view) view = "list"; // Explicit because we pass in the value of getAttribute('data-view')
 
-		var xOffset = -spc.x;
-		var yOffset = -spc.y;
+		var spcXOffset = -spc.x;
+		var spcYOffset = -spc.y;
 
 		//me.clearConstellationLines();
 
@@ -313,8 +313,8 @@ function ClientStarsAPI() {
 
 						anime({
 							targets: constellationStar.element,
-							left: newX + xOffset + styleVars.starGridPaddingX + 'px',
-							top: newY + yOffset + styleVars.starGridPaddingY + 'px',
+							left: newX + spcXOffset + styleVars.starGridPaddingX + 'px',
+							top: newY + spcYOffset + styleVars.starGridPaddingY + 'px',
 							duration: 500,
 							update: (anim) => me.updateConstellationLines()
 						});
@@ -361,15 +361,27 @@ function ClientStarsAPI() {
 						newY = (styleVars.starGridSquareSize + styleVars.starGridMargin) * starEleIndex;
 					}
 
+					// Get origin x based on where CSS has placed layout element:
+					//@TODO revisit this architecture
+					var originX = document.querySelector('#sorting-header')
+						.offsetLeft + styleVars.starSize;
 
 					// Animate the star to its target position
 					anime({
 						targets: starEle,
-						left: newX + styleVars.starGridPaddingX + xOffset + 'px',
-						top: newY + styleVars.starGridPaddingY + yOffset + 'px',
+						left: newX + originX + spcXOffset + 'px',
+						top: newY + styleVars.starGridPaddingY + spcYOffset + 'px',
 						duration: 500,
 						update: (anim) => me.updateConstellationLines()
 					});
+
+					//anime({
+					//    targets: starEle,
+					//    left: newX + styleVars.starGridPaddingX + spcXOffset + 'px',
+					//    top: newY + styleVars.starGridPaddingY + spcYOffset + 'px',
+					//    duration: 500,
+					//    update: (anim) => me.updateConstellationLines()
+					//});
 
 
 					if(view == CONSTS.VIEW.GRID) {

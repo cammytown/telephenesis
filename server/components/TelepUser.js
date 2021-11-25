@@ -2,7 +2,7 @@
  * User class for server use.
  * @param [usrDoc] {object} - Entry in Usr collection which represents this user.
  * @constructor
- */
+ **/
 function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta architecture
 	const me = this;
 
@@ -19,6 +19,7 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 			'creationTickets',
 			'recreationTickets',
 			'bookmarks',
+			'comments',
 		],
 
 		usrMeta: [
@@ -30,6 +31,7 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 			'creationTickets',
 			'recreationTickets',
 			'bookmarks',
+			'comments',
 		],
 
 		client: [
@@ -37,9 +39,11 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 			'email',
 			'lv',
 			'displayName',
+			'artists',
 			'creationTickets',
 			'recreationTickets',
 			'bookmarks',
+			'comments',
 		],
 
 		commentCache: [

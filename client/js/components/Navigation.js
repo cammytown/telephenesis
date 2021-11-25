@@ -9,6 +9,7 @@ import Interface from './Interface';
 import comments from './Comments';
 import Stars from './Stars';
 import Creator from './Creator';
+import ClientUser from './ClientUser.jsx';
 import CONSTS from '../../../abstract/constants';
 import telepCommon from '../../../abstract/telepCommon';
 
@@ -20,7 +21,7 @@ export default new ClientNavigation();
 /**
  * Handles page transitions and navigation links.
  * @constructor
- */
+ **/
 function ClientNavigation() {
 	var me = this;
 
@@ -28,6 +29,7 @@ function ClientNavigation() {
 	var galaxyContextMenu;
 
 	var boxPages = [
+		'user',
 		'login',
 		'register',
 		'settings',
@@ -282,7 +284,7 @@ function ClientNavigation() {
 			// Open the UI for the page if there is one:
 			if(boxPages.includes(newPage)) {
 				comments.toggleComments(false);
-				open(newPage);
+				open(newPage, url);
 			}
 
 			// If starting to create a star; change to galaxy view:
@@ -300,10 +302,14 @@ function ClientNavigation() {
 		if(order || view) {
 			// Display the view and/or order:
 			Interface.sort(order, view);
+
+			// Toggle on comments panel.
+			//@TODO allow people to keep comments panel off
+			comments.toggleComments(true);
 		} else {
-			if(Interface.order != CONSTS.ORDER.GALAXY) {
-				Interface.sort(CONSTS.ORDER.GALAXY);
-			}
+			//if(Interface.order != CONSTS.ORDER.GALAXY) {
+			//    Interface.sort(CONSTS.ORDER.GALAXY);
+			//}
 		}
 
 		// Do page-specific things:
@@ -337,7 +343,15 @@ function ClientNavigation() {
 					);
 				}
 
+				// Begin playback of the star:
 				Stars.clientStars[starID].play();
+
+				// Load star comments:
+				comments.loadStarComments(Stars.clientStars[starID]);
+
+				// Refresh position of stars if shifted by comments panel:
+				//@TODO bad architecture; maybe a .refresh() or something:
+				Interface.sort();
 			} break;
 
 			case 'user': {
@@ -397,17 +411,50 @@ function ClientNavigation() {
 		// }
 	}
 
-	function open(page) {
+	function open(page, url = null) {
 		//clientState.currentPage = page;
 
+		//@TODO architecture should revolve around returning a Promise
 		var pageElement = document.getElementById(page + '-page');
 		if(pageElement) {
-			clientState.activeWindow = pageElement;
-			document.body.appendChild(pageElement);
-			Anm.fadeIn(pageElement);
+			//@TODO-3 display a loader until page is ready
+
+			// Prepare page; fetching data from server if necessary:
+			return new Promise(resolve => {
+				switch(page) {
+					case 'user': {
+						//@TODO clean up architecture:
+						var userID = url.pathname.split('/')[2];
+						fetch('/ajax/user/' + userID, {
+							method: "GET",
+						})
+							.then(response => response.json())
+							.then(result => {
+								console.log(result);
+								var singleUser = new ClientUser(result.user);
+
+								//@TODO quick-fix architecture until we have
+								//smarter jsx handling:
+								pageElement.replaceWith(singleUser.element);
+								pageElement = singleUser.element;
+								resolve();
+							});
+					} break;
+
+					default: {
+						resolve();
+					}
+				}
+			})
+				.then(() => {
+					clientState.activeWindow = pageElement;
+					document.body.appendChild(pageElement);
+					Anm.fadeIn(pageElement);
+				});
 		} else {
 			///REVISIT
 			console.error("No element for page '" + page + "'");
+			return false;
 		}
 	}
 
