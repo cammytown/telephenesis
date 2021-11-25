@@ -17,7 +17,7 @@ const StarMapper = require('./StarMapper');
 const ArtistMapper = require('./ArtistMapper');
 const AdminMapper = require('./AdminMapper');
 const TelepRouter = require('../routes'); ///REVISIT have a TelepRouter in components/ ?
-const serverConfig = require('../telepServer.config.js');
+const serverConfig = require('../../config/telepServer.config.js');
 
 /**
  * Central component of the server which initializes the database connection, API, and networking.

@@ -6,7 +6,7 @@ const TelepUser = require('./TelepUser.js');
 const artists = require('./ArtistMapper');
 
 const CONSTS = require('../../abstract/constants.js');
-//const config = require('../../abstract/telep.config.js');
+//const config = require('../../config/telep.config.js');
 
 /**
  * Base Telephenesis methods.

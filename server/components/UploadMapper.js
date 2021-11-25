@@ -4,7 +4,7 @@ const ibm = require('ibm-cos-sdk');
 
 const stars = require('./StarMapper');
 
-const config = require('../telepServer.config');
+const config = require('../../config/telepServer.config');
 
 //var s3 = new S3Client(config.storage.s3Config);
 var s3 = new ibm.S3(config.storage.s3Config);
