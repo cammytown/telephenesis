@@ -8,8 +8,8 @@ node_modules/
 *.log
 
 # Telep config files:
-server/telepServer.config.js
-abstract/telep.config.js
+config/telepServer.config.js
+config/telep.config.js
 
 # IBM cloud auth:
 server/.bluemix/cos_credentials
