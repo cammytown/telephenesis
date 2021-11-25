@@ -7,6 +7,7 @@ class ArtistMapper {
 	initialize(server) {
 		this.server = server;
 		this.dbArtists = server.db.collection('ArtistIdentities');
+		this.dbUsrMeta = server.db.collection('usrMeta');
 	}
 
 	/**
@@ -35,8 +36,15 @@ class ArtistMapper {
 			// Build an Artist object:
 			var newArtist = new ServerArtist(artistData);
 
-			// Insert new artist into database and return Promise<doc>:
-			return this.dbArtists.insertOne(newArtist.export('client'));
+			var artistExport = newArtist.export('client');
+
+			// Update usrMeta:
+			return this.dbUsrMeta.update(
+				{ publicID: user.publicID },
+				{ $addToSet: { artists: artistExport } }
+			)
+				// Insert new artist into database:
+				.then(result => this.dbArtists.insertOne(artistExport));
 
 			//return this.dbArtists.insertOne({
 			//    publicID,

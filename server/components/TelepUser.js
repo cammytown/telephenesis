@@ -14,7 +14,7 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 			'lv',
 			'sessionCode',
 			'displayName',
-			'creatorName', //@TODO removing
+			//'creatorName', //@TODO removing
 			'artists', //@REVISIT naming
 			'creationTickets',
 			'recreationTickets',
@@ -25,7 +25,8 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 			'publicID',
 			'email',
 			'displayName',
-			'creatorName',
+			//'creatorName', //@TODO removing
+			'artists',
 			'creationTickets',
 			'recreationTickets',
 			'bookmarks',
