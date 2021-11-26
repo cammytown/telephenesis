@@ -5,8 +5,8 @@ const nodeExternals = require('webpack-node-externals');
 
 module.exports = [{
 	entry: './client/js/telepClient.js',
-	mode: 'development',
-	devtool: 'eval-source-map',
+	mode: 'production',
+	//devtool: 'eval-source-map',
 	output: {
 		filename: 'telephenesis.js',
 		path: path.resolve(__dirname, 'public')
