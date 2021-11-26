@@ -20,8 +20,9 @@ public/music/*
 !public/music/README
 
 # Telep client files:
-public/constellations.css
-public/telephenesis.js
+# (allowed on production branch)
+#public/constellations.css
+#public/telephenesis.js
 
 #@TODO delete:
 *.sublime-workspace
