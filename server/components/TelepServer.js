@@ -55,7 +55,7 @@ function TelepServer() {
 	//}
 
 	function initializeDatabase() {
-		return MongoClient.connect("mongodb://mongo:27017", { useUnifiedTopology: true })
+		return MongoClient.connect(serverConfig.database.uri, { useUnifiedTopology: true })
 			.then(mongoClient => {
 				console.log("Database connection established.");
 				me.db = mongoClient.db('telephenesis');
