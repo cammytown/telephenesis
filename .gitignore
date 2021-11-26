@@ -12,7 +12,7 @@ config/telepServer.config.js
 config/telep.config.js
 
 # IBM cloud auth:
-server/.bluemix/cos_credentials
+config/.bluemix/cos_credentials
 
 # Telep local uploads:
 uploads/*

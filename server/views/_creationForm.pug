@@ -47,7 +47,7 @@ section.fileUpload
 section.artist-id-section
 	label.floatBeside Artist Identity
 	select.artist-id-input(name="artist-id")
-		if user.artists.length
+		if user && user.artists.length
 			each artist in user.artists
 				option(
 					value=artist.publicID

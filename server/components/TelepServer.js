@@ -93,7 +93,7 @@ function TelepServer() {
 	function initializeExpress() {
 		const app = express();
 
-		app.set('views', './views');
+		app.set('views', __dirname + '/../views');
 		app.set('view engine', 'pug');
 
 		///REVISIT i've heard we should use something other than express to serve static files:
@@ -123,7 +123,7 @@ function TelepServer() {
 			resave: false,
 			saveUninitialized: false, ///
 			store: new MongoStore({
-				url: "mongodb://mongo:27017/telephenesis",
+				url: serverConfig.database.uri
 				// db: db /// ??? not working?
 			})
 			//cookie: { secure: true } /// HTTPS only
