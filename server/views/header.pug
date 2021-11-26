@@ -67,7 +67,7 @@ div#playingStarInfo
 	div#playingComments
 		//-button + Add Comment
 
-		form#createCommentForm.ajax(
+		form#createCommentForm.ajax.user(
 			method='POST'
 			action='/create-comment'
 			data-ajax-action='/ajax/create-comment'
@@ -83,6 +83,6 @@ div#playingStarInfo
 				rows='1'
 			)
 
-			button.btn.green.text-left.user(type='submit') + Add Comment
+			button.btn.green.text-left(type='submit') + Add Comment
 
 		ul.comments
