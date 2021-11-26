@@ -131,8 +131,8 @@ function ClientComment(commentData, createResponsePromise = null) { ///REVISIT e
 								{ new Date(me.timestamp).toLocaleDateString() }
 							</span>
 
-							<div class='comment-controls'>
-								<a class='open-reply-panel user' onClick={onReplyClick} href='#'>&#11178; Reply</a>
+							<div class='comment-controls user'>
+								<a class='open-reply-panel' onClick={onReplyClick} href='#'>&#11178; Reply</a>
 
 								<form
 									class='ajax comment-reply-form'
