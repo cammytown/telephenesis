@@ -9,37 +9,50 @@ const api = require('../components/TelepAPI');
 
 const routesIndex = require('./index');
 const authRoutes = require('./auth');
-const createRoutes = require('./create');
+const creationRouter = require('./create');
 const adminRoutes = require('./admin');
 
 ///REVISIT weird architecture
 //var api;
 function generate(telepServer) {
-	//api = telepServer.api;
+	//@REVISIT architecture of this block:
 
 	var ajaxRouter = express.Router();
 
-	ajaxRouter.post('/sync', syncWithClient);
-	ajaxRouter.post('/update-profile', updateProfile);
-
-	ajaxRouter.post('/bookmark', bookmarkStar);
-	ajaxRouter.post('/remove-bookmark', removeBookmarkStar);
-
-	ajaxRouter.post('/create-comment', createComment);
-	//@TODO change to a .get request I think?:
-	ajaxRouter.post('/get-star-comments', getStarComments);
-
 	ajaxRouter.get('/user/:userPublicID', getSingleUser);
 
-	//ajaxRouter.post('/request-upload-url', createRoutes.requestUploadURL);
-	ajaxRouter.post('/initialize-star', createRoutes.initializeStar);
-	ajaxRouter.post('/actualize-star', createRoutes.actualizeStar);
+	ajaxRouter.post('/login',
+		authRoutes.login,
+		validateUser,
+		authSuccessResponse);
 
-	ajaxRouter.post('/login', authRoutes.login, userCheck);
-	ajaxRouter.post('/register', authRoutes.register, authRoutes.login, userCheck);
+	ajaxRouter.post('/register',
+		authRoutes.register,
+		authRoutes.login,
+		validateUser,
+		authSuccessResponse);
+
 	ajaxRouter.post('/logout', authRoutes.logout);
 
-	ajaxRouter.use('/admin', adminRoutes.generate('json'));
+	var userActionRouter = express.Router();
+	userActionRouter.use(validateUser);
+
+	userActionRouter.post('/sync', syncWithClient);
+	userActionRouter.post('/update-profile', updateProfile);
+
+	userActionRouter.post('/bookmark', bookmarkStar);
+	userActionRouter.post('/remove-bookmark', removeBookmarkStar);
+
+	userActionRouter.post('/create-comment', createComment);
+	//@TODO change to a .get request I think?:
+	userActionRouter.post('/get-star-comments', getStarComments);
+
+	//ajaxRouter.post('/request-upload-url', createRoutes.requestUploadURL);
+	userActionRouter.use(creationRouter);
+
+	userActionRouter.use('/admin', adminRoutes.generate('json'));
+
+	ajaxRouter.use(userActionRouter);
 
 	//ajaxRouter.post('/upload/:starid', api.auth('creator'), routesIndex.upload.single('submission'), uploadMedia);
 	ajaxRouter.use(ajaxStatusHandler);
@@ -47,6 +60,25 @@ function generate(telepServer) {
 
 	return ajaxRouter;
 }
+
+function validateUser(req, res, next) {
+	if(!req.user) { ///TODO moving
+		//res.json({ errors: ["not logged in"] });
+		//return false;
+		next("Not logged in.");
+	} else {
+		next();
+	}
+}
+
+function authSuccessResponse(req, res) { //@REVISIT naming
+	res.json({
+		errors: [],
+		///TODO probably generalize front-end props; maybe a ClientUser class
+		user: req.user.export('client'),
+	});
+}
+
 
 function ajaxStatusHandler(req, res, next) {
 	res.status(404).json({
@@ -96,11 +128,6 @@ function syncWithClient(req, res) {
 }
 
 function updateProfile(req, res, next) {
-	if(!req.user) { ///TODO moving
-		res.json({ errors: ["not logged in"] });
-		return false;
-	}
-
 	api.updateProfile(
 		req.user,
 		// Convert to normal object with helper methods like hasOwnProperty:
@@ -111,14 +138,6 @@ function updateProfile(req, res, next) {
 }
 
 function bookmarkStar(req, res, next) {
-	// if(!req.user || (req.user.id != star.creatorId && req.user.lv !=
-	if(!req.user) {
-		res.json({ errors: ["not logged in"] });
-		return false;
-	}
-
-	//var starID = req.body.starID;
-
 	return api.bookmark(req.body.starID, req.user.id)
 		.then(result => {
 			res.json({ errors: false });
@@ -132,11 +151,6 @@ function bookmarkStar(req, res, next) {
 }
 
 function removeBookmarkStar(req, res) {
-	if(!req.user) { ///REFACTOR
-		res.json({ errors: ["not logged in"] });
-		return false;
-	}
-
 	return api.removeBookmark(req.body.starID, req.user.id)
 		.then(result => {
 			res.json({ errors: false });
@@ -152,12 +166,6 @@ function removeBookmarkStar(req, res) {
  * Router handler for posting a new comment.
  **/
 function createComment(req, res, next) {
-	if(!req.user) { ///TODO move somewhere general
-		///REVISIT:
-		res.json({ errors: ["Not logged in or not permitted."] });
-		throw new Error("Not logged in or not permitted.");
-	}
-
 	return api.createComment(
 		req.user,
 		req.body['starID'],
@@ -211,20 +219,6 @@ function getSingleUser(req, res, next) {
 				user: singleUser.export('client')
 			});
 		});
-}
-
-function userCheck(req, res) {
-	if(!req.user) {
-		throw ["Not logged in."];
-	}
-
-	res.json({
-		errors: [],
-		///TODO probably generalize front-end props; maybe a ClientUser class
-		user: req.user.export('client'),
-	});
-
-	return true;
 }
 
 function ajaxErrorHandler(err, req, res, next) {

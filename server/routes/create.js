@@ -5,22 +5,27 @@ const ServerStar = require('../components/ServerStar');
 const stars = require('../components/StarMapper');
 const config = require('../../config/telep.config');
 
-var usr;
-function generate(telepServer) {
-	usr = telepServer.usr;
-
+function generate() {
 	var createRouter = express.Router();
+	createRouter.use(validateCreator);
+	createRouter.post('/initialize-star', initializeStar);
+	createRouter.post('/actualize-star', actualizeStar);
 	return createRouter;
+}
+
+function validateCreator(req, res, next) {
+	if(!req.user || req.user.lv < config.creatorLevel) {
+		///REVISIT:
+		//res.json({ errors: ["Not logged in or not permitted."] });
+		//throw new Error("Not logged in or not permitted.");
+		next("Not logged in or not permitted");
+	} else {
+		next();
+	}
 }
 
 //function requestUploadURL(req, res, next) {
 function initializeStar(req, res, next) {
-	if(!req.user || req.user.lv < config.creatorLevel) { ///TODO move somewhere general
-		///REVISIT:
-		res.json({ errors: ["Not logged in or not permitted."] });
-		throw new Error("Not logged in or not permitted.");
-	}
-
 	//var serverStar = new ServerStar(req.body, 'client');
 	stars.initializeStar(req.user, req.body)
 		.then(newServerStar => {
@@ -35,13 +40,6 @@ function initializeStar(req, res, next) {
 }
 
 function actualizeStar(req, res, next) {
-	if(!req.user || req.user.lv < config.creatorLevel) { ///TODO move somewhere general
-		///REVISIT:
-		res.json({ errors: ["Not logged in or not permitted."] });
-		throw new Error("Not logged in or not permitted.");
-	}
-
-
 	//@TODO-4 req.body needs to be filtered here or in ServerStar:
 	//for instance, what if someone puts in their own publicID?
 	var newStar = new ServerStar(req.body, 'client');
@@ -88,8 +86,9 @@ function actualizeStar(req, res, next) {
 
 }
 
-module.exports = {
-	//generate,
-	initializeStar,
-	actualizeStar,
-};
+module.exports = generate(); //@REVISIT
+//module.exports = {
+//    //generate,
+//    initializeStar,
+//    actualizeStar,
+//};
