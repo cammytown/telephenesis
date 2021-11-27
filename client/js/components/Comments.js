@@ -76,7 +76,7 @@ function Comments() {
 
 	/**
 	 * Toggles display of comments in the interface.
-	 * @param {null|bool} [visibleInput]
+	 * @param {null|boolean} [visibleInput]
 	 **/
 	this.toggleComments = function(visibleInput = null) {
 		if(typeof visibleInput == 'boolean') {

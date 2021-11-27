@@ -1,12 +1,6 @@
-//const Lame = require('node-lame').Lame;
-//const fs = require('fs');
 const TelepUser = require('./TelepUser.js');
-//const ServerStar = require('./ServerStar.js');
-//const stars = require('./StarMapper.js');
 const artists = require('./ArtistMapper');
-
 const CONSTS = require('../../abstract/constants.js');
-//const config = require('../../config/telep.config.js');
 
 /**
  * Base Telephenesis methods.
@@ -52,6 +46,10 @@ function TelepAPI() {
 		dbComments = db.collection('starComments');
 	}
 
+	/**
+	 * Observe pertinent information sent from the client; like star plays.
+	 * @param {array} serverUpdates
+	 **/
 	me.syncWithClient = function(serverUpdates) {
 		return Promise.all([
 			dbStars.updateMany(
@@ -64,22 +62,6 @@ function TelepAPI() {
 				{ $inc: { longPlays: 1 } }
 			)
 		])
-	}
-
-	me.auth = function(level) {
-		return function(req, res, next) {
-			if(!req.user) {
-				res.json({ errors: ["not logged in"] });
-				return false; ///
-			}
-
-			if(!req.user.lv) {
-				res.json({ errors: ["no creator credentials"] });
-				return false; ///
-			}
-
-			next();
-		}
 	}
 
 	/**
@@ -263,22 +245,6 @@ function TelepAPI() {
 
 	}
 
-	me.recolor = function(starId, rgb, callback) {
-		dbStars.updateOne(
-			{ id: starId },
-			{ $set: { rgb } },
-			callback
-		);
-	}
-
-	me.renameStar = function(starId, creatorName, callback) {
-		dbStars.updateOne(
-			{ id: starId },
-			{ $set: { creatorName } },
-			callback
-		);
-	}
-
 	/**
 	 * Create a new comment for a star by a user.
 	 * @param {TelepUser} telepUser - The user creating the comment.
@@ -322,7 +288,6 @@ function TelepAPI() {
 	 * @param {string} starID - ID of star to retrieve comments for.
 	 **/
 	this.getStarComments = function(starID) {
-
 		return dbComments.find({ starID })
 			.toArray() ///REVISIT speed?
 			.then(docArray => {

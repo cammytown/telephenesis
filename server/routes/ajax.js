@@ -54,12 +54,27 @@ function generate(telepServer) {
 
 	ajaxRouter.use(userActionRouter);
 
-	//ajaxRouter.post('/upload/:starid', api.auth('creator'), routesIndex.upload.single('submission'), uploadMedia);
 	ajaxRouter.use(ajaxStatusHandler);
 	ajaxRouter.use(ajaxErrorHandler);
 
 	return ajaxRouter;
 }
+
+//function validateUserLevel(level) {
+//    return function(req, res, next) {
+//        if(!req.user) {
+//            res.json({ errors: ["not logged in"] });
+//            return false; ///
+//        }
+
+//        if(!req.user.lv) {
+//            res.json({ errors: ["no creator credentials"] });
+//            return false; ///
+//        }
+
+//        next();
+//    }
+//}
 
 function validateUser(req, res, next) {
 	if(!req.user) { ///TODO moving

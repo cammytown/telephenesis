@@ -115,14 +115,11 @@ function StarMapper() {
 	 * @param {starData} starData
 	 **/
 	this.initializeStar = function(user, starData) {
-		///TODO future-proof:
-		//var newStarID = starCount + 1;
-		//starCount += 1;
-		//MLMeta.updateOne({ id: "persistors" }, { $inc: {starCount: 1} });
-		//serverStar.publicID = newStarID;
+		//@TODO probably check if they have creation tickets before going
+		//through all this (we do it later in actualize):
 
-		//var serverStar = new ServerStar(starData, 'clientInit'); //@TODO
 		var serverStar = new ServerStar();
+		serverStar.userPublicID = user.publicID;
 		serverStar.originStarID = starData.originStarID;
 		serverStar.hostType = starData.hostType;
 		serverStar.file = starData.file;
@@ -167,7 +164,10 @@ function StarMapper() {
 					}
 
 				})
-					.then(() => dbStars.insertOne(serverStar.export(['uploadURL'])))
+					.then(() => dbStars.insertOne(serverStar.export([
+						'uploadURL',
+						'userPublicID',
+					])))
 					.then(result => { return serverStar; });
 			});
 
@@ -179,7 +179,7 @@ function StarMapper() {
 	 * @param {ServerStar} serverStar
 	 **/
 	this.actualizeStar = function(user, serverStar) {
-
+		// Prepare returned value:
 		var returnObject = {
 			newStar: null,
 			starMovements: null,
@@ -187,7 +187,6 @@ function StarMapper() {
 
 		//@TODO clean this block up by making an actualizePosition,
 		//actualizeInsertion, etc. probably?
-
 
 		// Get or create artist ID:
 		return (() => {
@@ -197,8 +196,15 @@ function StarMapper() {
 				//@TODO-2 validate name
 				return artists.createArtist(user, serverStar.artist);
 			} else {
-				//@TODO-4 ensure user owns artist
-				return artists.getArtist(serverStar.artist.publicID);
+				return artists.getArtist(serverStar.artist.publicID)
+					.then(artist => {
+						if(artist.userPublicID != user.publicID) {
+							//@TODO log suspicious
+							throw "User does not own artist.";
+						}
+
+						return artist;
+					});
 			}
 		})()
 			.then(artist => {
@@ -250,11 +256,13 @@ function StarMapper() {
 						+ 'star-' + serverStar.publicID
 						+ serverStar.file.extension;
 
-					//@TODO-4 ensure user is authorized to manipulate star...
 					// Star should have been initialized in the database when
 					// upload was started:
 					return dbStars.updateOne(
-						{ publicID: serverStar.publicID },
+						{
+							publicID: serverStar.publicID,
+							userPublicID: user.publicID
+						},
 						{ $set: serverStar.export(
 							[
 								'active',
