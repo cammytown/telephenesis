@@ -104,7 +104,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	 * Moves the star to a 2D coordinate over time.
 	 * @param x {number}
 	 * @param y {number}
-	 * @param animate {bool}
+	 * @param animate {boolean}
 	 */
 	this.animateToXY = function(x, y) {
 		var newPos = new Vector(x, y);

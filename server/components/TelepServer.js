@@ -33,8 +33,7 @@ function TelepServer() {
 	this.persistorDoc;
 	this.serverConfig = serverConfig;
 
-	//this.api;
-	var components = [];
+	var components;
 
 	this.initialize = function() {
 		console.log("initializing telephenesis...");
@@ -49,10 +48,6 @@ function TelepServer() {
 			throw new Error(err);
 		});
 	}
-
-	//this.addComponent = function(component) {
-		//components
-	//}
 
 	function initializeDatabase() {
 		return MongoClient.connect(serverConfig.database.uri, { useUnifiedTopology: true })
@@ -129,11 +124,13 @@ function TelepServer() {
 			//cookie: { secure: true } /// HTTPS only
 		}));
 
-		components.push(TelepAPI);
-		components.push(StarMapper);
-		components.push(ArtistMapper);
-		components.push(AdminMapper);
-		components.push(TelepRouter);
+		components = [
+			TelepAPI,
+			StarMapper,
+			ArtistMapper,
+			AdminMapper,
+			TelepRouter,
+		];
 
 		return true;
 	}

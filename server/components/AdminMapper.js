@@ -23,7 +23,7 @@ function AdminMapper() {
 	 * Star.
 	 * @param {Array.<'stars'|'userMeta'>} schemas
 	 * @todo revisit the jsdoc param type syntax for schemas
-	 * @returns {Promise<bool>}
+	 * @returns {Promise<boolean>}
 	 **/
 	this.updateDBSchemas = function(schemas = []) {
 		for(var schema of schemas) {

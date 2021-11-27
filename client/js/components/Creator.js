@@ -90,6 +90,11 @@ function Creator() {
 		colorShiftSelect = document.getElementById('colorShiftSelect');
 		colorwheelSelect = document.getElementById('colorwheelSelect');
 
+		colorShiftSelect.addEventListener('mouseover', function(e) {
+			// Change star color to option mouse is hovering over:
+			me.workingStar.linkElement.style.background = e.target.style.background;
+		});
+		colorShiftSelect.addEventListener('click', onColorShiftClick);
 		colorwheelSelect.addEventListener('mousemove', getColorFromWheelPosition);
 		colorwheelSelect.addEventListener('click', onColorwheelChoice);
 	}
@@ -349,35 +354,7 @@ function Creator() {
 			colorShiftSelect.children[1].style.background = 'hsl('+(hsl[0]+17)+', 45%, 80%)';
 			me.workingStar.element.appendChild(colorShiftSelect);
 
-			Anm.fadeIn(colorShiftSelect, 250, function() {
-				colorShiftSelect.addEventListener('mouseover', function(e) {
-					me.workingStar.linkElement.style.background = e.target.style.background;
-				});
-
-				colorShiftSelect.addEventListener('click', function(e) { // (finish)
-					me.workingStar.color = e.target.style.backgroundColor.substr(4).slice(0, -1);
-					me.workingStar.linkElement.style.background = e.target.style.background;
-
-					Anm.fadeOut(colorShiftSelect, 300, function() {
-						limbo.appendChild(colorShiftSelect);
-						//colorShiftSelect.parentNode.removeChild(colorShiftSelect);
-					});
-
-
-					// document.body.removeAttribute('class');
-					// spc.on = true;
-					me.workingStar.isPlaced = true;
-					actualizeStar();
-
-					// if(!me.workingStar.fileReady) {
-					// 	me.workingStar.isPlaced = true;
-					// 	Anm.fadeOut(colorShiftSelect);
-					// 	// console.log(me.workingStar.color);
-					// } else {
-					// 	actualizeStar()
-					// }
-				});
-			});
+			Anm.fadeIn(colorShiftSelect, 250);
 		}
 
 		// 	guide.innerHTML = "Now choose a color. You can only shift the color 11 degrees from the previous star.";
@@ -400,6 +377,30 @@ function Creator() {
 		else if(angle>300) selectedhue = 240;
 
 		me.workingStar.linkElement.style.backgroundColor = 'hsl('+selectedhue+', 45%, 80%)';
+	}
+
+	function onColorShiftClick(event) {
+		me.workingStar.color = event.target.style.backgroundColor.substr(4).slice(0, -1);
+		me.workingStar.linkElement.style.background = event.target.style.background;
+
+		Anm.fadeOut(colorShiftSelect, 300, function() {
+			limbo.appendChild(colorShiftSelect);
+			//colorShiftSelect.parentNode.removeChild(colorShiftSelect);
+		});
+
+
+		// document.body.removeAttribute('class');
+		// spc.on = true;
+		me.workingStar.isPlaced = true;
+		actualizeStar();
+
+		// if(!me.workingStar.fileReady) {
+		// 	me.workingStar.isPlaced = true;
+		// 	Anm.fadeOut(colorShiftSelect);
+		// 	// console.log(me.workingStar.color);
+		// } else {
+		// 	actualizeStar()
+		// }
 	}
 
 	function onColorwheelChoice(event) {

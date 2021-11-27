@@ -17,6 +17,7 @@ function ServerStar(starData, dataFilter) {
 	me.uploadURL = null;
 
 	const serverProps = [
+		'userPublicID',
 		'active',
 		'deleted'
 	];

@@ -37,6 +37,22 @@ function moveStar(req, res, next) {
 		});
 }
 
+function renameStar(starId, creatorName, callback) {
+	dbStars.updateOne(
+		{ id: starId },
+		{ $set: { creatorName } },
+		callback
+	);
+}
+
+function recolor(starId, rgb, callback) {
+	dbStars.updateOne(
+		{ id: starId },
+		{ $set: { rgb } },
+		callback
+	);
+}
+
 function deleteStar(req, res, next) {
 	return stars.deleteStar(req.body.starID)
 		.then(() => next())

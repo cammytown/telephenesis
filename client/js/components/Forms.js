@@ -13,6 +13,14 @@ function ClientForms() {
 	///REVISIT architecture:
 	var commentingStar;
 
+	//@REVISIT placement:
+	var loadingImage = (
+		<span>
+			<img class="loading-img" src="/images/loading-orbit_001.gif" />
+			<span>Loading...</span>
+		</span>
+	);
+
 	this.init = function() {
 		//// not a good solution:
 		// var forms = document.getElementsByTagName('form');
@@ -35,6 +43,13 @@ function ClientForms() {
 		var form = event.target;
 		//var op = form.action.split('/').pop();
 		var op = form.getAttribute('data-ajax-action').split('/').pop();
+
+		//@REVISIT are there ever multiple submit buttons?:
+		// Replace button text with loading symbol:
+
+		var submitButton = form.querySelector('button[type="submit"]');
+		submitButton.setAttribute('data-original-text', submitButton.innerText);
+		submitButton.childNodes[0].replaceWith(loadingImage); ///
 
 		//@REVISIT I don't like this architecture. Perhaps solution would be to
 		//have this class have a method that allows us to hook into this
@@ -90,6 +105,9 @@ function ClientForms() {
 		//var op = form.id.split('-page')[0]; ///REVISIT bad architecture
 		///REVISIT not very future-proof architecture:
 		var op = form.getAttribute('data-ajax-action').split('/').pop();
+
+		var submitButton = form.querySelector('button[type="submit"]');
+		submitButton.innerHTML = submitButton.getAttribute('data-original-text');
 
 		if(result.errors.length) {
 			// console.error(result.errors);
