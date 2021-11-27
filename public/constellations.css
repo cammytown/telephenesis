@@ -215,6 +215,12 @@ textarea#code:hover {
   text-align: center;
   border-radius: 0 0 2px 2px;
 }
+.btn.main span, .btn.main img, .btn:link.main span, .btn:link.main img {
+  vertical-align: middle;
+}
+.btn.main img.loading-img, .btn:link.main img.loading-img {
+  margin: 0 5px;
+}
 .btn.main:hover, .btn:link.main:hover {
   color: #789;
   background-color: #111;
@@ -1170,3 +1176,5 @@ canvas#uiEffects {
 #limbo {
   display: none;
 }
+
+/*# sourceMappingURL=constellations.css.map */
