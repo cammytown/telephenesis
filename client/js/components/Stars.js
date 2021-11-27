@@ -217,6 +217,7 @@ function ClientStarsAPI() {
 			case CONSTS.ORDER.CONSTELLATIONS: {
 				var constellations = {};
 
+
 				Object.values(me.clientStars).forEach(star => {
 					if(!constellations[star.constellationID]) {
 						constellations[star.constellationID] = [];
@@ -228,14 +229,20 @@ function ClientStarsAPI() {
 				Object.keys(constellations).forEach(constellationID => {
 					///REVISIT if we return from server and order elements in
 					//sequence of ID, this should be unnecessary:
-					constellations[constellationID].sort((a, b) => {
-						return a.timestamp - b.timestamp;
-					});
-				});
+					var sortedConstellation = constellations[constellationID]
+						//@REVISIT redundancy:
+						.sort((a, b) => {
+							return a.timestamp - b.timestamp;
+						})
+						.map(star => star.element)
+						.filter(starEle => starEle);
+
+					constellations[constellationID] = sortedConstellation;
+				})
 
 				///REVISIT should we be concerned that this order returns a
 				//different data structure than others?:
-				me.cachedSorts[order] = constellations;
+				me.cachedSorts[order] = constellations
 
 				return me.cachedSorts[order];
 			} break;
@@ -263,10 +270,6 @@ function ClientStarsAPI() {
 	 **/
 	this.sort = function(order, view) { ///REVISIT maybe separate into its own component? probably rename when we better understand how we will architect things
 		// if(!view) view = "list"; // Explicit because we pass in the value of getAttribute('data-view')
-
-		var spcXOffset = -spc.x;
-		var spcYOffset = -spc.y;
-
 		//me.clearConstellationLines();
 
 		// Reposition each star
@@ -297,100 +300,62 @@ function ClientStarsAPI() {
 
 			case CONSTS.VIEW.CONSTELLATIONS: {
 				spc.s = false;
-				var sortedElements = this.getSortedStars(order);
-				console.log(sortedElements);
 
-				cor.ac(document.body, 'sorting');
+				//@REVISIT kinda weird:
+				var sortedElements = this.getSortedStars(order);
 
 				var currentRow = 0;
 				for(var constellationID in sortedElements) {
 					var constellationStars = sortedElements[constellationID];
-					for(var starIndex = 0; starIndex < constellationStars.length; starIndex++) {
-						var constellationStar = constellationStars[starIndex];
 
-						var newX = starIndex * styleVars.starGridSquareSize;
-						var newY = currentRow * styleVars.starGridSquareSize;
+					positionLoop(constellationStars, (starIndex => {
+						const x = starIndex * styleVars.starGridSquareSize;
+						const y = currentRow * styleVars.starGridSquareSize;
 
-						anime({
-							targets: constellationStar.element,
-							left: newX + spcXOffset + styleVars.starGridPaddingX + 'px',
-							top: newY + spcYOffset + styleVars.starGridPaddingY + 'px',
-							duration: 500,
-							update: (anim) => me.updateConstellationLines()
-						});
-
-						//constellationStar
-					}
+						return { x, y };
+					}));
 
 					currentRow += 1;
 				}
+
+				cor.ac(document.body, 'sorting');
 			} break;
 
-			case CONSTS.VIEW.GRID:
-			case CONSTS.VIEW.LIST: {
+			case CONSTS.VIEW.GRID: {
 				spc.s = false;
-
 				var sortedElements = this.getSortedStars(order);
 
-				///REVISIT these variables only used by grid view; sort of odd placed here:
 				var currentRow = 0;
 				var columnCount = Math.floor(styleVars.starGridWidth / styleVars.starGridSquareSize);
+				positionLoop(sortedElements, (starIndex => {
+					// Calculate target position of the star
+					const x = styleVars.starGridSquareSize * (starEleIndex % columnCount);
+					const y = styleVars.starGridSquareSize * currentRow;
+
+					// Wrap grid if row filled
+					if(newX >= styleVars.starGridWidth - styleVars.starGridSquareSize) {
+						currentRow += 1;
+					}
+
+					return { x, y };
+				}));
+
+				cor.ac(document.body, 'sorting');
+			} break;
+
+			case CONSTS.VIEW.LIST: {
+				spc.s = false;
+				var sortedElements = this.getSortedStars(order);
+
+				positionLoop(sortedElements, (starIndex => {
+					// Calculate target position of the star
+					const x = 0;
+					const y = (styleVars.starGridSquareSize + styleVars.starGridMargin) * starIndex;
+
+					return { x, y };
+				}));
 
 				cor.ac(document.body, 'sorting'); ////
-
-				for (var starEleIndex = 0; starEleIndex < sortedElements.length; starEleIndex++) {
-					var starEle = sortedElements[starEleIndex];
-
-					///REVISIT architecture:
-					cor.rc(starEle, 'odd');
-					cor.rc(starEle, 'even');
-					cor.ac(starEle, starEleIndex % 2 ? 'odd' : 'even');
-
-					// Calculate target position of the star
-					var newX;
-					var newY;
-
-					// If grid view:
-					if(view == CONSTS.VIEW.GRID) {
-						newX = styleVars.starGridSquareSize * (starEleIndex % columnCount);
-						newY = styleVars.starGridSquareSize * currentRow;
-
-					// If list view:
-					} else if(view == CONSTS.VIEW.LIST) {
-						newX = 0;
-						newY = (styleVars.starGridSquareSize + styleVars.starGridMargin) * starEleIndex;
-					}
-
-					// Get origin x based on where CSS has placed layout element:
-					//@TODO revisit this architecture
-					var originX = document.querySelector('#sorting-header')
-						.offsetLeft + styleVars.starSize;
-
-					// Animate the star to its target position
-					anime({
-						targets: starEle,
-						left: newX + originX + spcXOffset + 'px',
-						top: newY + styleVars.starGridPaddingY + spcYOffset + 'px',
-						duration: 500,
-						update: (anim) => me.updateConstellationLines()
-					});
-
-					//anime({
-					//    targets: starEle,
-					//    left: newX + styleVars.starGridPaddingX + spcXOffset + 'px',
-					//    top: newY + styleVars.starGridPaddingY + spcYOffset + 'px',
-					//    duration: 500,
-					//    update: (anim) => me.updateConstellationLines()
-					//});
-
-
-					if(view == CONSTS.VIEW.GRID) {
-						// Wrap grid if row filled
-						if(newX >= styleVars.starGridWidth - styleVars.starGridSquareSize) {
-							currentRow += 1;
-						}
-					}
-				}
 
 			} break;
 
@@ -435,6 +400,37 @@ function ClientStarsAPI() {
 			//me.generateConstellationLines();
 			me.updateConstellationLines();
 		}, 600);
+	}
+
+	//@REVISIT naming:
+	function positionLoop(starEles, positionCallback) {
+		var spcXOffset = -spc.x;
+		var spcYOffset = -spc.y;
+
+		// Get origin x based on where CSS has placed layout element:
+		//@TODO revisit this architecture
+		var originX = document.querySelector('#sorting-header')
+			.offsetLeft + styleVars.starSize;
+
+		for (var starEleIndex = 0; starEleIndex < starEles.length; starEleIndex++) {
+			var starEle = starEles[starEleIndex];
+
+			///REVISIT architecture:
+			cor.rc(starEle, 'odd');
+			cor.rc(starEle, 'even');
+			cor.ac(starEle, starEleIndex % 2 ? 'odd' : 'even');
+
+			var position = positionCallback(starEleIndex);
+
+			// Animate the star to its target position
+			anime({
+				targets: starEle,
+				left: position.x + originX + spcXOffset + 'px',
+				top: position.y + styleVars.starGridPaddingY + spcYOffset + 'px',
+				duration: 500,
+				update: (anim) => me.updateConstellationLines()
+			});
+		}
 	}
 
 	function deleteStar(starElement) {

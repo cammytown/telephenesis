@@ -42,8 +42,6 @@ function Comments() {
 	 * Resize the textarea for creating a comment based on its content.
 	 **/
 	function resizeCommentTextarea() {
-		console.log(createCommentTextarea.scrollHeight);
-
 		// Reset height:
 		createCommentTextarea.style.height = 0;
 
