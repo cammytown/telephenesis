@@ -33,6 +33,14 @@
 		text-align: center;
 		border-radius: 0 0 2px 2px;
 
+		span, img {
+			vertical-align: middle;
+		}
+
+		img.loading-img {
+			margin: 0 5px;
+		}
+
 		&:hover {
 			color: #789;
 			background-color: #111;

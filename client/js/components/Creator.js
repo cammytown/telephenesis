@@ -354,8 +354,7 @@ function Creator() {
 			colorShiftSelect.children[1].style.background = 'hsl('+(hsl[0]+17)+', 45%, 80%)';
 			me.workingStar.element.appendChild(colorShiftSelect);
 
-			Anm.fadeIn(colorShiftSelect, 250, function() {
-			});
+			Anm.fadeIn(colorShiftSelect, 250);
 		}
 
 		// 	guide.innerHTML = "Now choose a color. You can only shift the color 11 degrees from the previous star.";
