@@ -270,6 +270,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 			switch(property) {
 				case 'publicID': {
+					me.element.setAttribute('data-public-id', me.publicID);
 					me.element.id = 'star_' + me.publicID;
 					me.linkElement.href = '/star/' + me.publicID;
 				} break;

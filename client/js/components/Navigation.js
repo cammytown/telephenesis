@@ -288,9 +288,9 @@ function ClientNavigation() {
 			}
 
 			// If starting to create a star; change to galaxy view:
-			if(createPages.includes(newPage)) {
-				Interface.sort(CONSTS.ORDER.GALAXY);
-			}
+			//if(createPages.includes(newPage)) {
+			//    Interface.sort(CONSTS.ORDER.GALAXY);
+			//}
 		}
 
 		//@TODO-1 revisit implementation; probably render on the server for page load:
@@ -307,9 +307,9 @@ function ClientNavigation() {
 			//@TODO allow people to keep comments panel off
 			comments.toggleComments(true);
 		} else {
-			//if(Interface.order != CONSTS.ORDER.GALAXY) {
-			//    Interface.sort(CONSTS.ORDER.GALAXY);
-			//}
+			if(Interface.order != CONSTS.ORDER.GALAXY) {
+				Interface.sort(CONSTS.ORDER.GALAXY);
+			}
 		}
 
 		// Do page-specific things:

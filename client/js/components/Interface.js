@@ -83,10 +83,6 @@ function Interface() {
 		menuToggleElement.addEventListener('click', toggleMenu);
 
 		window.addEventListener('keydown', onKeyDown);
-
-		//for(var sortLink of COR._('.sort')) {
-		//    sortLink.addEventListener('click', onSortClick);
-		//}
 	}
 
 	/**
@@ -288,17 +284,29 @@ function Interface() {
 			return false;
 		}
 
-		me.sort(
-			event.target.getAttribute('data-order'),
-			event.target.getAttribute('data-view'),
-			event.target
-		);
+		//me.sort(
+		//    event.target.getAttribute('data-order'),
+		//    event.target.getAttribute('data-view'),
+		//    event.target
+		//);
+
+		var order = event.target.getAttribute('data-order');
+		var view = event.target.getAttribute('data-view');
 
 		// Update the URI:
 		var newURI = "/";
-		if(me.view != CONSTS.VIEW.GALAXY) {
-			newURI += '?view=' + me.view.toLowerCase()
-				+ '&order=' + me.order.toLowerCase();
+		if(view) {
+			newURI += '?view=' + view.toLowerCase();
+		}
+
+		if(order) {
+			if(view) {
+				newURI += '&';
+			} else {
+				newURI += '?';
+			}
+
+			newURI += 'order=' + order.toLowerCase();
 		}
 
 		navigation.navigate(newURI);
@@ -311,10 +319,14 @@ function Interface() {
 	 * @param {Element} [clickedEle = false] - The sort link that was clicked to run this method.
 	 **/
 	this.sort = function(order, view, clickedEle = false) {
+
 		console.log('Navigation.sort(): ' + [order, view]);
 		///REVISIT not into all this .toLowerCase() business... better design?
 
 		if(order) {
+			// Ensure uppercase:
+			order = order.toUpperCase();
+
 			// If there's an order already, remove its class from document.body:
 			if(me.order) {
 				COR.rc(document.body, me.order.toLowerCase() + '-order'); ////
@@ -351,6 +363,9 @@ function Interface() {
 
 		// If a view was supplied to sort() and it is different from the current one:
 		if(view && view != me.view) {
+			// Ensure uppercase:
+			view = view.toUpperCase();
+
 			// If there's already a view, remove its class from document.body:
 			if(me.view) {
 				COR.rc(document.body, me.view.toLowerCase() + '-view'); ////

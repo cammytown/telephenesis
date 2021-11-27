@@ -52,3 +52,124 @@ function updateDBSchemas(req, res, next) {
 module.exports = { generate };
 
 //export default adminRouter;
+
+
+	//function ajaxOp(i, o) {
+	//    switch(i.params.operation) {
+	//        case 'renameStar': {
+	//            /// consolidate:
+	//            var starID = i.body.starID;
+	//            Stars.getStar(starID, function(err, star) {
+	//                if(err) {
+	//                    ///
+	//                    return false;
+	//                }
+
+	//                // if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
+	//                if(!i.user || i.user.lv != 7) {
+	//                    o.json({ errors: ["not logged in"] });
+	//                    return false;
+	//                }
+
+	//                api.renameStar(starID, i.body.creatorName, function(err, result) {
+	//                    if(err) {
+	//                        o.json({ errors: ["couldn't move..."] }); ///
+	//                        return false;
+	//                    }
+
+	//                    o.json({ errors: false });
+	//                });
+	//            });
+	//        } break;
+
+	//        case 'deleteStar': {
+	//            /// consolidate:
+	//            var starID = i.body.starID;
+	//            console.log(starID);
+
+	//            Stars.getStar(starID, function(err, star) {
+	//                if(err) {
+	//                    ///
+	//                    o.json({ errors: ["couldn't get star"] });
+	//                    return false;
+	//                }
+
+	//                // if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
+	//                if(!i.user || i.user.lv != 7) {
+	//                    o.json({ errors: ["not logged in"] });
+	//                    return false;
+	//                }
+
+	//                api.deleteStar(starID, function(err, result) {
+	//                    if(err) {
+	//                        o.json({ errors: ["couldn't delete"] }); ///
+	//                        return false;
+	//                    }
+
+	//                    console.log('no error');
+	//                    o.json({ errors: false });
+	//                });
+	//            });
+	//        } break;
+
+	//        case 'recolor': {
+	//            /// consolidate:
+	//            var starID = i.body.starID;
+	//            Stars.getStar(starID, function(err, star) {
+	//                if(err) {
+	//                    ///
+	//                    return false;
+	//                }
+
+	//                // if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
+	//                if(!i.user || i.user.lv != 7) {
+	//                    o.json({ errors: ["not logged in"] });
+	//                    return false;
+	//                }
+
+	//                api.recolor(starID, i.body.rgb, function(err, result) {
+	//                    if(err) {
+	//                        o.json({ errors: ["couldn't move..."] }); ///
+	//                        return false;
+	//                    }
+
+	//                    o.json({ errors: false });
+	//                });
+	//            });
+	//        } break;
+
+
+	//        case 'move': {
+	//            var starID = i.body.starID;
+	//            Stars.getStar(starID, function(err, star) {
+	//                if(err) {
+	//                    ///
+	//                    return false;
+	//                }
+
+	//                // if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
+	//                if(!i.user || i.user.lv != 7) {
+	//                    o.json({ errors: ["not logged in"] });
+	//                    return false;
+	//                }
+
+	//                var x = parseInt(i.body.x);
+	//                var y = -1 * parseInt(i.body.y);
+
+	//                api.move(starID, x, y, function(err, result) {
+	//                    if(err) {
+	//                        o.json({ errors: ["couldn't move..."] }); ///
+	//                        return false;
+	//                    }
+
+	//                    o.json({ errors: false });
+	//                });
+	//            });
+	//        } break;
+
+	//        default: {
+	//            /// log something maybe
+
+	//            o.json({ errors: ["unhandled ajax operation: " +  i.params.operation] }); /// safe to let people know?
+	//        }
+	//    }

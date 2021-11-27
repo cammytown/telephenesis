@@ -565,11 +565,18 @@ function Creator() {
 				// Shift stars around according to server instructions:
 				for(var starID in result.starMovements) {
 					var newPosition = result.starMovements[starID];
-					Promise.resolve(Stars.clientStars[starID].animateToXY(newPosition.x, newPosition.y))
-						.then(() => me.workingStar.observeProperties())
+
+					var starMovePromise = Stars.clientStars[starID].animateToXY(
+						newPosition.x,
+						newPosition.y
+					);
+
+					if(me.workingStar == Stars.clientStars[starID]) {
+						starMovePromise.then(() => me.workingStar.observeProperties())
 						///@REVISIT is it safe to not unset workingStar til later??:
 						.then(() => me.workingStar = null)
 						.then(() => Stars.generateConstellationLines());
+					}
 				}
 
 				// Back to homepage.
