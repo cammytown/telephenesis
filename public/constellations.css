@@ -303,35 +303,22 @@ textarea#code:hover {
   background: rgba(0, 0, 0, 0.7);
 }
 
-body {
-  /* menu */
-}
-body.playing nav {
-  top: 28px;
-}
-body .user, body .create {
+.user {
   display: none;
 }
 body.in .user {
   display: block;
 }
+
 body.in .guest {
   display: none;
 }
-body.in #navigation {
-  left: -140px;
-}
-body.in.creator .create {
-  display: block;
-}
-body.in.adminor .admin {
-  display: block;
-}
-body nav ul li a {
+
+nav ul li a {
   display: block;
   padding: 5px 10px;
 }
-body nav.site-nav {
+nav.site-nav {
   display: block;
   position: absolute;
   top: 5px;
@@ -341,17 +328,17 @@ body nav.site-nav {
   transition: top 250ms;
   z-index: 1;
 }
-body nav.site-nav a#logo {
+nav.site-nav a#logo {
   display: inline;
   font-family: "Strait";
   font-size: 1.8em;
   text-decoration: none;
   text-transform: uppercase;
 }
-body nav.site-nav a#logo:hover {
+nav.site-nav a#logo:hover {
   color: #edf;
 }
-body nav.site-nav a.menuToggle {
+nav.site-nav a.menuToggle {
   position: absolute;
   top: 1px;
   right: -35px;
@@ -368,16 +355,16 @@ body nav.site-nav a.menuToggle {
   -webkit-transform: rotate(90deg);
   -ms-transform: rotate(90deg);
 }
-body nav.site-nav a.menuToggle:hover {
+nav.site-nav a.menuToggle:hover {
   background: #bae;
   color: #111;
 }
-body nav.site-nav a.menuToggle.active {
+nav.site-nav a.menuToggle.active {
   transform: none;
   -webkit-transform: none;
   -ms-transform: none;
 }
-body nav.site-nav #menu {
+nav.site-nav #menu {
   position: absolute;
   top: 33px;
   right: 0;
@@ -389,15 +376,17 @@ body nav.site-nav #menu {
   overflow: hidden;
   transition: 0.3s;
 }
-body nav.site-nav #menu.active {
+nav.site-nav #menu.active {
   width: 165px;
 }
-body nav.site-nav #menu a {
+nav.site-nav #menu a {
+  display: block;
   padding: 3px 0;
   font-size: 1.25em;
   white-space: nowrap;
 }
-body #navigation {
+
+#navigation {
   position: relative;
   left: 0;
   width: 280px;
@@ -405,52 +394,42 @@ body #navigation {
   text-align: center;
   transition: left 0.5s;
 }
-body #navigation div {
+#navigation div {
   float: left;
   width: 140px;
 }
-body #navigation a {
+#navigation a {
   margin-left: 10px;
 }
-body #navigation a:first-child {
+#navigation a:first-child {
   margin-left: 0;
 }
-body .menu {
+body.in #navigation {
+  left: -140px;
+}
+
+/* menu */
+.menu {
   /* /// name? */
   position: absolute;
   z-index: 4;
   margin: -5px 0 0 3px;
   background: rgba(0, 0, 0, 0.8);
 }
-body .menu a {
-  display: block;
+.menu a {
   width: 200px;
   padding: 3px 10px;
   font-size: 1.2em;
 }
-body .menu a.create {
+.menu a.create {
   color: #9e9;
   display: none;
 }
-body .menu a.create:hover {
+.menu a.create:hover {
   background-color: rgba(0, 150, 0, 0.3);
 }
-body .menu a.admin {
-  color: #e7e;
-  display: none;
-}
-body .menu a.admin.danger {
-  color: #e77;
-}
-body .menu a.admin.danger:hover {
-  color: #f8c7c7;
-  background-color: rgba(150, 0, 0, 0.3);
-}
-body .menu a.admin:hover {
-  color: #f8c7f7;
-  background-color: rgba(150, 0, 150, 0.3);
-}
-body #menu .user a, body #menu .guest a {
+
+#menu .user a, #menu .guest a {
   display: block;
 }
 
@@ -483,7 +462,6 @@ body #menu .user a, body #menu .guest a {
 }
 .uibox p {
   margin: 15px 0;
-  font-size: 0.95em;
   text-align: justify;
 }
 .uibox hr {
@@ -921,6 +899,13 @@ form#settings-page .ticketCount.creationTickets .count, form#settings-page .tick
   font-size: 2em;
 }
 
+.create {
+  display: none;
+}
+body.creator .create {
+  display: block;
+}
+
 form#create #timeSettings {
   margin-bottom: 20px;
   padding: 7px;
@@ -1131,6 +1116,25 @@ body.sorting.bookmarks-order #uiEffects {
   display: none;
 }
 
+a.admin-nav {
+  color: #e7e;
+  display: none;
+}
+a.admin-nav.danger {
+  color: #e77;
+}
+a.admin-nav.danger:hover {
+  color: #f8c7c7;
+  background-color: rgba(150, 0, 0, 0.3);
+}
+a.admin-nav:hover {
+  color: #f8c7f7;
+  background-color: rgba(150, 0, 150, 0.3);
+}
+body.adminor a.admin-nav {
+  display: block;
+}
+
 #ui {
   position: absolute;
   top: 5px;
@@ -1176,5 +1180,3 @@ canvas#uiEffects {
 #limbo {
   display: none;
 }
-
-/*# sourceMappingURL=constellations.css.map */
