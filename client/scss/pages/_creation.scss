@@ -1,8 +1,14 @@
-/// all of this feels sloppy
+.create {
+	// Hide for non-creators:
+	display: none;
 
- //.create, .admin { display: none; }
- //.creator .create { display: block; }
- //.adminor .admin { display: block; }
+	body.creator & {
+		//@TODO would prefer to "unset" display: none but there's not a
+		//straightforward way to do that. I think what we'll want is two states
+		//for each filter; i.e. guest/user and creator/listener:
+		display: block;
+	}
+}
 
 form#create {
 	#timeSettings {
