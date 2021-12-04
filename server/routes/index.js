@@ -142,6 +142,7 @@ function TelepRouter() {
 					me.app.render('main', {
 						CONSTS: CONSTS,
 						L: LOCALE,
+						config,
 						page: req.params.page,
 						user: req.user,
 						viewingUser: req.viewingUser ? req.viewingUser : {}, //@RE

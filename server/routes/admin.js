@@ -1,12 +1,14 @@
 const express = require('express');
 const stars = require('../components/StarMapper');
 const admin = require('../components/AdminMapper');
+const config = require('../../config/telep.config.js');
 
 function generate(responseType = "json") {
 	///TODO not currently using responseType... all admin actions are done in ajax.
 
 	var adminRouter = express.Router();
 	adminRouter.use(validateAdminUser);
+	adminRouter.get('/list-users', listUsers);
 	adminRouter.post('/moveStar', moveStar, success);
 	adminRouter.post('/deleteStar', deleteStar, success);
 	adminRouter.post('/updateDBSchemas/:schema', updateDBSchemas, success);
@@ -14,12 +16,21 @@ function generate(responseType = "json") {
 	return adminRouter;
 }
 
-function success(req, res, next) {
+function success(req, res, next) { ///REVISIT improve naming/architecture
 	res.json({ errors: [] });
 }
 
+function listUsers(req, res) {
+	admin.getUsers()
+		.then(users => {
+			res.json({
+				users,
+			});
+		});
+}
+
 function validateAdminUser(req, res, next) {
-	if(!user || user.lv != 7) {
+	if(!req.user || req.user.lv < config.adminLevel) {
 		///@REVISIT
 		next("Not authorized");
 	} else {

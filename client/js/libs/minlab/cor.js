@@ -10,9 +10,11 @@ export default {
 	ac,
 	rc,
 	cc,
+	//GET,
 	POST,
 };
 
+//export { GET, POST };
 export { POST };
 
 var classListeners = {};
@@ -60,6 +62,12 @@ function relativeToEventTarget(event) {
 }
 
 function addClassListener(className, eventName, eventCallback) {
+	if(!eventName || !eventCallback) {
+		//@TODO revisit
+		console.error('COR not supplied with valid arguments');
+		return false;
+	}
+
 	if(!classListeners[eventName]) {
 		classListeners[eventName] = [];
 		document.body.addEventListener(eventName, (event) => onClassEvent(eventName, event));
@@ -109,6 +117,11 @@ function cc(ele, cls) {
 }
 
 // AJAX Methods:
+
+//function GET(url) {
+//    fetch(url)
+//}
+
 /**
  * Sends a POST request; attempts to automatically format body.
  * @param {string|FormData|Object} body

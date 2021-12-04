@@ -48,14 +48,6 @@ function Interface() {
 	this.init = function() {
 		messageElement = document.getElementById('notification');
 
-		//document.querySelectorAll('a.close').forEach(closeLink => {
-		//    closeLink.addEventListener('click', function(event) {
-		//        event.preventDefault();
-		//        navigation.navigate('/');
-		//    });
-		//});
-
-
 		spc.moveCallbacks.push(stars.drawLineStep);
 
 		//@REVISIT belongs in Navigation.js?:
@@ -91,6 +83,15 @@ function Interface() {
 	 **/
 	this.ready = function() {
 		stars.generateConstellationLines();
+
+
+		if(localStorage.getItem('firstVisit') == null) {
+			// Open help page on first visit:
+			//@REVISIT-3 probably temporary
+			navigation.navigate('/help');
+
+			localStorage.setItem('firstVisit', true);
+		}
 
 		// If loaded URL contains a query string:
 		//@TODO-1 revisit implementation; probably render on the server:

@@ -6,6 +6,8 @@ header#galaxy-ui
 		#menu
 			.user
 				a.create.nav(href="/settings") profile
+				if user && user.lv >= config.adminLevel
+					a.nav.admin(href="/admin") admin
 				a.nav(href="/logout") logout
 
 			.guest
