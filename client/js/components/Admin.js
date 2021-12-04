@@ -17,10 +17,7 @@ function TelepAdmin() {
 	this.targetStar = null;
 
 	this.init = function() {
-		var adminLinks = document.querySelectorAll('a.admin');
-		adminLinks.forEach(adminLink => {
-			adminLink.addEventListener('click', onAdminLinkClick);
-		});
+		COR.addClassListener('admin-nav', 'click', onAdminLinkClick);
 	}
 
 	function onAdminLinkClick(event) {
@@ -144,6 +141,10 @@ class UserAdminList {
 						{user.creationTickets},
 						{user.recreationTickets}
 					</div>
+
+					<a class="nav admin-nav" href="/admin/elevate">Elevate Access</a>
+					<a class="nav admin-nav" href="/admin/add-ticket">Add Tickets</a>
+					<a href="#">Ban</a>
 				</li>
 			);
 		}
@@ -157,7 +158,6 @@ class UserAdminList {
 }
 
 class UserAdminRow {
-	
 }
 
 export default new TelepAdmin();

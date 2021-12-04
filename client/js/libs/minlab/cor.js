@@ -62,6 +62,12 @@ function relativeToEventTarget(event) {
 }
 
 function addClassListener(className, eventName, eventCallback) {
+	if(!eventName || !eventCallback) {
+		//@TODO revisit
+		console.error('COR not supplied with valid arguments');
+		return false;
+	}
+
 	if(!classListeners[eventName]) {
 		classListeners[eventName] = [];
 		document.body.addEventListener(eventName, (event) => onClassEvent(eventName, event));
