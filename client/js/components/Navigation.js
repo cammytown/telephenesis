@@ -37,6 +37,7 @@ function ClientNavigation() {
 		'create',
 		'recreate',
 		'help',
+		'admin',
 		//'renameStar',
 		//'deleteStar',
 	];

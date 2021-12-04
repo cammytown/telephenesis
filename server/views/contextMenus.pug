@@ -10,10 +10,10 @@
 			class = (user.recreationTickets > 0 ? '' : 'disabled')
 		) Recreate
 
-		a.admin(href="/moveStar") Move
-		//-a.admin(href="/recolorStar") Recolor
-		//-a.admin(href="/renameStar") Change Creator
-		a.admin.danger(href="/deleteStar") Delete
+		a.admin(href="/admin/moveStar") Move
+		//-a.admin(href="/admin/recolorStar") Recolor
+		//-a.admin(href="/admin/renameStar") Change Creator
+		a.admin.danger(href="/admin/deleteStar") Delete
 
 	.guest
 		a.nav(href="/login") login
@@ -27,7 +27,8 @@
 		) Create Constellation
 
 		//-///REVISIT placement:
-		a.admin(href="/updateDBSchemas") Update Schemas
+		a.nav.admin(href="/admin") Admin
+		a.admin(href="/admin/updateDBSchemas") Update Schemas
 
 	.guest
 		a.nav(href="/login") login

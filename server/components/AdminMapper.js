@@ -11,11 +11,23 @@ function AdminMapper() {
 	var dbStars = null;
 
 	/** Database collection of user information. **/
-	//var dbUsrMeta = null;
+	var dbUsrMeta = null;
 
 	this.initialize = function(server) {
 		dbStars = server.db.collection('MLstars');
-		//dbUsrMeta = server.db.collection('usrMeta');
+		dbUsrMeta = server.db.collection('usrMeta');
+	}
+
+	/**
+	 * Retrieve users from the database for administration views.
+	 **/
+	this.getUsers = function() {
+		return dbUsrMeta.find()
+			.limit(10)
+			.toArray()
+			.then(users => {
+				return users;
+			});
 	}
 
 	/**

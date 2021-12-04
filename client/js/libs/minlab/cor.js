@@ -10,9 +10,11 @@ export default {
 	ac,
 	rc,
 	cc,
+	//GET,
 	POST,
 };
 
+//export { GET, POST };
 export { POST };
 
 var classListeners = {};
@@ -109,6 +111,11 @@ function cc(ele, cls) {
 }
 
 // AJAX Methods:
+
+//function GET(url) {
+//    fetch(url)
+//}
+
 /**
  * Sends a POST request; attempts to automatically format body.
  * @param {string|FormData|Object} body

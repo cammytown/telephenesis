@@ -29,8 +29,27 @@ function TelepAdmin() {
 		me.targetStar = clientState.actingStar;
 
 		///TODO probably improve architecture; maybe use URL()
-		var operation = event.target.pathname.split('/')[1];
+		var pathParts = event.target.pathname.split('/');
+
+		// Retrieve operation from path parts (e.g. ['', 'admin', 'moveStar']):
+		var operation = pathParts[2];
+		if(!operation) {
+			operation = 'index';
+		}
+
 		switch(operation) {
+			case 'index': {
+				fetch('/ajax/admin/list-users')
+				.then(response => response.json())
+				.then(result => {
+					var userAdminList = new UserAdminList(result.users);
+
+					var adminListEle = document.querySelector('.user-admin-list');
+					adminListEle.replaceWith(userAdminList.element);
+
+				});
+			} break;
+
 			case 'moveStar': {
 				initializeMove();
 			} break;
@@ -102,6 +121,43 @@ function TelepAdmin() {
 			});
 		}
 	}
+}
+
+class UserAdminList {
+	constructor(users) {
+		this.users = users;
+
+		this.element = null;
+
+		this.render();
+	}
+
+	render() {
+		var userRows = [];
+		for(var user of this.users) {
+			//var userRow = new UserAdminRow(user);
+			userRows.push(
+				<li>
+					<div>{user.email}</div>
+					<div>{user.displayName}</div>
+					<div>
+						{user.creationTickets},
+						{user.recreationTickets}
+					</div>
+				</li>
+			);
+		}
+
+		this.element = (
+			<ul class="user-admin-list">
+				{userRows}
+			</ul>
+		);
+	}
+}
+
+class UserAdminRow {
+	
 }
 
 export default new TelepAdmin();
