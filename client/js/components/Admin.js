@@ -2,6 +2,7 @@ import COR from '../libs/minlab/cor';
 import spc from '../libs/minlab/spc';
 
 import clientState from './ClientState';
+import tpInterface from './Interface';
 
 /**
  * Class of administrator methods.
@@ -57,6 +58,28 @@ function TelepAdmin() {
 
 			case 'deleteStar': {
 				confirmDelete();
+			} break;
+
+			case 'elevate': {
+				var newLevel = parseInt(prompt('Choose a new level for the user'));
+				if(isNaN(newLevel)) {
+					console.error('Invalid level'); ///
+					return false;
+				}
+
+				var userPublicID = pathParts[3];
+				if(confirm('Set user ' + userPublicID + ' access level to ' + newLevel + '?')) {
+					COR.POST('/ajax/admin/elevate-user', {
+						userPublicID,
+						newLevel
+					})
+						.then(response => response.json())
+						.then(result => {
+							if(!result.errors.length) {
+								tpInterface.displayMessage('User elevated.');
+							}
+						});
+				}
 			} break;
 
 			case 'updateDBSchemas': {
@@ -142,8 +165,8 @@ class UserAdminList {
 						{user.recreationTickets}
 					</div>
 
-					<a class="nav admin-nav" href="/admin/elevate">Elevate Access</a>
-					<a class="nav admin-nav" href="/admin/add-ticket">Add Tickets</a>
+					<a class="nav admin-nav" href={"/admin/elevate/" + user.publicID}>Elevate Access</a>
+					<a class="nav admin-nav" href={"/admin/add-tickets/" + user.publicID}>Add Tickets</a>
 					<a href="#">Ban</a>
 				</li>
 			);

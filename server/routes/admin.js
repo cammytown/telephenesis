@@ -11,6 +11,7 @@ function generate(responseType = "json") {
 	adminRouter.get('/list-users', listUsers);
 	adminRouter.post('/moveStar', moveStar, success);
 	adminRouter.post('/deleteStar', deleteStar, success);
+	adminRouter.post('/elevate-user', elevateUser, success);
 	adminRouter.post('/updateDBSchemas/:schema', updateDBSchemas, success);
 
 	return adminRouter;
@@ -36,6 +37,11 @@ function validateAdminUser(req, res, next) {
 	} else {
 		next();
 	}
+}
+
+function elevateUser(req, res, next) {
+	console.log('do something');
+	next();
 }
 
 function moveStar(req, res, next) {
