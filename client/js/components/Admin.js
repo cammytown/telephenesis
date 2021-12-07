@@ -2,7 +2,7 @@ import COR from '../libs/minlab/cor';
 import spc from '../libs/minlab/spc';
 
 import clientState from './ClientState';
-import tpInterface from './Interface';
+import tlpInterface from './Interface';
 
 /**
  * Class of administrator methods.
@@ -67,7 +67,7 @@ function TelepAdmin() {
 					return false;
 				}
 
-				var userPublicID = pathParts[3];
+				const userPublicID = pathParts[3];
 				if(confirm('Set user ' + userPublicID + ' access level to ' + newLevel + '?')) {
 					COR.POST('/ajax/admin/elevate-user', {
 						userPublicID,
@@ -75,11 +75,40 @@ function TelepAdmin() {
 					})
 						.then(response => response.json())
 						.then(result => {
-							if(!result.errors.length) {
-								tpInterface.displayMessage('User elevated.');
+							if(result.errors.length) {
+								//@REVISIT
+								throw result.errors.length;
 							}
+
+							tlpInterface.displayMessage('User elevated.');
 						});
 				}
+			} break;
+
+			case 'set-ticket-count': {
+				var creationTicketCount = prompt("How many creation tickets should this user have?");
+				var recreationTicketCount = prompt("Recreation tickets?");
+				if(confirm("Setting user tickets to "
+					+ creationTicketCount + " creation tickets and "
+					+ recreationTicketCount + " recreation tickets. Confirm?"
+				)) {
+					const userPublicID = pathParts[3];
+					COR.POST('/ajax/admin/set-ticket-count', {
+						userPublicID,
+						creationTicketCount,
+						recreationTicketCount
+					})
+						.then(response => response.json())
+						.then(result => {
+							if(result.errors.length) {
+								//@REVISIT
+								throw result.errors;
+							}
+
+							tlpInterface.displayMessage('User ticket count has been set.');
+						});
+				}
+
 			} break;
 
 			case 'updateDBSchemas': {
@@ -159,15 +188,30 @@ class UserAdminList {
 			userRows.push(
 				<li>
 					<div>{user.email}</div>
-					<div>{user.displayName}</div>
-					<div>
-						{user.creationTickets},
-						{user.recreationTickets}
-					</div>
+					<div class="more-info">
+						<div>{user.displayName}</div>
+						<div>Access Level - {user.accessLevel}</div>
+						<div>
+							{user.creationTickets} creation tickets,<br />
+							{user.recreationTickets} recreation tickets
+						</div>
 
-					<a class="nav admin-nav" href={"/admin/elevate/" + user.publicID}>Elevate Access</a>
-					<a class="nav admin-nav" href={"/admin/add-tickets/" + user.publicID}>Add Tickets</a>
-					<a href="#">Ban</a>
+						<a
+							class="nav admin-nav"
+							href={"/admin/elevate/" + user.publicID}
+						>
+							Elevate Access
+						</a>
+
+						<a
+							class="nav admin-nav"
+							href={"/admin/set-ticket-count/" + user.publicID}
+						>
+							Set Ticket Count
+						</a>
+
+						<a href="#">Ban</a>
+					</div>
 				</li>
 			);
 		}

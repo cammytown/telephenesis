@@ -21,3 +21,21 @@ a.admin-nav {
 	}
 }
 
+ul.user-admin-list { //@REVISIT naming
+	li {
+		padding: 5px;
+
+		.more-info {
+			display: none;
+		}
+
+		&:hover {
+			background: $adminBackground;
+
+			.more-info {
+				display: block;
+			}
+		}
+	}
+}
+

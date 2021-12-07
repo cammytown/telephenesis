@@ -37,8 +37,9 @@ function AdminMapper() {
 	 * @param {number} newLevel - The access level to set the user to.
 	 **/
 	this.elevateUser = function(userPublicID, newLevel) {
+		console.log('elevating userPublicID ' + userPublicID + ' to level ' + newLevel);
 		return dbUsrMeta.updateOne(
-			{ userPublicID },
+			{ publicID: userPublicID },
 			{ $set: { accessLevel: newLevel } }
 		);
 	}

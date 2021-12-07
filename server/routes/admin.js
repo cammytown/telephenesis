@@ -40,7 +40,6 @@ function validateAdminUser(req, res, next) {
 }
 
 function elevateUser(req, res, next) {
-	console.log('do something');
 	admin.elevateUser(req.body.userPublicID, req.body.newLevel);
 
 	next();
