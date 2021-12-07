@@ -31,7 +31,7 @@ html(lang="en")
 			include help.pug
 			include profile.pug
 			include singleUser.pug
-			if user && user.lv >= config.adminLevel
+			if user && user.accessLevel >= config.adminLevel
 				include admin.pug
 
 			div#notification

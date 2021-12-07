@@ -151,8 +151,10 @@ function TelepAPI() {
 			.then(usrDoc => {
 				server.generatePublicID(usrMeta)
 					.then(publicID => {
+						//@REVISIT maybe have like a static TelepUser.buildInitialObject
 						var userMetaObject = {
 							publicID,
+							accessLevel: 0,
 							displayName,
 							//creatorName,
 							creationTickets: 1,

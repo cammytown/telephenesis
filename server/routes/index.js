@@ -121,11 +121,11 @@ function TelepRouter() {
 		if(req.user) {
 			className += ' in';
 
-			if(req.user.lv >= config.creatorLevel) {
+			if(req.user.accessLevel >= config.creatorLevel) {
 				className += ' creator';
 			}
 
-			if(req.user.lv == 7) {
+			if(req.user.accessLevel == 7) {
 				className += ' adminor';
 			}
 		}

@@ -11,7 +11,7 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 			'id', //@TODO replacing with publicID
 			'publicID',
 			'email',
-			'lv',
+			'accessLevel',
 			'sessionCode',
 			'displayName',
 			//'creatorName', //@TODO removing
@@ -37,7 +37,7 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 		client: [
 			'publicID',
 			'email',
-			'lv',
+			'accessLevel',
 			'displayName',
 			'artists',
 			'creationTickets',
@@ -58,7 +58,6 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 		if(usrDoc) {
 			me.loadData({
 				'id': usrDoc.id,
-				'lv': usrDoc.lv,
 				'email': usrDoc.em,
 				'sessionCode': usrDoc.ss,
 			});

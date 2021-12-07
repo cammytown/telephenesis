@@ -149,7 +149,6 @@ module.exports = function Usr(db, vl, bcrypt) {
 
 				var usrObject = {
 					id: userCount,
-					lv: 0,
 					em: em,
 					pw: cr,
 					ip: ip,

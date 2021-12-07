@@ -207,7 +207,7 @@ function ClientState() {
 		document.body.classList.add('in');
 
 		// Enable creator interface elements if authorized:
-		if(user.lv >= config.creatorLevel) {
+		if(user.accessLevel >= config.creatorLevel) {
 			document.body.classList.add('creator');
 		}
 

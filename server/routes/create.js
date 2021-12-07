@@ -14,7 +14,7 @@ function generate() {
 }
 
 function validateCreator(req, res, next) {
-	if(!req.user || req.user.lv < config.creatorLevel) {
+	if(!req.user || req.user.accessLevel < config.creatorLevel) {
 		///REVISIT:
 		next("Not logged in or not permitted");
 	} else {

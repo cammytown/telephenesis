@@ -31,6 +31,19 @@ function AdminMapper() {
 	}
 
 	/**
+	 * Changes a user access level.
+	 * @todo rename since you might decrease the level
+	 * @param {number} userPublicID - The public ID of the user to change.
+	 * @param {number} newLevel - The access level to set the user to.
+	 **/
+	this.elevateUser = function(userPublicID, newLevel) {
+		return dbUsrMeta.updateOne(
+			{ userPublicID },
+			{ $set: { accessLevel: newLevel } }
+		);
+	}
+
+	/**
 	 * Updates documents in database to reflect any changes to structure of
 	 * Star.
 	 * @param {Array.<'stars'|'userMeta'>} schemas

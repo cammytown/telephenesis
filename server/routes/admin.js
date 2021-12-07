@@ -31,7 +31,7 @@ function listUsers(req, res) {
 }
 
 function validateAdminUser(req, res, next) {
-	if(!req.user || req.user.lv < config.adminLevel) {
+	if(!req.user || req.user.accessLevel < config.adminLevel) {
 		///@REVISIT
 		next("Not authorized");
 	} else {
@@ -41,6 +41,8 @@ function validateAdminUser(req, res, next) {
 
 function elevateUser(req, res, next) {
 	console.log('do something');
+	admin.elevateUser(req.body.userPublicID, req.body.newLevel);
+
 	next();
 }
 
@@ -62,13 +64,13 @@ function renameStar(starId, creatorName, callback) {
 	);
 }
 
-function recolor(starId, rgb, callback) {
-	dbStars.updateOne(
-		{ id: starId },
-		{ $set: { rgb } },
-		callback
-	);
-}
+//function recolor(starId, rgb, callback) {
+//    dbStars.updateOne(
+//        { id: starId },
+//        { $set: { rgb } },
+//        callback
+//    );
+//}
 
 function deleteStar(req, res, next) {
 	return stars.deleteStar(req.body.starID)
@@ -98,12 +100,6 @@ module.exports = { generate };
 	//                    return false;
 	//                }
 
-	//                // if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
-	//                if(!i.user || i.user.lv != 7) {
-	//                    o.json({ errors: ["not logged in"] });
-	//                    return false;
-	//                }
-
 	//                api.renameStar(starID, i.body.creatorName, function(err, result) {
 	//                    if(err) {
 	//                        o.json({ errors: ["couldn't move..."] }); ///
@@ -127,11 +123,6 @@ module.exports = { generate };
 	//                    return false;
 	//                }
 
-	//                // if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
-	//                if(!i.user || i.user.lv != 7) {
-	//                    o.json({ errors: ["not logged in"] });
-	//                    return false;
-	//                }
 
 	//                api.deleteStar(starID, function(err, result) {
 	//                    if(err) {
@@ -154,11 +145,6 @@ module.exports = { generate };
 	//                    return false;
 	//                }
 
-	//                // if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
-	//                if(!i.user || i.user.lv != 7) {
-	//                    o.json({ errors: ["not logged in"] });
-	//                    return false;
-	//                }
 
 	//                api.recolor(starID, i.body.rgb, function(err, result) {
 	//                    if(err) {
@@ -177,12 +163,6 @@ module.exports = { generate };
 	//            Stars.getStar(starID, function(err, star) {
 	//                if(err) {
 	//                    ///
-	//                    return false;
-	//                }
-
-	//                // if(!i.user || (i.user.id != star.creatorId && i.user.lv != 7)) {
-	//                if(!i.user || i.user.lv != 7) {
-	//                    o.json({ errors: ["not logged in"] });
 	//                    return false;
 	//                }
 

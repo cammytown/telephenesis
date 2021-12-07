@@ -67,7 +67,7 @@ function generate(telepServer) {
 //            return false; ///
 //        }
 
-//        if(!req.user.lv) {
+//        if(!req.user.accessLevel) {
 //            res.json({ errors: ["no creator credentials"] });
 //            return false; ///
 //        }
