@@ -12,6 +12,7 @@ function generate(responseType = "json") {
 	adminRouter.post('/moveStar', moveStar, success);
 	adminRouter.post('/deleteStar', deleteStar, success);
 	adminRouter.post('/elevate-user', elevateUser, success);
+	adminRouter.post('/set-user-ticket-count', setUserTicketCount, success);
 	adminRouter.post('/updateDBSchemas/:schema', updateDBSchemas, success);
 
 	return adminRouter;
@@ -40,9 +41,16 @@ function validateAdminUser(req, res, next) {
 }
 
 function elevateUser(req, res, next) {
-	admin.elevateUser(req.body.userPublicID, req.body.newLevel);
+	admin.elevateUser(req.body.userPublicID, req.body.newLevel)
+		.then(() => next());
+}
 
-	next();
+function setUserTicketCount(req, res, next) {
+	admin.setUserTicketCount(
+		req.body.userPublicID,
+		req.body.creationTicketCount,
+		req.body.recreationTicketCount
+	).then(() => next());
 }
 
 function moveStar(req, res, next) {

@@ -35,12 +35,34 @@ function AdminMapper() {
 	 * @todo rename since you might decrease the level
 	 * @param {number} userPublicID - The public ID of the user to change.
 	 * @param {number} newLevel - The access level to set the user to.
+	 * @returns Promise;
 	 **/
 	this.elevateUser = function(userPublicID, newLevel) {
 		console.log('elevating userPublicID ' + userPublicID + ' to level ' + newLevel);
 		return dbUsrMeta.updateOne(
 			{ publicID: userPublicID },
 			{ $set: { accessLevel: newLevel } }
+		);
+	}
+
+	/**
+	 * Sets the number of creation/recreation tickets a user has.
+	 * @param {number} userPublicID - The public ID of the user to change.
+	 * @param {number} creationTicketCount
+	 * @param {number} recreationTicketCount
+	 * @returns Promise;
+	 **/
+	this.setUserTicketCount = function(
+		userPublicID,
+		creationTicketCount,
+		recreationTicketCount
+	) {
+		return dbUsrMeta.updateOne(
+			{ publicID: userPublicID },
+			{ $set: {
+				creationTickets: creationTicketCount,
+				recreationTickets: recreationTicketCount
+			} }
 		);
 	}
 

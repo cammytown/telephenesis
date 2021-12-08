@@ -93,7 +93,7 @@ function TelepAdmin() {
 					+ recreationTicketCount + " recreation tickets. Confirm?"
 				)) {
 					const userPublicID = pathParts[3];
-					COR.POST('/ajax/admin/set-ticket-count', {
+					COR.POST('/ajax/admin/set-user-ticket-count', {
 						userPublicID,
 						creationTicketCount,
 						recreationTicketCount
