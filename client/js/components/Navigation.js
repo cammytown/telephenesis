@@ -5,7 +5,7 @@ import Anm from '../libs/minlab/anm';
 import HistoryTime from '../libs/history-time';
 
 import clientState from './ClientState';
-import Interface from './Interface';
+import tlpInterface from './Interface';
 import comments from './Comments';
 import Stars from './Stars';
 import Creator from './Creator';
@@ -17,7 +17,7 @@ import locale from '../../../locale/en_us.json'; //@TODO scaffolding
 
 export default new ClientNavigation();
 
-///TODO consider combining with Interface
+///TODO consider combining with tlpInterface
 /**
  * Handles page transitions and navigation links.
  * @constructor
@@ -150,7 +150,7 @@ function ClientNavigation() {
 				bookmarkLink.href = "/bookmark";
 			}
 
-			if(Interface.order == CONSTS.ORDER.GALAXY) {
+			if(tlpInterface.order == CONSTS.ORDER.GALAXY) {
 				starContextMenu.style.left = clientStar.position.x + 12 + 'px';
 				starContextMenu.style.top = clientStar.position.y - 5 + 'px';
 			} else {
@@ -205,7 +205,7 @@ function ClientNavigation() {
 				// Check if user has creation tickets:
 				if(!clientState.creationTickets) {
 					// No creation tickets; display error:
-					Interface.displayError(CONSTS.ERROR.NO_CREATION_TICKETS);
+					tlpInterface.displayError(CONSTS.ERROR.NO_CREATION_TICKETS);
 					return false;
 				}
 			} break;
@@ -216,7 +216,7 @@ function ClientNavigation() {
 				// Check if user has recreation tickets:
 				if(!clientState.recreationTickets) {
 					// No recreation tickets; display error:
-					Interface.displayError(CONSTS.ERROR.NO_RECREATION_TICKETS);
+					tlpInterface.displayError(CONSTS.ERROR.NO_RECREATION_TICKETS);
 					return false;
 				}
 			} break;
@@ -290,7 +290,7 @@ function ClientNavigation() {
 
 			// If starting to create a star; change to galaxy view:
 			//if(createPages.includes(newPage)) {
-			//    Interface.sort(CONSTS.ORDER.GALAXY);
+			//    tlpInterface.sort(CONSTS.ORDER.GALAXY);
 			//}
 		}
 
@@ -302,14 +302,14 @@ function ClientNavigation() {
 		// If there's a view or order in the query string:
 		if(order || view) {
 			// Display the view and/or order:
-			Interface.sort(order, view);
+			tlpInterface.sort(order, view);
 
 			// Toggle on comments panel.
 			//@TODO allow people to keep comments panel off
 			comments.toggleComments(true);
 		} else {
-			if(Interface.order != CONSTS.ORDER.GALAXY) {
-				Interface.sort(CONSTS.ORDER.GALAXY);
+			if(tlpInterface.order != CONSTS.ORDER.GALAXY) {
+				tlpInterface.sort(CONSTS.ORDER.GALAXY);
 			}
 		}
 
@@ -352,7 +352,7 @@ function ClientNavigation() {
 
 				// Refresh position of stars if shifted by comments panel:
 				//@TODO bad architecture; maybe a .refresh() or something:
-				Interface.sort();
+				tlpInterface.sort();
 			} break;
 
 			case 'user': {
@@ -492,6 +492,8 @@ function ClientNavigation() {
 
 	function logout() { ///REVISIT placement; maybe put into a ClientUser
 		///@REVISIT technically I suppose we don't even need to ping the server?
+		//@REVISIT Prefer or additionally do a loading graphic?:
+		tlpInterface.displayMessage("Logging out...");
 		return fetch('/ajax/logout', {
 			method: "POST",
 			body: {}
@@ -501,6 +503,7 @@ function ClientNavigation() {
 				if(result.errors.length) {
 					console.error(result.errors); ///
 				} else {
+					tlpInterface.hideMessage();
 					clientState.logout();
 				}
 			})

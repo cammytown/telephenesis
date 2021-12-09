@@ -37,7 +37,10 @@ function TelepRouter() {
 		me.app.use((req, res, next) => {
 			console.log("client visited: " + req.url);
 			//console.log(req.body);
-			next();
+
+			// Simulate network delay:
+			setTimeout(next, 2000);
+			//next();
 		});
 
 		// Get user if logged in.

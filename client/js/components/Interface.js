@@ -413,6 +413,20 @@ function Interface() {
 
 	// 	event.preventDefault();
 	// }
+	
+	/**
+	 * Create a loading graphic element.
+	 * @returns Element
+	 **/
+	//@TODO revisit naming/implementation:
+	this.createLoaderElement = function() {
+		return (
+			<span>
+				<img class="loading-img" src="/images/loading-orbit_001.gif" />
+				<span>Loading...</span>
+			</span>
+		);
+	}
 }
 
 export default new Interface();

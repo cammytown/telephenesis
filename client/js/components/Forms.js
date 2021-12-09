@@ -4,6 +4,7 @@ import Pijin from '../libs/pijin-js';
 
 import clientState from './ClientState';
 import navigation from './Navigation';
+import tlpInterface from './Interface';
 import ClientUser from './ClientUser';
 import ClientComment from './ClientComment.jsx';
 
@@ -12,14 +13,6 @@ export default new ClientForms();
 function ClientForms() {
 	///REVISIT architecture:
 	var commentingStar;
-
-	//@REVISIT placement:
-	var loadingImage = (
-		<span>
-			<img class="loading-img" src="/images/loading-orbit_001.gif" />
-			<span>Loading...</span>
-		</span>
-	);
 
 	this.init = function() {
 		//// not a good solution:
@@ -49,7 +42,7 @@ function ClientForms() {
 
 		var submitButton = form.querySelector('button[type="submit"]');
 		submitButton.setAttribute('data-original-text', submitButton.innerText);
-		submitButton.childNodes[0].replaceWith(loadingImage); ///
+		submitButton.childNodes[0].replaceWith(tlpInterface.createLoaderElement()); ///
 
 		//@REVISIT I don't like this architecture. Perhaps solution would be to
 		//have this class have a method that allows us to hook into this

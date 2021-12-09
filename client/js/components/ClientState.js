@@ -114,7 +114,11 @@ function ClientState() {
 		//various properties of the logged-in user
 		var bookmarksInputEle = document.getElementById('user-bookmarks');
 		for(var starID of bookmarksInputEle.value.split(',')) {
-			me.user.bookmarks.push(Stars.clientStars[starID]);
+			if(Stars.clientStars[starID]) {
+				me.user.bookmarks.push(Stars.clientStars[starID]);
+			} else {
+				//@TODO probably inform server in next sync?
+			}
 		}
 	}
 

@@ -1,6 +1,7 @@
 import { POST } from '../libs/minlab/cor';
 import ClientStar from './ClientStar';
 import ClientComment from './ClientComment.jsx';
+import tlpInterface from './Interface';
 
 export default new Comments();
 
@@ -22,6 +23,9 @@ function Comments() {
 	/** The element that holds comments. **/
 	var commentsListEle;
 
+	/** Loading graphic for loading comments. **/
+	var commentsLoadingEle;
+
 	this.init = function() {
 		createCommentTextarea = document.querySelector('#createCommentForm textarea.comment-text');
 
@@ -31,6 +35,8 @@ function Comments() {
 		commentToggleEle.addEventListener('click', me.toggleComments);
 
 		commentsListEle = document.querySelector('#playingComments ul.comments');
+
+		commentsLoadingEle = tlpInterface.createLoaderElement();
 	}
 
 	//this.ready = function() {
@@ -61,9 +67,15 @@ function Comments() {
 			commentsListEle.removeChild(commentsListEle.firstChild);
 		}
 
+		// Replace <ul> with loading graphic until comments are loaded:
+		commentsListEle.replaceWith(commentsLoadingEle);
+
 		POST('/ajax/get-star-comments', { starID: clientStar.publicID })
 			.then(response => response.json())
 			.then(result => {
+				// Replace loading image with comments:
+				commentsLoadingEle.replaceWith(commentsListEle);
+
 				result.comments.forEach(comment => {
 					new ClientComment(comment);
 				});
