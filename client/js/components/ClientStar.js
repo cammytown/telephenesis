@@ -8,6 +8,7 @@ import Vector from '../../../abstract/Vector.js';
 import MediaPlayer from './MediaPlayer';
 import clientState from './ClientState';
 import Navigation from './Navigation';
+import tlpInterface from './Interface';
 
 export default ClientStar;
 
@@ -158,12 +159,20 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	 * Bookmarks the star for the client's user account.
 	 **/
 	this.bookmark = function() {
+		//@TODO more gracefully handle case where user starts to bookmark
+		//another star before previous receives success response
+		tlpInterface.displayMessage("Bookmarking star...", 0);
+
 		return cor.POST('/ajax/bookmark', { starID: this.id })
 			.then(response => response.json())
 			.then(result => {
 				if(result.errors) {
 					throw result.errors;
 				}
+
+				//@TODO handle case where message has changed so we don't hide
+				//wrong message
+				tlpInterface.hideMessage();
 
 				cor.ac(this.element, 'bookmarked');
 				me.isBookmarked = true;
@@ -180,12 +189,20 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	 * Removes bookmark from star for client's user account.
 	 **/
 	this.removeBookmark = function() {
+		//@TODO more gracefully handle case where user starts to bookmark
+		//another star before previous receives success response
+		tlpInterface.displayMessage("Removing bookmark...");
+
 		return cor.POST('/ajax/remove-bookmark', { starID: this.id })
 			.then(response => response.json())
 			.then(result => {
 				if(result.errors) {
 					throw result.errors;
 				}
+
+				//@TODO handle case where message has changed so we don't hide
+				//wrong message
+				tlpInterface.hideMessage();
 
 				this.element.classList.remove('bookmarked');
 				me.isBookmarked = false;
