@@ -512,12 +512,12 @@ function Creator() {
 	}
 
 	function initializeStar() {
-		return COR.POST('/ajax/initialize-star', me.workingStar.export())
+		return COR.POST('/ajax/initialize-star', me.workingStar.export('common'))
 			.then(response => response.json())
 			.then(result => {
 				console.log('initialize response');
 				console.log(result);
-				me.workingStar.loadData(result.newStar, ['uploadURL']);
+				me.workingStar.import(result.newStar, 'client', ['uploadURL', 'file']);
 			});
 
 		//uploads.requestuploadurl(me.workingstar).then(uploadurl => {
@@ -542,7 +542,7 @@ function Creator() {
 		//};
 
 		//fetch('/ajax/actualize', request) ///REVISIT old browser compatability?
-		return COR.POST('/ajax/actualize-star', me.workingStar.export())
+		return COR.POST('/ajax/actualize-star', me.workingStar.export('common'))
 			.then(response => response.json())
 			.then(result => {
 				if(result.errors.length) {
@@ -552,7 +552,7 @@ function Creator() {
 				me.workingStar.element.classList.remove('placementSymbol');
 
 				// Load server data into star:
-				me.workingStar.loadData(result.actualizedStar);
+				me.workingStar.import(result.actualizedStar, 'client');
 
 				Stars.addStar(me.workingStar);
 

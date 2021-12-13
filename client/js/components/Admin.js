@@ -38,14 +38,23 @@ function TelepAdmin() {
 		switch(operation) {
 			case 'index': {
 				fetch('/ajax/admin/list-users')
-				.then(response => response.json())
-				.then(result => {
-					var userAdminList = new UserAdminList(result.users);
+					.then(response => response.json())
+					.then(result => {
+						var userAdminList = new UserAdminList(result.users);
 
-					var adminListEle = document.querySelector('.user-admin-list');
-					adminListEle.replaceWith(userAdminList.element);
+						var adminListEle = document.querySelector('.user-admin-list');
+						adminListEle.replaceWith(userAdminList.element);
 
-				});
+					});
+
+				//@TODO consolidate w/ above probably
+				fetch('/ajax/admin/list-stars')
+					.then(response => response.json())
+					.then(result => {
+						var starAdminList = new StarAdminList(result.stars);
+						var starListEle = document.querySelector('.star-admin-list');
+						starListEle.replaceWith(starAdminList.element);
+					});
 			} break;
 
 			case 'moveStar': {
@@ -111,9 +120,9 @@ function TelepAdmin() {
 
 			} break;
 
-			case 'updateDBSchemas': {
+			case 'update-db-schemas': {
 				if(confirm("Update database schema to reflect changes in code?")) {
-					COR.POST('/ajax/admin/updateDBSchemas');
+					COR.POST('/ajax/admin/update-db-schemas');
 				}
 			} break;
 
@@ -172,6 +181,35 @@ function TelepAdmin() {
 	}
 }
 
+class StarAdminList {
+	constructor(stars) {
+		this.stars = stars;
+
+		this.element = null;
+
+		this.render();
+	}
+
+	render() {
+		var userRows = [];
+		for(var star of this.stars) {
+			//var userRow = new UserAdminRow(user);
+			userRows.push(
+				<li>
+					<div>{star.title}</div>
+					<div>{star.artist.name}</div>
+					<div>{star.partialPlays}</div>
+				</li>
+			);
+		}
+
+		this.element = (
+			<ul class="user-admin-list">
+				{userRows}
+			</ul>
+		);
+	}
+}
 class UserAdminList {
 	constructor(users) {
 		this.users = users;

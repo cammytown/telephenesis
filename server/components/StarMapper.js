@@ -164,10 +164,7 @@ function StarMapper() {
 					}
 
 				})
-					.then(() => dbStars.insertOne(serverStar.export([
-						'uploadURL',
-						'userPublicID',
-					])))
+					.then(() => dbStars.insertOne(serverStar.export('database')))
 					.then(result => { return serverStar; });
 			});
 
@@ -263,20 +260,14 @@ function StarMapper() {
 							publicID: serverStar.publicID,
 							userPublicID: user.publicID
 						},
-						{ $set: serverStar.export(
-							[
-								'active',
-								'deleted',
-								'uploadURL',
-							])
-						}
+						{ $set: serverStar.export('database') }
 					);
 				} else {
 					// This should be the server's first encounter with the
 					// star; generate a publicID and other init concerns:
 					return me.initializeStar(user, serverStar)
 						.then(serverStar => {
-							dbStars.insertOne(serverStar.export(['active', 'deleted']))
+							dbStars.insertOne(serverStar.export('database'))
 						});
 				}
 			})
@@ -291,7 +282,7 @@ function StarMapper() {
 				}
 
 				//TODO filter return:
-				returnObject.newStar = serverStar.export();
+				returnObject.newStar = serverStar;
 
 				// Return the new star and any star movements that need to
 				// occur on the client:

@@ -39,8 +39,8 @@ function TelepRouter() {
 			//console.log(req.body);
 
 			// Simulate network delay:
-			setTimeout(next, 2000);
-			//next();
+			//setTimeout(next, 2000);
+			next();
 		});
 
 		// Get user if logged in.

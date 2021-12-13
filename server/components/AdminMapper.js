@@ -1,4 +1,5 @@
 const stars = require('./StarMapper');
+const ServerStar = require('./ServerStar');
 
 module.exports = new AdminMapper();
 
@@ -73,29 +74,28 @@ function AdminMapper() {
 	 * @todo revisit the jsdoc param type syntax for schemas
 	 * @returns {Promise<boolean>}
 	 **/
-	this.updateDBSchemas = function(schemas = []) {
+	this.updateDBSchemas = function(schemas = ['stars']) {
 		for(var schema of schemas) {
 			switch(schema) {
 				case 'stars': {
 					///REVISIT
-					stars.getStars(false, {})
-					then(stars => {
-						stars.forEach(star => {
-							///TODO warn about unused properties and implement a param
-							//that if set true will remove them:
+					return stars.getStars(false, {})
+						.then(stars => {
+							stars.forEach(star => {
+								///TODO warn about unused properties and implement a param
+								//that if set true will remove them:
 
-							// Load data into a ServerStar to initialize data structure:
-							var serverStar = new ServerStar(star, 'server');
-							dbStars.updateOne(
-								{ id: star.publicID },
-								// Simply set all properties of the star to the newly crafted ServerStar's:
-								{ $set: serverStar.export('identity') },
-							);
-						});
+								// Load data into a ServerStar to initialize data structure:
+								var serverStar = new ServerStar(star, 'server');
+								dbStars.updateOne(
+									{ publicID: star.publicID },
+									// Simply set all properties of the star to the newly crafted ServerStar's:
+									{ $set: serverStar.export('database') },
+								);
+							});
 
 						///@TODO probably want to wait til server interaction is
 						//actually done before returning:
-						return true;
 					});
 				} break;
 

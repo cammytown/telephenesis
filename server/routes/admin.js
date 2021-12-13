@@ -13,7 +13,8 @@ function generate(responseType = "json") {
 	adminRouter.post('/deleteStar', deleteStar, success);
 	adminRouter.post('/elevate-user', elevateUser, success);
 	adminRouter.post('/set-user-ticket-count', setUserTicketCount, success);
-	adminRouter.post('/updateDBSchemas/:schema', updateDBSchemas, success);
+	adminRouter.post('/update-db-schemas', updateDBSchemas, success);
+	//adminRouter.post('/update-db-schema/:schema', updateDBSchemas, success);
 
 	return adminRouter;
 }
@@ -86,7 +87,8 @@ function deleteStar(req, res, next) {
 }
 
 function updateDBSchemas(req, res, next) {
-	return admin.updateDBSchemas([req.params.schema])
+	//return admin.updateDBSchemas([req.params.schema])
+	return admin.updateDBSchemas(['stars'])
 		.then(() => next())
 		.catch(err => next(err));
 }

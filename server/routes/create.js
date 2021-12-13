@@ -29,7 +29,7 @@ function initializeStar(req, res, next) {
 		.then(newServerStar => {
 			res.json({
 				errors: [],
-				newStar: newServerStar.export(['uploadURL', 'file'])
+				newStar: newServerStar.export('client', ['uploadURL', 'file'])
 			});
 		})
 		.catch(err => {
@@ -95,7 +95,7 @@ function actualizeStar(req, res, next) {
 		.then(result => {
 			res.json({
 				errors: [],
-				actualizedStar: result.newStar,
+				actualizedStar: result.newStar.export('client'),
 				creatorName: req.user.creatorName,
 				//newStarPublicID: result.newStar.publicID,
 				//timestamp: result.newStar.timestamp,

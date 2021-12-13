@@ -99,15 +99,15 @@ function MediaPlayer() {
 		activeMediaState.totalMediaPlaySeconds += delta;
 
 		// Check if played long enough to ping server:
-		if(!activeMediaState.flags.longPlay) {
-			if(!activeMediaState.flags.partialPlay) {
-				// If played long enough to flag partial play:
-				if(activeMediaState.totalMediaPlaySeconds >= playerConfig.partialPlaySeconds) {
-					activeMediaState.flags.partialPlay = true;
-					pendingServerUpdates.push({ type: 'partialPlay', starID: clientState.playingStar.publicID });
-				}
+		if(!activeMediaState.flags.partialPlay) {
+			// If played long enough to flag partial play:
+			if(activeMediaState.totalMediaPlaySeconds >= playerConfig.partialPlaySeconds) {
+				activeMediaState.flags.partialPlay = true;
+				pendingServerUpdates.push({ type: 'partialPlay', starID: clientState.playingStar.publicID });
 			}
+		}
 
+		if(!activeMediaState.flags.longPlay) {
 			// If played long enough to flag long play:
 			var totalPlayTimeFloat = activeMediaState.totalMediaPlaySeconds / me.audio.element.duration;
 			if(totalPlayTimeFloat >= playerConfig.longPlayPercent / 100) {

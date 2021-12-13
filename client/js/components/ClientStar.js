@@ -19,6 +19,8 @@ export default ClientStar;
  * @constructor
  **/
 function ClientStar(element) { ///REVISIT element not in use atm
+	Star.call(this);
+
 	var me = this;
 
 	// Inherits properties from Star.js ...
@@ -43,7 +45,6 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	this.isBookmarked = false;
 
 	function init(element = false) {
-		Star.call(me);
 
 		if(element) {
 			me.element = element;
@@ -219,16 +220,16 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	 * Load properties into the star from an object (e.g. from the server).
 	 * @param {object} starData
 	 **/
-	this.loadData = function(starData, additionalProps = []) {
-		var importProps = me.identityProps.concat(additionalProps);
+	//this.loadData = function(starData, additionalProps = []) {
+	//    var importProps = me.identityProps.concat(additionalProps);
 
-		for(var identityProp of importProps) {
-			//@REVISIT only updating if value is not falsey; always? use flag?:
-			if(starData[identityProp]) {
-				me[identityProp] = starData[identityProp];
-			}
-		}
-	}
+	//    for(var identityProp of importProps) {
+	//        //@REVISIT only updating if value is not falsey; always? use flag?:
+	//        if(starData[identityProp]) {
+	//            me[identityProp] = starData[identityProp];
+	//        }
+	//    }
+	//}
 
 	/**
 	 * Set properties according to HTML element attribute values.
@@ -237,7 +238,7 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		// Function-scoped variable so we can use getter/setter with same name.
 		var positionValue;
 
-		for(var property of me.identityProps) {
+		for(var property in me.targetProps['client']) {
 			switch(property) {
 				case 'position': {
 					///REVISIT architecture
@@ -282,8 +283,8 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	 * Set HTML element attributes according to property values.
 	 **/
 	this.observeProperties = function() {
-		for(var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
-			var property = me.identityProps[propIndex];
+		for(var propIndex = 0; propIndex < me.targetProps['client'].length; propIndex++) {
+			var property = me.targetProps['client'][propIndex];
 
 			switch(property) {
 				case 'publicID': {
@@ -335,44 +336,44 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	 * @param dataType {string} - Type of data structure to return.
 	 */
 	//@REVISIT dataType not currently in use
-	this.export = function(dataType = "object") {
-		switch(dataType) {
-			case 'object': {
-				var exportObject = {};
+	//this.export = function(dataType = "object") {
+	//    switch(dataType) {
+	//        case 'object': {
+	//            var exportObject = {};
 
-				for(var identityProp of me.identityProps) {
-					exportObject[identityProp] = me[identityProp];
-				}
+	//            for(var identityProp of me.identityProps) {
+	//                exportObject[identityProp] = me[identityProp];
+	//            }
 
-				return exportObject;
-			} break;
+	//            return exportObject;
+	//        } break;
 
-			//case 'FormData': {
-			//    var formData = new FormData();
+	//        //case 'FormData': {
+	//        //    var formData = new FormData();
 
-			//    for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
-			//        var identityProp = me.identityProps[propIndex];
+	//        //    for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
+	//        //        var identityProp = me.identityProps[propIndex];
 
-			//        // If property is an object:
-			//        if(me.objectProps.indexOf(identityProp) != -1) { ///probably keep array of which properties are objects in Star class
-			//            formData.append(identityProp, JSON.stringify(me[identityProp]));
+	//        //        // If property is an object:
+	//        //        if(me.objectProps.indexOf(identityProp) != -1) { ///probably keep array of which properties are objects in Star class
+	//        //            formData.append(identityProp, JSON.stringify(me[identityProp]));
 
-			//        // Property is a literal value; no need to stringify:
-			//        } else {
-			//            formData.append(identityProp, me[identityProp]);
-			//        }
-			//    }
+	//        //        // Property is a literal value; no need to stringify:
+	//        //        } else {
+	//        //            formData.append(identityProp, me[identityProp]);
+	//        //        }
+	//        //    }
 
-			//    return formData;
-			//} break;
+	//        //    return formData;
+	//        //} break;
 
-			default: {
-				var error = "ClientStar.export(): Unhandled dataType '" + dataType + "'";
-				console.error(error);
-				throw new Error(error);
-			}
-		}
-	}
+	//        default: {
+	//            var error = "ClientStar.export(): Unhandled dataType '" + dataType + "'";
+	//            console.error(error);
+	//            throw new Error(error);
+	//        }
+	//    }
+	//}
 
 	/** Remove the ClientStar from the client. **/
 	this.delete = function() {

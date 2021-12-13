@@ -237,7 +237,7 @@ function getSingleUser(req, res, next) {
 }
 
 function ajaxErrorHandler(err, req, res, next) {
-	console.trace();
+	//console.trace();
 	console.log(err.stack);
 	console.log('ajax error: ' + err);
 	res.json({ errors: err instanceof Error ? [err.message] : err }); ///TODO just always throw Error and get rid of this check
