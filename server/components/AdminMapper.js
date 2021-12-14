@@ -90,7 +90,7 @@ function AdminMapper() {
 								dbStars.updateOne(
 									{ publicID: star.publicID },
 									// Simply set all properties of the star to the newly crafted ServerStar's:
-									{ $set: serverStar.export('database') },
+									{ $set: serverStar.export('server') },
 								);
 							});
 

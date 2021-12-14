@@ -22,20 +22,6 @@ function validateCreator(req, res, next) {
 	}
 }
 
-//function requestUploadURL(req, res, next) {
-function initializeStar(req, res, next) {
-	//var serverStar = new ServerStar(req.body, 'client');
-	stars.initializeStar(req.user, req.body)
-		.then(newServerStar => {
-			res.json({
-				errors: [],
-				newStar: newServerStar.export('client', ['uploadURL', 'file'])
-			});
-		})
-		.catch(err => {
-			next(err);
-		});
-}
 
 /**
  * Ensures the properties of the star are valid.
@@ -64,6 +50,21 @@ function validateStar(user, serverStar) {
 	}
 
 	return true;
+}
+
+//function requestUploadURL(req, res, next) {
+function initializeStar(req, res, next) {
+	//var serverStar = new ServerStar(req.body, 'client');
+	stars.initializeStar(req.user, req.body)
+		.then(newServerStar => {
+			res.json({
+				errors: [],
+				newStar: newServerStar.export('client', ['uploadURL', 'file'])
+			});
+		})
+		.catch(err => {
+			next(err);
+		});
 }
 
 function actualizeStar(req, res, next) {

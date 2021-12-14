@@ -22,19 +22,12 @@ function ServerStar(starData, dataSourceTarget) {
 		userPublicID: 'string',
 		active: 'bool',
 		deleted: 'bool',
+		uploadURL: 'string',
 		partialPlays: 'int',
 		longPlays: 'int',
 	});
 
 	init(starData, dataSourceTarget);
-
-	//const serverProps = [
-	//    'userPublicID',
-	//    'active',
-	//    'deleted',
-	//    'partialPlays',
-	//    'longPlays',
-	//];
 
 	function init(starData, dataSourceTarget) {
 		if(starData) {

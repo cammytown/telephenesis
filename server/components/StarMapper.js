@@ -164,7 +164,7 @@ function StarMapper() {
 					}
 
 				})
-					.then(() => dbStars.insertOne(serverStar.export('database')))
+					.then(() => dbStars.insertOne(serverStar.export('server')))
 					.then(result => { return serverStar; });
 			});
 
@@ -260,14 +260,14 @@ function StarMapper() {
 							publicID: serverStar.publicID,
 							userPublicID: user.publicID
 						},
-						{ $set: serverStar.export('database') }
+						{ $set: serverStar.export('server') }
 					);
 				} else {
 					// This should be the server's first encounter with the
 					// star; generate a publicID and other init concerns:
 					return me.initializeStar(user, serverStar)
 						.then(serverStar => {
-							dbStars.insertOne(serverStar.export('database'))
+							dbStars.insertOne(serverStar.export('server'))
 						});
 				}
 			})

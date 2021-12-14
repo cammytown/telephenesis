@@ -4,7 +4,7 @@
  * @constructor
  **/
 function PersistentObject() {
-	//var me = this;
+	var me = this;
 
 	/**
 	 * Example:
@@ -18,30 +18,46 @@ function PersistentObject() {
 
 	this.targetProps = {};
 
-	this.import = function(data, source, additionalProps = []) {
-		if(!this.targetProps.hasOwnProperty(source)) {
+	this.import = function(data, sourceTarget, additionalProps = []) {
+		if(!me.targetProps.hasOwnProperty(sourceTarget)) {
 			//@REVISIT
-			throw new Error("No importProps for target: " + target);
+			throw new Error("No importProps for sourceTarget: " + sourceTarget);
 		}
 
-		var importProps = this.targetProps[target];
+		var importProps = this.targetProps[sourceTarget];
 
 		for(var importProp in importProps) {
 			var type = importProps[importProp];
 
-			switch(type) {
-				case 'int': {
-					me[importProp] = parseInt(data[importProp]);
-				} break;
+			if(typeof type == 'string') {
+				switch(type) {
+					case 'int': {
+						//@REVISIT only parseInt when necessary?
+						me[importProp] = parseInt(data[importProp]);
+					} break;
 
-				default: {
-					console.warn("PersistentObject: unhandled type " + type);
-
-					//@REVISIT only updating if value is not falsey; always? use flag?:
-					if(data[importProp]) {
+					case 'string':
+					case 'bool': {
 						me[importProp] = data[importProp];
+					} break;
+
+
+
+					default: {
+						console.warn("PersistentObject: unhandled type " + type);
+
+						//@REVISIT only updating if value is not falsey; always? use flag?:
+						if(data[importProp]) {
+							me[importProp] = data[importProp];
+						}
 					}
 				}
+			} else if(typeof type == 'function') {
+				if(data.hasOwnProperty(importProp)) {
+					me[importProp] = type(data);
+				}
+			} else {
+				console.error("Unhandled type of 'type' property: " + typeof type);
 			}
 		}
 
@@ -50,13 +66,13 @@ function PersistentObject() {
 		//identityProps is an object holding names and types, and targetProps
 		//only holds arrays of names; this way we can still reference props and
 		//retrieve their types by name:
-		for(var additionalProp in additionalProps) {
+		for(var additionalProp of additionalProps) {
 			me[additionalProp] = data[additionalProp];
 		}
 	}
 
 	this.export = function(target, additionalProps = []) {
-		if(!this.targetProps.hasOwnProperty(target)) {
+		if(!me.targetProps.hasOwnProperty(target)) {
 			//@REVISIT
 			throw new Error("No exportProps for target: " + target);
 		}
@@ -67,12 +83,12 @@ function PersistentObject() {
 		var exportProps = this.targetProps[target];
 		for(var exportProp in exportProps) {
 			//var type = exportProps[exportProp];
-			exportObject[exportProp] = this[exportProp];
+			exportObject[exportProp] = me[exportProp];
 		}
 
 		//@TODO see common on this architecture in .import()
 		for(var additionalProp in additionalProps) {
-			exportObject[additionalProp] = this[additionalProp];
+			exportObject[additionalProp] = me[additionalProp];
 		}
 
 		return exportObject;

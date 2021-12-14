@@ -19,7 +19,7 @@ function Star() {
 		'originStarID': 'string',
 		'constellationID': 'string',
 		'title': 'string',
-		'position': Vector,
+		'position': (data) => { return new Vector(data.position.x, data.position.y) },
 		'color': 'string',
 		'tier': 'int',
 		'artist': 'object',
