@@ -12,7 +12,8 @@ function MediaPlayer() {
 
 	var lastSyncTime;
 	var playerConfig = {
-		syncInterval: 30 * 1000,
+		//syncInterval: 30 * 1000,
+		syncInterval: 5 * 1000,
 		partialPlaySeconds: 5,
 		longPlayPercent: 50,
 	};

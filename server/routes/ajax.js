@@ -109,6 +109,7 @@ function ajaxStatusHandler(req, res, next) {
  */
 function syncWithClient(req, res) {
 	console.log("syncWithClient");
+	console.log(req.body);
 
 	////TODO security to prevent spoofed plays
 

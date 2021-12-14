@@ -53,12 +53,12 @@ function TelepAPI() {
 	me.syncWithClient = function(serverUpdates) {
 		return Promise.all([
 			dbStars.updateMany(
-				{ id: { $in: serverUpdates.partialPlay } },
+				{ publicID: { $in: serverUpdates.partialPlay } },
 				{ $inc: { partialPlays: 1 } }
 			),
 
 			dbStars.updateMany(
-				{ id: { $in: serverUpdates.longPlay } },
+				{ publicID: { $in: serverUpdates.longPlay } },
 				{ $inc: { longPlays: 1 } }
 			)
 		])
