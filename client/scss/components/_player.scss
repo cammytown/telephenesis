@@ -33,6 +33,7 @@ header#playingStarHeader { ///placement
 			// position: absolute;
 			// left: 0;
 			// top: 0;
+			transition: width 150ms; //@REVISIT probably not best solution
 			width: 0%;
 			height: 100%;
 			background: rgba(227, 63, 84, 0.7);

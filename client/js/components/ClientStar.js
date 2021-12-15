@@ -143,7 +143,9 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		cor._('#playingCreatorName').innerHTML = creatorName;
 
 		var creatorLink = me.element.getAttribute('data-creatorLink');
-		cor._('#playingCreatorLink').innerHTML = creatorLink;
+		var creatorExternalLinkEle = cor._('#playingCreatorLink');
+		creatorExternalLinkEle.innerHTML = creatorLink;
+		creatorExternalLinkEle.href = creatorLink;
 
 		// cor._('#playingStarHeader').style.display = 'block';
 		cor.ac(document.body, 'playing');
