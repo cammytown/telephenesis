@@ -67,6 +67,7 @@ function Comments() {
 			commentsListEle.removeChild(commentsListEle.firstChild);
 		}
 
+
 		// Replace <ul> with loading graphic until comments are loaded:
 		commentsListEle.replaceWith(commentsLoadingEle);
 

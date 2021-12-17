@@ -17,7 +17,6 @@ import creator from './Creator';
 //import effects from './ClientEffects';
 import stars from './Stars';
 
-
 /**
  * Telephenesis class for user interface methods.
  * @constructor
@@ -44,6 +43,9 @@ function Interface() {
 
 	/** The last saved position of the mouse. **/
 	var lastMousePos = null;
+
+	/** The function to run pending user confirmation. **/
+	var confirmationCallback = null;
 
 	this.init = function() {
 		messageElement = document.getElementById('notification');
@@ -73,6 +75,8 @@ function Interface() {
 
 		// Open header menu when button is clicked
 		menuToggleElement.addEventListener('click', toggleMenu);
+
+		COR.addClassListener('confirmation-link', 'click', onConfirmationLinkClick);
 
 		window.addEventListener('keydown', onKeyDown);
 	}
@@ -168,7 +172,23 @@ function Interface() {
 		me.displayMessage(errorMessage, "error");
 	}
 
-	function onClick(event) {
+	this.confirmAction = function(message, action) {
+		var confirmActionEle = COR._('#confirmAction-page');
+		confirmActionEle.querySelector('.confirmation-message').innerText = message;
+		confirmationCallback = action;
+
+		navigation.open('confirmAction');
+	}
+
+	function onConfirmationLinkClick(event) {
+		event.preventDefault();
+
+		if(confirmationCallback) {
+			confirmationCallback();
+		}
+
+		//@TODO improve architecture:
+		navigation.close(document.getElementById('confirmAction-page'));
 	}
 
 	function onMouseDown(event) {

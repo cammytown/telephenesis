@@ -17,6 +17,11 @@ ul.comments {
 				.comment-controls {
 					visibility: hidden;
 
+					a {
+						display: inline-block;
+						margin: 5px 6px;
+					}
+
 					.comment-reply-form {
 						display: none;
 					}

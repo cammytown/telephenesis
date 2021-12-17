@@ -285,7 +285,7 @@ function ClientNavigation() {
 			// Open the UI for the page if there is one:
 			if(boxPages.includes(newPage)) {
 				comments.toggleComments(false);
-				open(newPage, url);
+				me.open(newPage, url);
 			}
 
 			// If starting to create a star; change to galaxy view:
@@ -412,7 +412,12 @@ function ClientNavigation() {
 		// }
 	}
 
-	function open(page, url = null) {
+	/**
+	 * Open a uiBox.
+	 * @param {string} page
+	 * @param {string} url
+	 **/
+	this.open = function(page, url = null, updateState = true) {
 		//clientState.currentPage = page;
 
 		//@TODO architecture should revolve around returning a Promise
@@ -448,7 +453,14 @@ function ClientNavigation() {
 				}
 			})
 				.then(() => {
-					clientState.activeWindow = pageElement;
+					//@TODO-3 quick-fix; i think ultimately we want a
+					//base Page class with methods like .close(); additionally
+					//we probably want clientState.activeWindow to be
+					//activeWindows (an array) that gets pushed/popped:
+					if(updateState) {
+						clientState.activeWindow = pageElement;
+					}
+
 					document.body.appendChild(pageElement);
 					Anm.fadeIn(pageElement);
 				});
@@ -463,7 +475,7 @@ function ClientNavigation() {
 	 * Close an open page.
 	 * @param {Element} [page]
 	 **/
-	this.close = function(page) {
+	this.close = function(page, updateState = true) {
 		page = (typeof page === "undefined") ? clientState.activeWindow : page;
 
 		///:
@@ -487,7 +499,9 @@ function ClientNavigation() {
 		}
 
 		//clientState.currentPage = false;
-		clientState.activeWindow = null;
+		if(updateState) {
+			clientState.activeWindow = null;
+		}
 	}
 
 	function logout() { ///REVISIT placement; maybe put into a ClientUser

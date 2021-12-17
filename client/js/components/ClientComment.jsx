@@ -1,5 +1,9 @@
 //import Navigation from './Navigation';
 //import 'nano-jsx';
+
+import { POST } from '../libs/minlab/cor';
+import tlpInterface from './Interface';
+
 export default ClientComment;
 
 /**
@@ -93,6 +97,25 @@ function ClientComment(commentData, createResponsePromise = null) { ///REVISIT e
 		//replyForm.classList(
 	}
 
+	function onDeleteClick(event) {
+		console.log('deleting comment');
+
+		tlpInterface.confirmAction(
+			"Are you sure you want to delete this comment?",
+			() => {
+				POST('/ajax/delete-comment/' + me.publicID, {})
+					.then(response => {
+						if(response.errors) {
+							console.error(response.errors);
+							throw response.errors;
+						}
+
+						me.element.remove();
+					});
+			}
+		);
+	}
+
 	this.loadData = function(dataObject) {
 		for(var identityProp of identityProps) {
 			if(dataObject.hasOwnProperty(identityProp)) {
@@ -132,7 +155,8 @@ function ClientComment(commentData, createResponsePromise = null) { ///REVISIT e
 							</span>
 
 							<div class='comment-controls user'>
-								<a class='open-reply-panel' onClick={onReplyClick} href='#'>&#11178; Reply</a>
+								<a class='open-reply-panel-button' onClick={onReplyClick} href='#'>&#11178; Reply</a>
+								<a class='delete-comment-button' onClick={onDeleteClick} href="#">&#128465; Delete</a>
 
 								<form
 									class='ajax comment-reply-form'

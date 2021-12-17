@@ -278,6 +278,28 @@ function TelepAPI() {
 	}
 
 	/**
+	 * Delete a comment.
+	 * @param {TelepUser} telepUser - The user deleting the comment.
+	 * @param {string} commentPublicID - ID of comment.
+	 * @returns {Promise<object>}
+	 **/
+	this.deleteComment = function(telepUser, commentPublicID) {
+		return dbComments.findOne({ publicID: commentPublicID })
+			.then(comment => {
+				if(!comment) {
+					throw new Error("Comment does not exist.");
+				}
+
+				if(comment.user.publicID != telepUser.publicID) {
+					//@TODO log suspicious activity
+					throw new Error("Not permitted to delete that comment.");
+				}
+
+				return dbComments.deleteOne({ publicID: commentPublicID });
+			});
+	}
+
+	/**
 	 * Retrieve comments made by user.
 	 * @param {string} userPublicID
 	 **/

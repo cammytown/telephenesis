@@ -30,6 +30,7 @@
 
 @import 'shame';
 
+//@TODO move this stuff:
 div#notification {
 	position: absolute;
 	top: 100px;
@@ -43,6 +44,12 @@ div#notification {
 
 	&.error {
 		color: $errorText;
+	}
+}
+
+#confirmAction-page {
+	.confirmation-message {
+		margin-bottom: 20px;
 	}
 }
 

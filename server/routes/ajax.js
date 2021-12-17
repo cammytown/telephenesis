@@ -44,6 +44,8 @@ function generate(telepServer) {
 	userActionRouter.post('/remove-bookmark', removeBookmarkStar);
 
 	userActionRouter.post('/create-comment', createComment);
+	userActionRouter.post('/delete-comment/:commentPublicID', deleteComment);
+
 	//@TODO change to a .get request I think?:
 	userActionRouter.post('/get-star-comments', getStarComments);
 
@@ -209,6 +211,26 @@ function createComment(req, res, next) {
 		});
 
 }
+
+/**
+ * Router handler for deleting a comment.
+ **/
+function deleteComment(req, res, next) {
+	return api.deleteComment(
+		req.user,
+		req.params.commentPublicID
+	)
+		.then(success => {
+			res.json({
+				errors: []
+			});
+		})
+		.catch(err => {
+			throw err;
+		});
+
+}
+
 
 /** Router handler for retrieving star comments. **/
 function getStarComments(req, res, next) {
