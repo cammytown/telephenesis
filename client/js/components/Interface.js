@@ -231,8 +231,9 @@ function Interface() {
 				if(clientState.playingStar) {
 					// If there's a previous star:
 					if(clientState.playingStar.originStarID != -1) {
-						var previousStar = stars.clientStars[clientState.playingStar.originStarID];
-						mediaPlayer.playStar(previousStar);
+					//    var previousStar = stars.clientStars[clientState.playingStar.originStarID];
+					//    mediaPlayer.playStar(previousStar);
+						navigation.navigate('/star/' + clientState.playingStar.originStarID);
 					}
 				}
 			} break;
@@ -245,15 +246,17 @@ function Interface() {
 					///TODO better solution:
 					var nsid = clientState.playingStar.element.getAttribute('data-next');
 					/// if next star isn't loaded? if there is no next star?
-					var nextStar = stars.clientStars[nsid];
-					console.log(stars.clientStars);
-					if(!nextStar) {
-						///REVISIT
-						console.log('no next star');
-						return false;
-					}
+					//var nextStar = stars.clientStars[nsid];
+					//console.log(stars.clientStars);
+					//if(!nextStar) {
+					//    ///REVISIT
+					//    console.log('no next star');
+					//    return false;
+					//}
 
-					mediaPlayer.playStar(nextStar);
+					//mediaPlayer.playStar(nextStar);
+
+					navigation.navigate('/star/' + nsid);
 				}
 			} break;
 
