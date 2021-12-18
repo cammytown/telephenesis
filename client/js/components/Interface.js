@@ -243,11 +243,13 @@ function Interface() {
 
 				if(clientState.playingStar) {
 					///TODO better solution:
-					var nsid = parseInt(clientState.playingStar.element.getAttribute('data-next'));
+					var nsid = clientState.playingStar.element.getAttribute('data-next');
 					/// if next star isn't loaded? if there is no next star?
 					var nextStar = stars.clientStars[nsid];
+					console.log(stars.clientStars);
 					if(!nextStar) {
 						///REVISIT
+						console.log('no next star');
 						return false;
 					}
 
