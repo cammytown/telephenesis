@@ -9,7 +9,7 @@ const api = require('../components/TelepAPI');
 
 const routesIndex = require('./index');
 const authRoutes = require('./auth');
-const creationRouter = require('./create');
+const creationRouter = require('./create').generate(true);
 const adminRoutes = require('./admin');
 
 ///REVISIT weird architecture

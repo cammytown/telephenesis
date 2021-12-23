@@ -13,6 +13,7 @@ const telepCommon = require('../../abstract/telepCommon');
 
 const authRouter = require('./auth');
 const ajaxRouter = require('./ajax');
+const createRouter = require('./create');
 const adminRouter = require('./admin');
 
 
@@ -53,14 +54,17 @@ function TelepRouter() {
 		me.app.use('/auth', authRouter.generate(server));
 		me.app.use('/ajax', ajaxRouter.generate(server));
 		//me.app.use('/admin', adminRouter.generate());
+		//me.app.use(createRouter.generate(server));
 
 		// me.app.post('/register', register);
 		// me.app.post('/login', login);
 
-		me.app.get('/:page?', main);
+		me.app.get('/create', createRouter.validateCreator, main); ////REVISIT architecture
+		me.app.get('/recreate/:starID', createRouter.validateCreator, observeStarID, main); ////REVISIT architecture
 		me.app.get('/user/:userPublicID', singleUserView); //@TODO pick between this and below architecture
 		me.app.get('/star/:starID', observeStarID, main); ////REVISIT architecture
-		me.app.get('/recreate/:starID', observeStarID, main); ////REVISIT architecture
+
+		me.app.get('/:page?', main);
 		//me.app.get('/star/:starID', main);
 		//me.app.get('/recreate/:starID', main);
 	}

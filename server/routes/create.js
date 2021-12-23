@@ -5,11 +5,15 @@ const ServerStar = require('../components/ServerStar');
 const stars = require('../components/StarMapper');
 const config = require('../../config/telep.config');
 
-function generate() {
+function generate(ajax = false) {
 	var createRouter = express.Router();
 	createRouter.use(validateCreator);
-	createRouter.post('/initialize-star', initializeStar);
-	createRouter.post('/actualize-star', actualizeStar);
+
+	if(ajax) { //@REVISIT kinda weird architecture? maybe it works, though
+		createRouter.post('/initialize-star', initializeStar);
+		createRouter.post('/actualize-star', actualizeStar);
+	}
+
 	return createRouter;
 }
 
@@ -120,7 +124,7 @@ function actualizeStar(req, res, next) {
 
 }
 
-module.exports = generate(); //@REVISIT
+module.exports = { generate, validateCreator }; //@REVISIT
 //module.exports = {
 //    //generate,
 //    initializeStar,
