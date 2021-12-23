@@ -14,6 +14,7 @@ function generate(responseType = "json") {
 	adminRouter.post('/elevate-user', elevateUser, success);
 	adminRouter.post('/set-user-ticket-count', setUserTicketCount, success);
 	adminRouter.post('/update-db-schemas', updateDBSchemas, success);
+	adminRouter.post('/generate-demo-stars', generateDemoStars, success);
 	//adminRouter.post('/update-db-schema/:schema', updateDBSchemas, success);
 
 	return adminRouter;
@@ -49,8 +50,8 @@ function elevateUser(req, res, next) {
 function setUserTicketCount(req, res, next) {
 	admin.setUserTicketCount(
 		req.body.userPublicID,
-		req.body.creationTicketCount,
-		req.body.recreationTicketCount
+		parseInt(req.body.creationTicketCount),
+		parseInt(req.body.recreationTicketCount)
 	).then(() => next());
 }
 
@@ -91,6 +92,11 @@ function updateDBSchemas(req, res, next) {
 	return admin.updateDBSchemas(['stars'])
 		.then(() => next())
 		.catch(err => next(err));
+}
+
+function generateDemoStars(req, res, next) {
+	admin.generateDemoStars(req.user, 500)
+		.then(demoStars => next());
 }
 
 module.exports = { generate };

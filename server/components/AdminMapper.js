@@ -8,6 +8,8 @@ module.exports = new AdminMapper();
  * @constructor
  **/
 function AdminMapper() {
+	var tlpServer;
+
 	/** Database collection of stars. **/
 	var dbStars = null;
 
@@ -15,6 +17,7 @@ function AdminMapper() {
 	var dbUsrMeta = null;
 
 	this.initialize = function(server) {
+		tlpServer = server;
 		dbStars = server.db.collection('MLstars');
 		dbUsrMeta = server.db.collection('usrMeta');
 	}
@@ -111,5 +114,79 @@ function AdminMapper() {
 				}
 			}
 		}
+	}
+
+	this.generateDemoStars = async function(user, count = 10) {
+		var area = 4000;
+		var starInserts = [];
+
+		var currentRootStar = null;
+		for(var index = 0; index < count; index++) {
+			var newDemoStar = await generateSingleDemoStar(currentRootStar);
+
+			// Randomly assign currentRootStar to the new demoStar:
+			if(Math.random() > 0.7) {
+				currentRootStar = newDemoStar;
+
+			// Randomly get rid of currentRootStar to start new constellation:
+			} else if(Math.random() > 0.5) {
+				currentRootStar = null;
+			}
+		}
+
+		function generateSingleDemoStar(rootStar = null) {
+			//var demoStar = new ServerStar();
+			//demoStar.publicID = tlpServer.generatePublicID(dbStars);
+			var color = ""
+				+ parseInt(100 + Math.random() * 100) + ","
+				+ parseInt(100 + Math.random() * 100) + ","
+				+ parseInt(100 + Math.random() * 100);
+
+			var randomPos;
+			var rootStarDistance = 100;
+			if(rootStar) {
+				randomPos = {
+					x: parseInt(rootStar.position.x + (Math.random() * rootStarDistance)) - rootStarDistance/2,
+					y: parseInt(rootStar.position.y + (Math.random() * rootStarDistance)) - rootStarDistance/2,
+				};
+			} else {
+				randomPos = {
+					x: parseInt(area - (Math.random() * (area))),
+					y: parseInt(area - (Math.random() * (area))),
+				};
+			}
+
+			return stars.initializeStar(user, {
+				originStarID: rootStar ? rootStar.publicID : -1,
+				color,
+				hostType: 'external',
+				file: { type: 'audio/mpeg' },
+			})
+				.then(demoStar => {
+					demoStar.artist = user.artists[0];
+
+					demoStar.position = randomPos;
+					demoStar.color = color;
+					//demoStar.isDemo = true;
+
+					//@REVISIT really weird; mostly a quick-fix so it gives us Vector for position...
+					demoStar = new ServerStar(demoStar, 'server');
+					return stars.actualizeStar(user, demoStar);
+				})
+				.then(returnObject => {
+					//returnObject.newStar.isDemo = true;
+					console.log('star inserting');
+					//dbStars.insertOne(returnObject.newStar.export('server', ['isDemo']));
+					return returnObject.newStar;
+				});
+
+			starInserts.push(insertPromise);
+
+			console.log('star loop');
+
+			//stars.insertOne(demoStar.export('server', ['isDemo']));
+		}
+
+		return Promise.all(starInserts);
 	}
 }

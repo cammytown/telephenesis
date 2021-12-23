@@ -126,6 +126,12 @@ function TelepAdmin() {
 				}
 			} break;
 
+			case 'generate-demo-stars': {
+				if(confirm("Generate demo stars?")) {
+					COR.POST('/ajax/admin/generate-demo-stars');
+				}
+			} break;
+
 			default: {
 				console.error("Unhandled admin operation: " + operation);
 			}

@@ -19,7 +19,7 @@ ul.comments {
 
 					a {
 						display: inline-block;
-						margin: 5px 6px;
+						margin: 0px 6px;
 					}
 
 					.comment-reply-form {
@@ -44,6 +44,10 @@ ul.comments {
 				}
 			}
 		}
+
+		//&:nth-child(even) {
+		//    background: $uiBackgroundLight;
+		//}
 
 		//ul.replies {
 		//}

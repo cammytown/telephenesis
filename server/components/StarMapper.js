@@ -101,6 +101,9 @@ function StarMapper() {
 					document.position = new Vector(document.position.x, document.position.y);
 				});
 
+				//console.log('?');
+				//console.log(typeof results);
+				//console.log(results);
 				return results;
 			})
 			.catch(err => {
@@ -123,6 +126,7 @@ function StarMapper() {
 		serverStar.originStarID = starData.originStarID;
 		serverStar.hostType = starData.hostType;
 		serverStar.file = starData.file;
+		//serverStar.artist
 
 		if(serverStar.file.type != 'audio/mpeg') {
 			//@REVISIT
@@ -135,9 +139,6 @@ function StarMapper() {
 		return server.generatePublicID(dbStars)
 			.then(publicID => {
 				serverStar.publicID = publicID;
-				//@TODO put somewhere general or make part of a loadData call probably:
-				serverStar.fileURL = server.serverConfig.storage.servingUrl
-					+ publicID + serverStar.file.extension;
 
 				//@TODO replacing with .artist:
 				//serverStar.creator = { //@TODO-2 move to .export architecture
@@ -153,6 +154,10 @@ function StarMapper() {
 							//@TODO-1 implement
 							throw "Telephenesis: local storage not implemented yet";
 						}
+
+						//@TODO put somewhere general or make part of a loadData call probably:
+						serverStar.fileURL = server.serverConfig.storage.servingUrl
+							+ publicID + serverStar.file.extension;
 
 						uploads.requestUploadURL(serverStar)
 							.then(uploadURL => {
@@ -195,9 +200,13 @@ function StarMapper() {
 			} else {
 				return artists.getArtist(serverStar.artist.publicID)
 					.then(artist => {
+						if(!artist) {
+							throw new Error("Artist does not exist.");
+						}
+
 						if(artist.userPublicID != user.publicID) {
 							//@TODO log suspicious
-							throw "User does not own artist.";
+							throw new Error("User does not own artist.");
 						}
 
 						return artist;
@@ -255,21 +264,29 @@ function StarMapper() {
 
 					// Star should have been initialized in the database when
 					// upload was started:
-					return dbStars.updateOne(
-						{
-							publicID: serverStar.publicID,
-							userPublicID: user.publicID
-						},
-						{ $set: serverStar.export('server') }
-					);
+					//return dbStars.updateOne(
+					//    {
+					//        publicID: serverStar.publicID,
+					//        userPublicID: user.publicID
+					//    },
+					//    { $set: serverStar.export('server') }
+					//);
 				} else {
 					// This should be the server's first encounter with the
 					// star; generate a publicID and other init concerns:
-					return me.initializeStar(user, serverStar)
-						.then(serverStar => {
-							dbStars.insertOne(serverStar.export('server'))
-						});
+					//return me.initializeStar(user, serverStar)
+					//    .then(serverStar => {
+					//        dbStars.insertOne(serverStar.export('server'))
+					//    });
 				}
+
+				return dbStars.updateOne(
+					{
+						publicID: serverStar.publicID,
+						userPublicID: user.publicID
+					},
+					{ $set: serverStar.export('server') }
+				);
 			})
 			// Update user creation tickets:
 			.then(result => {
@@ -339,6 +356,11 @@ function StarMapper() {
 		//point and push stars outward from there, like a ripple.
 
 		if(!position) {
+			if(!targetStar.position) {
+				console.log(targetStar.position);
+				throw new Error('StarMapper.attemptPlacement(): No star position.');
+			}
+
 			position = targetStar.position;
 		}
 
@@ -394,6 +416,8 @@ function StarMapper() {
 
 			// Convert to array and round vectors down to ints:
 			// var returnArray = [];
+
+
 			for(var starPublicID in starMovements) {
 				starMovements[starPublicID] = starMovements[starPublicID].floor();
 				// returnArray.push(starMovements[id].floor());
