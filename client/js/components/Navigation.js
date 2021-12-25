@@ -49,6 +49,9 @@ function ClientNavigation() {
 		'color',
 	];
 
+	var galaxyOrders = Object.values(CONSTS.ORDER);
+	var galaxyViews = Object.values(CONSTS.VIEW);
+
 	this.init = function() {
 		// Setup element references:
 		starContextMenu = document.getElementById('starContextMenu');
@@ -257,7 +260,12 @@ function ClientNavigation() {
 				} break;
 
 				default: {
-					console.error("observePath(): unhandled oldPage '" + oldPage + '"');
+					if(galaxyOrders.includes(oldPage)) {
+						// Navigating away from a galaxy order/view.
+						//@REVISIT nothing?
+					} else {
+						console.error("observePath(): unhandled oldPage '" + oldPage + '"');
+					}
 				}
 			}
 		}
@@ -395,11 +403,27 @@ function ClientNavigation() {
 			} break;
 
 			default: {
-				if(boxPages.includes(newPage)) {
-					// Assuming no logic.
+				//var isOrderLink = false;
+				//for(var orderKey in CONSTS.ORDER) {
+				//    var order = CONSTS.ORDER[orderKey];
+				//    if(newPage == order) {
+				//        // Navigated to a galaxy order link.
+				//        tlpInterface.sort(newPage);
+				//        isOrderLink = true;
+				//    }
+				//}
+
+				// If navigated to a galaxy order:
+				if(galaxyOrders.includes(newPage)) {
+					tlpInterface.sort(newPage);
 				} else {
-					console.error("Unhandled path: " + path);
-					///TODO some kind of 404?
+					// If link has an associated visual page:
+					if(boxPages.includes(newPage)) {
+						// Assuming no logic.
+					} else {
+						console.error("Unhandled path: " + path);
+						///TODO some kind of 404?
+					}
 				}
 			}
 		}

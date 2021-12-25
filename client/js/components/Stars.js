@@ -282,14 +282,9 @@ function ClientStarsAPI() {
 				Object.values(me.clientStars).forEach((clientStar, starIndex) => {
 					cor.rc(document.body, 'sorting'); ////
 
-					anime({
-						targets: clientStar.element,
+					beginAnimation([clientStar.element], false, {
 						left: clientStar.position.x + 'px',
 						top: clientStar.position.y + 'px',
-						///TODO move 500 into maybe styleVars or at least a const
-						duration: 500,
-						update: (anim) => me.updateConstellationLines()
-						//complete: function() {}
 					});
 
 					// Set the dimensions of the canvas to that of the window:
@@ -308,7 +303,7 @@ function ClientStarsAPI() {
 				for(var constellationID in sortedElements) {
 					var constellationStars = sortedElements[constellationID];
 
-					positionLoop(constellationStars, (starIndex => {
+					beginAnimation(constellationStars, (starIndex => {
 						const x = starIndex * styleVars.starGridSquareSize;
 						const y = currentRow * styleVars.starGridSquareSize;
 
@@ -327,7 +322,7 @@ function ClientStarsAPI() {
 
 				var currentRow = 0;
 				var columnCount = Math.floor(styleVars.starGridWidth / styleVars.starGridSquareSize);
-				positionLoop(sortedElements, (starIndex => {
+				beginAnimation(sortedElements, (starIndex => {
 					// Calculate target position of the star
 					const x = styleVars.starGridSquareSize * (starEleIndex % columnCount);
 					const y = styleVars.starGridSquareSize * currentRow;
@@ -347,7 +342,7 @@ function ClientStarsAPI() {
 				spc.s = false;
 				var sortedElements = this.getSortedStars(order);
 
-				positionLoop(sortedElements, (starIndex => {
+				beginAnimation(sortedElements, (starIndex => {
 					// Calculate target position of the star
 					const x = 0;
 					const y = (styleVars.starGridSquareSize + styleVars.starGridMargin) * starIndex;
@@ -403,7 +398,7 @@ function ClientStarsAPI() {
 	}
 
 	//@REVISIT naming:
-	function positionLoop(starEles, positionCallback) {
+	function beginAnimation(starEles, positionCallback, animationOptions = {}) {
 		var spcXOffset = -spc.x;
 		var spcYOffset = -spc.y;
 
@@ -420,16 +415,23 @@ function ClientStarsAPI() {
 			cor.rc(starEle, 'even');
 			cor.ac(starEle, starEleIndex % 2 ? 'odd' : 'even');
 
-			var position = positionCallback(starEleIndex);
+			var defaultAnimationOptions = {
+				targets: starEle,
+				duration: 500,
+				//update: (anim) => me.updateConstellationLines()
+			};
+
+			if(positionCallback) {
+				var position = positionCallback(starEleIndex);
+				defaultAnimationOptions.left = position.x + originX + spcXOffset + 'px';
+				defaultAnimationOptions.top = position.y + styleVars.starGridPaddingY + spcYOffset + 'px';
+			}
+
+			var starAnimationOptions = Object.assign(defaultAnimationOptions, animationOptions);
+			console.log(starAnimationOptions);
 
 			// Animate the star to its target position
-			anime({
-				targets: starEle,
-				left: position.x + originX + spcXOffset + 'px',
-				top: position.y + styleVars.starGridPaddingY + spcYOffset + 'px',
-				duration: 500,
-				update: (anim) => me.updateConstellationLines()
-			});
+			anime(starAnimationOptions);
 		}
 	}
 

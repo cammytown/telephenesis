@@ -321,18 +321,21 @@ function Interface() {
 
 		// Update the URI:
 		var newURI = "/";
-		if(view) {
-			newURI += '?view=' + view.toLowerCase();
-		}
 
 		if(order) {
-			if(view) {
-				newURI += '&';
-			} else {
-				newURI += '?';
-			}
+			newURI += order.toLowerCase();
 
-			newURI += 'order=' + order.toLowerCase();
+			//if(view) {
+			//    newURI += '&';
+			//} else {
+			//    newURI += '?';
+			//}
+
+			//newURI += 'order=' + order.toLowerCase();
+		}
+
+		if(view) {
+			newURI += '?view=' + view.toLowerCase();
 		}
 
 		navigation.navigate(newURI);
@@ -351,7 +354,7 @@ function Interface() {
 
 		if(order) {
 			// Ensure uppercase:
-			order = order.toUpperCase();
+			//order = order.toUpperCase();
 
 			// If there's an order already, remove its class from document.body:
 			if(me.order) {
@@ -371,7 +374,6 @@ function Interface() {
 			} else {
 				// If no view was provided to sort():
 				if(!view) {
-					// If we're already in a non-galaxy view (i.e. list/grid):
 					if(me.view != CONSTS.VIEW.GALAXY && me.view != CONSTS.VIEW.CONSTELLATIONS) { ///TODO remove constellations
 						// Do nothing; keep current view.
 
@@ -384,13 +386,14 @@ function Interface() {
 			}
 
 			// Convert to upper in case of user input:
-			me.order = order.toUpperCase();
+			//me.order = order.toUpperCase();
+			me.order = order;
 		}
 
 		// If a view was supplied to sort() and it is different from the current one:
 		if(view && view != me.view) {
 			// Ensure uppercase:
-			view = view.toUpperCase();
+			//view = view.toUpperCase();
 
 			// If there's already a view, remove its class from document.body:
 			if(me.view) {
@@ -401,24 +404,25 @@ function Interface() {
 			COR.ac(document.body, view.toLowerCase() + '-view'); ////
 
 			// Convert to upper in case of user input:
-			me.view = view.toUpperCase();
+			//me.view = view.toUpperCase();
+			me.view = view;
 		}
 
 		///TODO only do this stuff if the value has changed:
 
 		// Update labels that display the current order:
 		for(var orderLabelEle of document.getElementsByClassName('current-order')) {
-			orderLabelEle.innerText = locale[me.order].toLowerCase();
+			orderLabelEle.innerText = locale[me.order.toUpperCase()].toLowerCase();
 		}
 
 		// Update any labels that display the current view:
 		for(var viewLabelEle of document.getElementsByClassName('current-view')) {
-			viewLabelEle.innerText = locale[me.view].toLowerCase();
+			viewLabelEle.innerText = locale[me.view.toUpperCase()].toLowerCase();
 		}
 
 		// Update the header of the view (to reflect the order):
 		for(var viewHeaderEle of document.getElementsByClassName('view-header')) {
-			viewHeaderEle.innerText = locale['SORT-BY-' + me.order];
+			viewHeaderEle.innerText = locale['SORT-BY-' + me.order.toUpperCase()];
 		}
 
 		// Actually sort and position the stars:

@@ -61,6 +61,7 @@ function TelepRouter() {
 
 		me.app.get('/create', createRouter.validateCreator, main); ////REVISIT architecture
 		me.app.get('/recreate/:starID', createRouter.validateCreator, observeStarID, main); ////REVISIT architecture
+
 		me.app.get('/user/:userPublicID', singleUserView); //@TODO pick between this and below architecture
 		me.app.get('/star/:starID', observeStarID, main); ////REVISIT architecture
 
