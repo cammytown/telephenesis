@@ -324,11 +324,11 @@ function ClientStarsAPI() {
 				var columnCount = Math.floor(styleVars.starGridWidth / styleVars.starGridSquareSize);
 				beginAnimation(sortedElements, (starIndex => {
 					// Calculate target position of the star
-					const x = styleVars.starGridSquareSize * (starEleIndex % columnCount);
+					const x = styleVars.starGridSquareSize * (starIndex % columnCount);
 					const y = styleVars.starGridSquareSize * currentRow;
 
 					// Wrap grid if row filled
-					if(newX >= styleVars.starGridWidth - styleVars.starGridSquareSize) {
+					if(x >= styleVars.starGridWidth - styleVars.starGridSquareSize) {
 						currentRow += 1;
 					}
 

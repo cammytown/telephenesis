@@ -334,8 +334,10 @@ function Interface() {
 			//newURI += 'order=' + order.toLowerCase();
 		}
 
-		if(view) {
-			newURI += '?view=' + view.toLowerCase();
+		//@REVISIT architecture:
+		if(view && view != CONSTS.VIEW.GALAXY) {
+			newURI += '?view=' + view;
+			//newURI += '?view=' + view.toLowerCase();
 		}
 
 		navigation.navigate(newURI);
