@@ -428,7 +428,6 @@ function ClientStarsAPI() {
 			}
 
 			var starAnimationOptions = Object.assign(defaultAnimationOptions, animationOptions);
-			console.log(starAnimationOptions);
 
 			// Animate the star to its target position
 			anime(starAnimationOptions);

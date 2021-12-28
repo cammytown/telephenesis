@@ -125,6 +125,9 @@ function TelepRouter() {
 			'recreate',
 		];
 
+		// Add galaxy orders like 'most-recent' to realPages:
+		realPages = realPages.concat(Object.values(CONSTS.ORDER));
+
 		var className = '';
 		if(req.user) {
 			className += ' in';

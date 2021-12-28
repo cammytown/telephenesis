@@ -163,6 +163,7 @@ function AdminMapper() {
 				file: { type: 'audio/mpeg' },
 			})
 				.then(demoStar => {
+					demoStar.title = "Testing Testing 123...";
 					demoStar.artist = user.artists[0];
 
 					demoStar.position = randomPos;

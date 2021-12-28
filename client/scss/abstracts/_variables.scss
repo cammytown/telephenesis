@@ -38,7 +38,12 @@ $uiBackground: rgba(0, 0, 0, 0.82);
 $uiBackgroundLightSolid: rgba(250, 250, 250, 0.85);
 $uiBackgroundLight: rgba(250, 250, 250, 0.2);
 
+$starHoverBorderColor: #ae5200;
+
+$bookmarkBorderColor: #a73292;
+
 $creationBackground: rgba(31, 75, 30, 0.6);
+
 $disabledBackground: rgba(134, 74, 46, 0.6);
 $disabledText: #b07254;
 
@@ -47,12 +52,13 @@ $adminBackground: rgba(100, 70, 70, 0.5);
 $errorText: $lightRed;
 
 // SIZES
+//@REVISIT naming and placement of these vars:
+
 $playerHeight: 28px;
 
 $starSize: 14px;
 $activeBorderWidth: 14px;
 $inactiveBorderWidth: 1px;
-
 
 $starGridWidth: 500px;
 $starGridSquareSize: 50px;
