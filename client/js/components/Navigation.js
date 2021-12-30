@@ -283,6 +283,11 @@ function ClientNavigation() {
 		var pathParts = url.pathname.split('/');
 		var newPage = pathParts[1];
 
+		//@TODO-1 revisit implementation; probably render on the server for page load:
+		var params = url.searchParams;
+		var order = params.get('order');
+		var view = params.get('view');
+
 		// If this is not initial page load (and thus we cannot rely on the
 		// server having rendered certain things):
 		if(!pageInitialization) {
@@ -302,11 +307,6 @@ function ClientNavigation() {
 			//}
 		}
 
-		//@TODO-1 revisit implementation; probably render on the server for page load:
-		var params = url.searchParams;
-		var order = params.get('order');
-		var view = params.get('view');
-
 		// If there's a view or order in the query string:
 		if(order || view) {
 			// Display the view and/or order:
@@ -317,7 +317,12 @@ function ClientNavigation() {
 			comments.toggleComments(true);
 		} else {
 			if(tlpInterface.order != CONSTS.ORDER.GALAXY) {
-				tlpInterface.sort(CONSTS.ORDER.GALAXY);
+				//@TODO i think this is more of a quick-fix; a better solution
+				//is perhaps to allow urls like
+				///star/[starID]?order=most-recent:
+				if(newPage != 'star') {
+					tlpInterface.sort(CONSTS.ORDER.GALAXY);
+				}
 			}
 		}
 
@@ -357,10 +362,6 @@ function ClientNavigation() {
 
 				// Load star comments:
 				comments.loadStarComments(Stars.clientStars[starID]);
-
-				// Refresh position of stars if shifted by comments panel:
-				//@TODO bad architecture; maybe a .refresh() or something:
-				tlpInterface.sort();
 			} break;
 
 			case 'user': {

@@ -291,6 +291,13 @@ function ClientStarsAPI() {
 					effects.canvas.width = document.body.offsetWidth;
 					effects.canvas.height = document.body.offsetHeight;
 				});
+
+				if(clientState.playingStar) {
+					spc.ctr(
+						clientState.playingStar.position.x,
+						clientState.playingStar.position.y
+					);
+				}
 			} break;
 
 			case CONSTS.VIEW.CONSTELLATIONS: {

@@ -27,6 +27,9 @@ function Spc(elementID = "spc") {
 
 	var bfr = 3; ///
 	var seg = 500; ///
+	var centerStartTime = 0;
+	var centerStartPos;
+	var centerPosDiff;
 
 	var lastX;
 	var lastY;
@@ -63,6 +66,10 @@ function Spc(elementID = "spc") {
 		constructor(x, y) {
 			this.x = x;
 			this.y = y;
+		}
+
+		add(otherVec2) {
+			return new me.Vec2(this.x + otherVec2.x, this.y + otherVec2.y);
 		}
 
 		subtract(otherVec2) {
@@ -108,21 +115,34 @@ function Spc(elementID = "spc") {
 		//me.set(me.x + 1, me.y + 1);
 		//return false;
 
-		var curPos = new me.Vec2(me.x, me.y); /// use globally later
-		var diff = targetCenter.subtract(curPos);
-		var distance = diff.getMagnitude();
-		var speed = Math.max(Math.min(distance / 25, 25), 1);
+		var centerTimer = ms - centerStartTime;
+		var progress = Math.min(centerTimer / 1000, 1);
+		progress = 1 - Math.pow(1 - progress, 3);
+		var progressVec = centerPosDiff.scale(progress);
+		var curPos = centerStartPos.add(progressVec);
+		me.set(curPos.x, curPos.y);
 
-		// If there's still distance to move after this frame:
-		if(distance > speed) {
-			var change = diff.normalize().scale(speed);
-			me.set(me.x + change.x, me.y + change.y); ///
-			window.requestAnimationFrame(stepTowardsPos);
-		// Otherwise, just set it to the target position:
-		} else {
-			me.set(targetCenter.x, targetCenter.y);
+		if(progress >= 1) {
 			animating = false;
+		} else {
+			window.requestAnimationFrame(stepTowardsPos);
 		}
+
+		//var curPos = new me.Vec2(me.x, me.y); /// use globally later
+		//var diff = targetCenter.subtract(curPos);
+		//var distance = diff.getMagnitude();
+		//var speed = Math.max(Math.min(distance / 25, 25), 1);
+
+		//// If there's still distance to move after this frame:
+		//if(distance > speed) {
+		//    var change = diff.normalize().scale(speed);
+		//    me.set(me.x + change.x, me.y + change.y); ///
+		//    window.requestAnimationFrame(stepTowardsPos);
+		//// Otherwise, just set it to the target position:
+		//} else {
+		//    me.set(targetCenter.x, targetCenter.y);
+		//    animating = false;
+		//}
 
 		if(animationUpdateCallback) {
 			animationUpdateCallback(ms);
@@ -140,6 +160,9 @@ function Spc(elementID = "spc") {
 
 		if(!animating) {
 			animating = true;
+			centerStartTime = performance.now();
+			centerStartPos = new me.Vec2(me.x, me.y);
+			centerPosDiff = new me.Vec2(x, y).subtract(centerStartPos);
 			window.requestAnimationFrame(stepTowardsPos);
 		}
 

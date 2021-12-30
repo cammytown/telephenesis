@@ -2,6 +2,7 @@ import { POST } from '../libs/minlab/cor';
 import ClientStar from './ClientStar';
 import ClientComment from './ClientComment.jsx';
 import tlpInterface from './Interface';
+import CONSTS from '../../../abstract/constants';
 
 export default new Comments();
 
@@ -116,6 +117,12 @@ function Comments() {
 			//@REVISIT-1 I don't like this solution but I'm at my wits end for
 			//trying to get CSS to behave as I would expect it to:
 			resizeCommentTextarea();
+		}
+
+		if(tlpInterface.order != CONSTS.ORDER.GALAXY) {
+			// Refresh position of stars if shifted by comments panel:
+			//@TODO bad architecture; maybe a .refresh() or something:
+			tlpInterface.sort();
 		}
 	}
 }
