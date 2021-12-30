@@ -411,8 +411,10 @@ function ClientStarsAPI() {
 
 		// Get origin x based on where CSS has placed layout element:
 		//@TODO revisit this architecture
-		var originX = document.querySelector('#sorting-header')
-			.offsetLeft + styleVars.starSize;
+		//var originX = document.querySelector('#sorting-header')
+		//    .offsetLeft + styleVars.starSize;
+		var infoPanel = document.querySelector('#playingStarInfo')
+		var originX = infoPanel.offsetWidth + infoPanel.offsetLeft + styleVars.starSize * 2;
 
 		for (var starEleIndex = 0; starEleIndex < starEles.length; starEleIndex++) {
 			var starEle = starEles[starEleIndex];
