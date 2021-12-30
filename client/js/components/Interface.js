@@ -444,7 +444,7 @@ function Interface() {
 
 	// 	event.preventDefault();
 	// }
-	
+
 	/**
 	 * Create a loading graphic element.
 	 * @returns Element
