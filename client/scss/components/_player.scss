@@ -62,7 +62,7 @@ header#playingStarHeader { ///placement
 	flex-direction: column;
 	z-index: 1;
 	box-sizing: border-box;
-	max-width: 640px;
+	max-width: 45%;
 	max-height: 100%;
 	//@TODO this is meant to offset by the height of galaxy-ui but I don't like this solution
 	padding: 80px 20px 0;
@@ -76,6 +76,11 @@ header#playingStarHeader { ///placement
 
 	h2, h3 {
 		margin: 5px 0;
+	}
+
+	a#playingCreatorLink {
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	a#togglePlayingComments {

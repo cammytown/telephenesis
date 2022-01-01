@@ -416,6 +416,10 @@ function ClientStarsAPI() {
 		var infoPanel = document.querySelector('#playingStarInfo')
 		var originX = infoPanel.offsetWidth + infoPanel.offsetLeft + styleVars.starSize * 2;
 
+		// Adjust position of sorting header:
+		var sortingHeader = document.querySelector('#sorting-header');
+		sortingHeader.style.left = originX + 'px';
+
 		for (var starEleIndex = 0; starEleIndex < starEles.length; starEleIndex++) {
 			var starEle = starEles[starEleIndex];
 
