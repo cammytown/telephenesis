@@ -70,9 +70,9 @@ header#playingStarHeader { ///placement
 	background: $uiBackground;
 	overflow: hidden;
 
-	.show-comments & {
-		width: 45%;
-	}
+	//.show-comments & {
+	//    width: 45%;
+	//}
 
 	h2, h3 {
 		margin: 5px 0;

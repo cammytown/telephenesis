@@ -414,11 +414,11 @@ function ClientStarsAPI() {
 		//var originX = document.querySelector('#sorting-header')
 		//    .offsetLeft + styleVars.starSize;
 		var infoPanel = document.querySelector('#playingStarInfo')
-		var originX = infoPanel.offsetWidth + infoPanel.offsetLeft + styleVars.starSize * 2;
+		var originX = infoPanel.offsetWidth + infoPanel.offsetLeft + styleVars.starSize * 4;
 
 		// Adjust position of sorting header:
 		var sortingHeader = document.querySelector('#sorting-header');
-		sortingHeader.style.left = originX + 'px';
+		sortingHeader.style.left = (originX - styleVars.starSize * 2) + 'px';
 
 		for (var starEleIndex = 0; starEleIndex < starEles.length; starEleIndex++) {
 			var starEle = starEles[starEleIndex];
