@@ -26,7 +26,7 @@ header#galaxy-ui
 
 			ul
 				li
-					a.sort(data-view=CONSTS.ORDER.GALAXY) galaxy
+					a.sort(data-order=CONSTS.ORDER.GALAXY) galaxy
 				li
 					a.sort(data-order=CONSTS.ORDER.CONSTELLATIONS) constellations
 				li
@@ -52,13 +52,14 @@ header#galaxy-ui
 				li
 					a.sort(data-view=CONSTS.VIEW.GRID) grid
 
-		header#sorting-header
-			h2.view-header Sorting by Most Recent
 
 	header#playingStarHeader.inactive
 		div#playbackProgress
 			div#playbackProgressBar
 			// div#playbackProgressAccent
+
+header#sorting-header
+	h2.view-header Sorting by Most Recent
 
 //-move into own file probably:
 div#playingStarInfo

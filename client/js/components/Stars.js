@@ -7,6 +7,8 @@ import styleVars from '../../scss/abstracts/_variables.scss';
 
 import clientState from './ClientState';
 import effects from './ClientEffects';
+import tlpInterface from './Interface';
+
 import ClientStar from './ClientStar';
 import CONSTS from '../../../abstract/constants.js';
 
@@ -268,9 +270,19 @@ function ClientStarsAPI() {
 	 * @param {CONSTANTS.ORDER} order
 	 * @param {CONSTANTS.VIEW} view
 	 **/
-	this.sort = function(order, view) { ///REVISIT maybe separate into its own component? probably rename when we better understand how we will architect things
+	///REVISIT maybe separate into its own component? probably rename when we
+	//better understand how we will architect things:
+	//@REVISIT sameView architecture/naming
+	this.sort = function(order, view, sameView = false) { 
 		// if(!view) view = "list"; // Explicit because we pass in the value of getAttribute('data-view')
 		//me.clearConstellationLines();
+
+		var animationOptions = {};
+
+		if(sameView) {
+			// If we're in the same view, don't use elastic easing:
+			animationOptions.easing = "cubicBezier(0.120, 0.620, 0.340, 0.960)";
+		}
 
 		// Reposition each star
 		switch(view) {
@@ -285,7 +297,7 @@ function ClientStarsAPI() {
 					beginAnimation([clientStar.element], false, {
 						left: clientStar.position.x + 'px',
 						top: clientStar.position.y + 'px',
-					});
+					}, animationOptions);
 
 					// Set the dimensions of the canvas to that of the window:
 					effects.canvas.width = document.body.offsetWidth;
@@ -315,7 +327,7 @@ function ClientStarsAPI() {
 						const y = currentRow * styleVars.starGridSquareSize;
 
 						return { x, y };
-					}));
+					}), animationOptions);
 
 					currentRow += 1;
 				}
@@ -340,7 +352,7 @@ function ClientStarsAPI() {
 					}
 
 					return { x, y };
-				}));
+				}), animationOptions);
 
 				cor.ac(document.body, 'sorting');
 			} break;
@@ -355,7 +367,7 @@ function ClientStarsAPI() {
 					const y = (styleVars.starGridSquareSize + styleVars.starGridMargin) * starIndex;
 
 					return { x, y };
-				}));
+				}), animationOptions);
 
 				cor.ac(document.body, 'sorting'); ////
 
@@ -431,6 +443,7 @@ function ClientStarsAPI() {
 			var defaultAnimationOptions = {
 				targets: starEle,
 				duration: 500,
+				easing: 'easeOutElastic(1, 0.5)',
 				//update: (anim) => me.updateConstellationLines()
 			};
 

@@ -317,12 +317,23 @@ function Interface() {
 		//);
 
 		var order = event.target.getAttribute('data-order');
+		if(!order) {
+			order = me.order;
+		}
+
 		var view = event.target.getAttribute('data-view');
+		if(!view) {
+			if(order == CONSTS.ORDER.GALAXY) {
+				view = CONSTS.VIEW.GALAXY;
+			} else {
+				view = me.view;
+			}
+		}
 
 		// Update the URI:
 		var newURI = "/";
 
-		if(order) {
+		if(order != CONSTS.ORDER.GALAXY) {
 			newURI += order.toLowerCase();
 
 			//if(view) {
@@ -332,12 +343,12 @@ function Interface() {
 			//}
 
 			//newURI += 'order=' + order.toLowerCase();
-		}
 
-		//@REVISIT architecture:
-		if(view && view != CONSTS.VIEW.GALAXY) {
-			newURI += '?view=' + view;
-			//newURI += '?view=' + view.toLowerCase();
+			//@REVISIT architecture:
+			if(view && view != CONSTS.VIEW.GALAXY) {
+				newURI += '?view=' + view;
+				//newURI += '?view=' + view.toLowerCase();
+			}
 		}
 
 		navigation.navigate(newURI);
@@ -351,7 +362,6 @@ function Interface() {
 	 **/
 	this.sort = function(order, view, clickedEle = false) {
 
-		console.log('Navigation.sort(): ' + [order, view]);
 		///REVISIT not into all this .toLowerCase() business... better design?
 
 		if(order) {
@@ -392,6 +402,8 @@ function Interface() {
 			me.order = order;
 		}
 
+		var sameView = view == me.view; //@REVISIT architecture/naming
+
 		// If a view was supplied to sort() and it is different from the current one:
 		if(view && view != me.view) {
 			// Ensure uppercase:
@@ -428,7 +440,7 @@ function Interface() {
 		}
 
 		// Actually sort and position the stars:
-		stars.sort(me.order, me.view);
+		stars.sort(me.order, me.view, sameView);
 	}
 
 	// me.invite = function(event) {

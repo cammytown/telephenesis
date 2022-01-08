@@ -43,33 +43,33 @@
 		}
 	}
 
-	header#sorting-header {
-		position: absolute;
-		width: 500px; ////REVISIT bad solution
-		left: $starGridPaddingX - 25;
-		top: $starGridPaddingY - 65;
-		z-index: 1;
-		opacity: 0;
-		transition: opacity 1s, left 100ms;
-
-		h2 {
-			display: none;
-		}
-
-		body.sorting & {
-			opacity: 1;
-
-			h2 {
-				display: block;
-			}
-		}
-
-		body.playing & {
-			left: 50%;
-		}
-	}
 }
 
+header#sorting-header {
+	position: absolute;
+	width: 500px; ////REVISIT bad solution
+	left: $starGridPaddingX - 25;
+	top: $starGridPaddingY - 65;
+	z-index: 1;
+	opacity: 0;
+	transition: opacity 1s, left 100ms;
+
+	h2 {
+		display: none;
+	}
+
+	body.sorting & {
+		opacity: 1;
+
+		h2 {
+			display: block;
+		}
+	}
+
+	body.playing & {
+		left: 50%;
+	}
+}
 
 body {
 	&.galaxy-view,

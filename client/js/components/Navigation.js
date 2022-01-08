@@ -1,7 +1,7 @@
 import COR from '../libs/minlab/cor';
 import spc from '../libs/minlab/spc'; /// relying on implied singleton
-import Anm from '../libs/minlab/anm';
-//import anime from 'animejs/lib/anime.es';
+//import Anm from '../libs/minlab/anm';
+import anime from 'animejs/lib/anime.es';
 import HistoryTime from '../libs/history-time';
 
 import clientState from './ClientState';
@@ -285,8 +285,12 @@ function ClientNavigation() {
 
 		//@TODO-1 revisit implementation; probably render on the server for page load:
 		var params = url.searchParams;
-		var order = params.get('order');
-		var view = params.get('view');
+
+		//var order = Object.keys(CONSTS.ORDER).indexOf(newPage) == -1
+		//    ? CONSTS.ORDER.GALAXY : newPage;
+		//var order = params.get('order');
+
+		//var view = params.get('view');
 
 		// If this is not initial page load (and thus we cannot rely on the
 		// server having rendered certain things):
@@ -308,14 +312,14 @@ function ClientNavigation() {
 		}
 
 		// If there's a view or order in the query string:
-		if(order || view) {
-			// Display the view and/or order:
-			tlpInterface.sort(order, view);
+		//if(order || view) {
+		//    // Display the view and/or order:
+		//    tlpInterface.sort(order, view);
 
-			// Toggle on comments panel.
-			//@TODO allow people to keep comments panel off
-			comments.toggleComments(true);
-		} else {
+		//    // Toggle on comments panel.
+		//    //@TODO allow people to keep comments panel off
+		//    comments.toggleComments(true);
+		//} else {
 			if(tlpInterface.order != CONSTS.ORDER.GALAXY) {
 				//@TODO i think this is more of a quick-fix; a better solution
 				//is perhaps to allow urls like
@@ -324,7 +328,7 @@ function ClientNavigation() {
 					tlpInterface.sort(CONSTS.ORDER.GALAXY);
 				}
 			}
-		}
+		//}
 
 		// Do page-specific things:
 		switch(newPage) {
@@ -416,7 +420,9 @@ function ClientNavigation() {
 
 				// If navigated to a galaxy order:
 				if(galaxyOrders.includes(newPage)) {
-					tlpInterface.sort(newPage);
+					var view = params.get('view');
+
+					tlpInterface.sort(newPage, view);
 				} else {
 					// If link has an associated visual page:
 					if(boxPages.includes(newPage)) {
@@ -487,7 +493,12 @@ function ClientNavigation() {
 					}
 
 					document.body.appendChild(pageElement);
-					Anm.fadeIn(pageElement);
+					
+					anime({
+						targets: pageElement,
+						opacity: 1
+					});
+
 				});
 		} else {
 			///REVISIT
@@ -518,8 +529,10 @@ function ClientNavigation() {
 				//}
 			}
 
-			Anm.fadeOut(page, 250, function() {
-				limbo.appendChild(page);
+			anime({
+				targets: page,
+				opacity: 0,
+				finished: () => { limbo.appendChild(page); }
 			});
 		}
 
