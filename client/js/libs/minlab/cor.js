@@ -80,10 +80,18 @@ function addClassListener(className, eventName, eventCallback) {
 //@REVISIT naming:
 function onClassEvent(eventName, event) {
 	for(var eventListener of classListeners[eventName]) {
-		var className = eventListener[0];
-		var eventCallback = eventListener[1];
+		var classNames = eventListener[0].split(' ');
+		var matching = true;
+		for(var className of classNames) {
+			//var className = eventListener[0];
+			var eventCallback = eventListener[1];
 
-		if(event.target.classList.contains(className)) {
+			if(!event.target.classList.contains(className)) {
+				matching = false
+			}
+		}
+
+		if(matching) {
 			eventCallback(event);
 		}
 	}

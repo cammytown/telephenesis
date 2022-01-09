@@ -9,6 +9,7 @@ function generate(responseType = "json") {
 	var adminRouter = express.Router();
 	adminRouter.use(validateAdminUser);
 	adminRouter.get('/list-users', listUsers);
+	adminRouter.get('/list-stars', listStars);
 	adminRouter.post('/moveStar', moveStar, success);
 	adminRouter.post('/deleteStar', deleteStar, success);
 	adminRouter.post('/elevate-user', elevateUser, success);
@@ -29,6 +30,15 @@ function listUsers(req, res) {
 		.then(users => {
 			res.json({
 				users,
+			});
+		});
+}
+
+function listStars(req, res) {
+	admin.getStars()
+		.then(stars => {
+			res.json({
+				stars,
 			});
 		});
 }

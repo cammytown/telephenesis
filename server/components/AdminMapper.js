@@ -35,6 +35,18 @@ function AdminMapper() {
 	}
 
 	/**
+	 * Retrieve stars from the database for administration views.
+	 **/
+	this.getStars = function() {
+		return dbStars.find()
+			.limit(10)
+			.toArray()
+			.then(stars => {
+				return stars;
+			});
+	}
+
+	/**
 	 * Changes a user access level.
 	 * @todo rename since you might decrease the level
 	 * @param {number} userPublicID - The public ID of the user to change.

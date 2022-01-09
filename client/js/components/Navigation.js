@@ -532,7 +532,7 @@ function ClientNavigation() {
 			anime({
 				targets: page,
 				opacity: 0,
-				finished: () => { limbo.appendChild(page); }
+				complete: () => { limbo.appendChild(page); }
 			});
 		}
 

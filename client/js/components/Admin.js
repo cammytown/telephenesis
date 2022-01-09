@@ -18,7 +18,7 @@ function TelepAdmin() {
 	this.targetStar = null;
 
 	this.init = function() {
-		COR.addClassListener('admin-nav', 'click', onAdminLinkClick);
+		COR.addClassListener('admin nav', 'click', onAdminLinkClick);
 	}
 
 	function onAdminLinkClick(event) {
@@ -34,6 +34,8 @@ function TelepAdmin() {
 		if(!operation) {
 			operation = 'index';
 		}
+
+		console.log('visiting admin page: ' + operation);
 
 		switch(operation) {
 			case 'index': {
@@ -241,14 +243,14 @@ class UserAdminList {
 						</div>
 
 						<a
-							class="nav admin-nav"
+							class="nav admin"
 							href={"/admin/elevate/" + user.publicID}
 						>
 							Elevate Access
 						</a>
 
 						<a
-							class="nav admin-nav"
+							class="nav admin"
 							href={"/admin/set-ticket-count/" + user.publicID}
 						>
 							Set Ticket Count
