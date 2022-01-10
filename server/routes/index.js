@@ -119,7 +119,7 @@ function TelepRouter() {
 			'login',
 			'register',
 
-			'settings',
+			'account',
 
 			'create',
 			'recreate',

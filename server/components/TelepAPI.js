@@ -24,7 +24,7 @@ function TelepAPI() {
 	/** MongoCollection of system meta-information. **/
 	var MLMeta;
 
-	/** MongoCollection of user profile information. **/
+	/** MongoCollection of user account information. **/
 	var usrMeta;
 
 	/** MongoCollection of star comments. **/
@@ -180,8 +180,8 @@ function TelepAPI() {
 			});
 	}
 
-	// me.createProfile = function(profileData, callback) { /// post naming?
-	// 	usrMeta.insertOne(profileData, function(err, result) {
+	// me.createAccount = function(accountData, callback) { /// post naming?
+	// 	usrMeta.insertOne(accountData, function(err, result) {
 	// 		if(err) {
 	// 			////
 	// 			callback(err);
@@ -192,11 +192,11 @@ function TelepAPI() {
 	// }
 
 	/**
-	 * Update user profile information.
+	 * Update user account information.
 	 * @param {TelepUser} user - The user to update.
 	 * @param {object} newValues - The new properties/values to set.
 	 **/
-	this.updateProfile = function(user, newValues) {
+	this.updateAccount = function(user, newValues) {
 		if(newValues.email) {
 			///@TODO allow email changes
 			// Not allowing email changes for now:

@@ -3,7 +3,7 @@ import CONSTS from '../../../abstract/constants';
 import config from '../../../config/telep.config.js';
 import Stars from './Stars';
 import ClientUser from './ClientUser';
-import profile from '../pages/Profile.jsx';
+import accountPage from '../pages/Account.jsx';
 
 /**
  * Holds data relevant to the client and initializes components.
@@ -223,8 +223,8 @@ function ClientState() {
 			bookmarkedStar.isBookmarked = true;
 		});
 
-		// Re-render profile page:
-		profile.render();
+		// Re-render account page:
+		accountPage.render();
 	}
 
 	this.logout = function() {

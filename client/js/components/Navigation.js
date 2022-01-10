@@ -33,7 +33,7 @@ function ClientNavigation() {
 		'user',
 		'login',
 		'register',
-		'settings',
+		'account',
 		//'invite',
 		'create',
 		'recreate',

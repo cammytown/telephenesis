@@ -2,13 +2,13 @@
 //import Nano from 'nano-jsx';
 import clientState from '../components/ClientState';
 
-export default new ProfilePage();
+export default new AccountPage();
 
 /**
- * Profile editing page.
+ * Account editing page.
  * @constructor
  */
-function ProfilePage() { ///REVISIT element not in use atm
+function AccountPage() { ///REVISIT element not in use atm
 	const me = this;
 	var element;
 
@@ -22,10 +22,10 @@ function ProfilePage() { ///REVISIT element not in use atm
 		//complete jsx
 
 		if(clientState.user) {
-			const profileEmailInput = document.querySelector('#profile_email');
-			profileEmailInput.value = clientState.user.email;
+			const accountEmailInput = document.querySelector('#account_email');
+			accountEmailInput.value = clientState.user.email;
 
-			const displayNameInput = document.querySelector('#profile_display-name');
+			const displayNameInput = document.querySelector('#account_display-name');
 			displayNameInput.value = clientState.user.displayName;
 
 			var creationTicketCounts = document.querySelectorAll('.creationTickets .count');

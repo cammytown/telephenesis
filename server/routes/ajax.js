@@ -38,7 +38,7 @@ function generate(telepServer) {
 	userActionRouter.use(validateUser);
 
 	userActionRouter.post('/sync', syncWithClient);
-	userActionRouter.post('/update-profile', updateProfile);
+	userActionRouter.post('/update-account', updateAccount);
 
 	userActionRouter.post('/bookmark', bookmarkStar);
 	userActionRouter.post('/remove-bookmark', removeBookmarkStar);
@@ -145,8 +145,8 @@ function syncWithClient(req, res) {
 		});
 }
 
-function updateProfile(req, res, next) {
-	api.updateProfile(
+function updateAccount(req, res, next) {
+	api.updateAccount(
 		req.user,
 		// Convert to normal object with helper methods like hasOwnProperty:
 		Object.assign({}, req.body)
