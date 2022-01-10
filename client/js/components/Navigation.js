@@ -12,6 +12,7 @@ import Creator from './Creator';
 import ClientUser from './ClientUser.jsx';
 import CONSTS from '../../../abstract/constants';
 import telepCommon from '../../../abstract/telepCommon';
+import config from '../../../config/telep.config';
 
 import locale from '../../../locale/en_us.json'; //@TODO scaffolding
 
@@ -496,7 +497,9 @@ function ClientNavigation() {
 					
 					anime({
 						targets: pageElement,
-						opacity: 1
+						duration: config.pageTransitionTime,
+						opacity: [0, 1],
+						easing: 'linear'
 					});
 
 				});
@@ -531,7 +534,9 @@ function ClientNavigation() {
 
 			anime({
 				targets: page,
+				duration: config.pageTransitionTime,
 				opacity: 0,
+				easing: 'linear',
 				complete: () => { limbo.appendChild(page); }
 			});
 		}

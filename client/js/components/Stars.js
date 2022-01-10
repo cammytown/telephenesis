@@ -11,6 +11,7 @@ import tlpInterface from './Interface';
 
 import ClientStar from './ClientStar';
 import CONSTS from '../../../abstract/constants.js';
+import config from '../../../config/telep.config';
 
 export default new ClientStarsAPI();
 
@@ -23,9 +24,6 @@ function ClientStarsAPI() {
 
 	/** Active stars currently loaded on the client. **/
 	me.clientStars = {};
-
-	/** Enforced margin between stars. **/
-	var starSpacing = 50; ///REVISIT placement; in a central config file maybe?
 
 	/** Array of start and end points for lines between stars. **/
 	var constellationLines = [];
@@ -95,8 +93,8 @@ function ClientStarsAPI() {
 	// 	var starDistance = differenceVector.getMagnitude();
 
 	// 	// If star is too close and adjustments must be made:
-	// 	if(starDistance < starSpacing) {
-	// 		const marginExcess = starSpacing - distance;
+	// 	if(starDistance < config.starSpacing) {
+	// 		const marginExcess = config.starSpacing - distance;
 
 	// 		// Move observedStar away from this star:
 	// 		var observedStarMovement = differenceVector.normalize().scale(marginExcess);
@@ -157,9 +155,9 @@ function ClientStarsAPI() {
 			}
 
 			// If star is too close and adjustments must be made:
-			if(starDistance < starSpacing) {
+			if(starDistance < config.starSpacing) {
 				// console.log(differenceVector);
-				const marginExcess = starSpacing - starDistance;
+				const marginExcess = config.starSpacing - starDistance;
 
 				// Move this clientStar away from targetStar:
 				var clientStarMovement = differenceVector.normalize().scale(-1 * (marginExcess + 10)/2);
