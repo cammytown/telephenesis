@@ -54,12 +54,12 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 
 	function init(usrDoc = null, userMeta = null) {
 		//var proposedValues = {};
-		
+	
 		if(usrDoc) {
 			me.loadData({
 				'id': usrDoc.id,
 				'email': usrDoc.em,
-				'sessionCode': usrDoc.ss,
+				'sessionCode': usrDoc.ss, //@REVISIT maybe don't always include
 			});
 		}
 		//me.loadData(usrDoc);

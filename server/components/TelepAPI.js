@@ -220,7 +220,7 @@ function TelepAPI() {
 
 				//@REVISIT only need to set properties thave have changed but
 				//we're setting all of them; do we care?:
-				$set: user.export()
+				$set: user.export('usrMeta')
 			}
 		);
 	}
