@@ -112,7 +112,7 @@ module.exports = function Usr(db, vl, bcrypt) {
 				// var cr = bcrypt.hashSync(pw, s);
 				var sessionCode = generateString(16);
 
-				return collection.update( ///ARCHITECTURE
+				return collection.updateOne( ///ARCHITECTURE
 					{ em: em },
 					{ $set: { ip: ip, ss: sessionCode } }
 				)

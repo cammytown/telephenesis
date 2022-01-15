@@ -45,6 +45,12 @@
 
 	section {
 		margin: 20px 0;
+		@extend .clearfix;
+
+		&.short { //@REVISIT better name?
+			margin-top: 0;
+			margin-bottom: 0;
+		}
 	}
 
 	//input {

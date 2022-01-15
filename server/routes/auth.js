@@ -1,6 +1,7 @@
 const express = require('express');
 //const Telep = require('../components/TelepServer');
 const api = require('../components/TelepAPI');
+const config = require('../../config/telep.config.js');
 
 ///REVISIT weird architecture so we can access api without circular reference:
 //var api;
@@ -18,12 +19,17 @@ function generate(telepServer) {
 function login(req, res, next) {
 	return api.login(req.body.email, req.body.password, req.ip)
 		.then(telepUser => {
-			// Send cookie to client for saving:
-			res.cookie('session_code', telepUser.sessionCode, {
+			var cookieOptions = {
+				//@REVISIT uncomment?:
 				// secure: true /// https only
-			});
+ 			};
 
-			console.log(telepUser);
+			//if(config.mode == 'development') {
+			//    cookieOptions.sameSite = 'none';
+			//}
+
+			// Send cookie to client for saving:
+			res.cookie('session_code', telepUser.sessionCode, cookieOptions);
 
 			req.user = telepUser;
 			next();
@@ -80,6 +86,7 @@ function logout(req, res, next) {
  * @param {express.NextFunction} next
  **/
 function observeSessionCookie(req, res, next) {
+	console.log(req.cookies.session_code);
 	return api.getUserBySessionCode(req.cookies.session_code)
 		.then(telepUser => {
 			// User is either TelepUser or false:

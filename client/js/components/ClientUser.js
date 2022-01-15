@@ -36,6 +36,11 @@ function ClientUser(initializationData) {
 						case 'bookmarks': {
 							for(var bookmarkedStarID of initializationData['bookmarks']) {
 								var bookmarkedStar = stars.clientStars[bookmarkedStarID];
+
+								if(!bookmarkedStar) {
+									console.error("No real star known for bookmarkedStar.");
+								}
+
 								me.bookmarks.push(bookmarkedStar);
 							}
 						} break;

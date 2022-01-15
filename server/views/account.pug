@@ -34,17 +34,25 @@ form#account-page.ajax.uibox.center-text(
 	//-)
 
 	.ticketCount.floatBeside Tickets [?]
-	.ticketCount.creationTickets Tickets:
-		input#creation-tickets(type="hidden" value=user.creationTickets)
-		.count= user.creationTickets
-	.ticketCount.recreationTickets Recreation Tickets:
-		input#recreation-tickets(type="hidden" value=user.recreationTickets)
-		.count= user.recreationTickets
+	section.short
+		.ticketCount.creationTickets Tickets:
+			input#creation-tickets(type="hidden" value=user.creationTickets)
+			.count= user.creationTickets
+		.ticketCount.recreationTickets Recreation Tickets:
+			input#recreation-tickets(type="hidden" value=user.recreationTickets)
+			.count= user.recreationTickets
 
 	// label(for="password") Password
 	// input(name="password" placeholder="password")
 	// label(for="password-confirm") Confirm
 	// input(name="password-confirm" placeholder="password again")
+
+	label.floatBeside Subscription [?]
+	section
+		ul
+			li Free
+			li 10 tokens Monthly
+			li 20 tokens Monthly
 
 	button.btn.main(type="submit") Submit
 

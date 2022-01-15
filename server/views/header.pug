@@ -8,6 +8,7 @@ header#galaxy-ui
 				a.create.nav(href="/account") account
 				if user && user.accessLevel >= config.adminLevel
 					a.nav.admin(href="/admin") admin
+				a.nav(href="/terms") terms
 				a.nav(href="/logout") logout
 
 			.guest
