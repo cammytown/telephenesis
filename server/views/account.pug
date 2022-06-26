@@ -48,10 +48,11 @@ form#account-page.ajax.uibox.center-text(
 	// input(name="password-confirm" placeholder="password again")
 
 	label.floatBeside Subscription [?]
-	section
-		ul
+	section.money
+		ul.subscriptions
 			li Free
 			li 10 tokens Monthly
+				a.nav(href="/subscribe") Subscribe
 			li 20 tokens Monthly
 
 	button.btn.main(type="submit") Submit

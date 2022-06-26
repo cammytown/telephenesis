@@ -83,13 +83,19 @@ header#playingStarHeader { ///placement
 		text-overflow: ellipsis;
 	}
 
-	a#togglePlayingComments {
-		&::after {
-			content: " \25B2";
+	div#starControls {
+		a {
+			margin-right: 10px;
 		}
 
-		.show-comments &::after {
-			content: " \25BC";
+		a#togglePlayingComments {
+			&::after {
+				content: " \25B2";
+			}
+
+			.show-comments &::after {
+				content: " \25BC";
+			}
 		}
 	}
 

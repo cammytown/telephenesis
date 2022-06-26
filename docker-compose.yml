@@ -14,7 +14,7 @@ services:
             - app-network
         volumes:
             - .:/usr/src/app #/// probably change for production
-            - node_modules:/usr/src/app/node_modules # named volume to keep node_modules persistent
+            - ./node_modules:/usr/src/app/node_modules # named volume to keep node_modules persistent
         working_dir: /usr/src/app/server
         command: /usr/src/app/node_modules/.bin/nodemon main.js -L --verbose --harmony
     mongo:

@@ -120,6 +120,7 @@ function TelepRouter() {
 			'register',
 
 			'account',
+			'subscribe',
 
 			'create',
 			'recreate',

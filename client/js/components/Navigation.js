@@ -34,6 +34,7 @@ function ClientNavigation() {
 		'login',
 		'register',
 		'account',
+		'subscribe',
 		//'invite',
 		'create',
 		'recreate',
