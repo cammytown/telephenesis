@@ -1,0 +1,27 @@
+div#user-page.single-user.uibox
+	section
+		span.floatBeside username
+		h1= viewingUser.displayName
+
+	//-@TODO probably implement:
+	//-span.floatBeside member since
+	//-div= viewingUser.joinTimestamp
+	if(viewingUser.artists && viewingUser.artists.length)
+		section
+			h3 Artist Identities
+			ul
+				each artist in viewingUser.artists
+					li
+						div= artist.name
+						if artist.externalLink
+							a.external-link(href=artist.externalLink)
+								= artist.externalLink
+
+	section
+		h3 Recent Comments
+		if viewingUser.comments && viewingUser.comments.length
+			ul
+				each comment in viewingUser.comments
+					li= comment.text
+		else
+			span No user comments.

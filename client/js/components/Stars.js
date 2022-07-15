@@ -7,8 +7,11 @@ import styleVars from '../../scss/abstracts/_variables.scss';
 
 import clientState from './ClientState';
 import effects from './ClientEffects';
+import tlpInterface from './Interface';
+
 import ClientStar from './ClientStar';
 import CONSTS from '../../../abstract/constants.js';
+import config from '../../../config/telep.config';
 
 export default new ClientStarsAPI();
 
@@ -20,10 +23,7 @@ function ClientStarsAPI() {
 	var me = this;
 
 	/** Active stars currently loaded on the client. **/
-	me.clientStars = [];
-
-	/** Enforced margin between stars. **/
-	var starSpacing = 50; ///REVISIT placement; in a central config file maybe?
+	me.clientStars = {};
 
 	/** Array of start and end points for lines between stars. **/
 	var constellationLines = [];
@@ -56,8 +56,9 @@ function ClientStarsAPI() {
 				continue;
 			}
 
+			// Load HTML element into a ClientStar:
 			var clientStar = new ClientStar(starElement);
-			me.clientStars[clientStar.id] = clientStar;
+			me.clientStars[clientStar.publicID] = clientStar;
 		}
 
 		// Convert all styleVar properties to ints (from i.e. "20px" to 20)
@@ -74,8 +75,12 @@ function ClientStarsAPI() {
 	// }
 
 	me.addStar = function(newStar) {
+		if(!newStar.publicID) {
+			throw "addStar(): no publicID on ClientStar";
+		}
+
 		// me.attemptPosition(newStar, newStar.position);
-		me.clientStars[newStar.id] =  newStar;
+		me.clientStars[newStar.publicID] =  newStar;
 	}
 
 	// /**
@@ -88,8 +93,8 @@ function ClientStarsAPI() {
 	// 	var starDistance = differenceVector.getMagnitude();
 
 	// 	// If star is too close and adjustments must be made:
-	// 	if(starDistance < starSpacing) {
-	// 		const marginExcess = starSpacing - distance;
+	// 	if(starDistance < config.starSpacing) {
+	// 		const marginExcess = config.starSpacing - distance;
 
 	// 		// Move observedStar away from this star:
 	// 		var observedStarMovement = differenceVector.normalize().scale(marginExcess);
@@ -116,18 +121,18 @@ function ClientStarsAPI() {
 		// me.position = newPosition;
 		// var movingStars = []; ///REVISIT architecture
 
-		// if(starMovements[targetStar.id]) { ////DEBUGGING
+		// if(starMovements[targetStar.publicID]) { ////DEBUGGING
 		// 	return;
 		// }
 
-		starMovements[targetStar.id] = newPosition; ///REVISIT 
-		// starMovements[targetStar.id] = newPosition;
+		starMovements[targetStar.publicID] = newPosition; ///REVISIT
+		// starMovements[targetStar.publicID] = newPosition;
 
 		// for(var clientStar of me.clientStars) {
 		// for (var starIndex = 0; starIndex < me.clientStars.length; starIndex++) {
 		// 	var clientStar = me.clientStars[starIndex];
-		me.clientStars.forEach((clientStar, starIndex) => {
-			if(clientStar.id == targetStar.id) { ///REVISIT best check?
+		Object.values(me.clientStars).forEach((clientStar, starIndex) => {
+			if(clientStar.publicID == targetStar.publicID) { ///REVISIT best check?
 				console.log('skipping self');
 				return; //continue;
 			}
@@ -135,8 +140,8 @@ function ClientStarsAPI() {
 			var checkPosition = clientStar.position;
 
 			// Check if we're already planning to move this star:
-			if(starMovements.hasOwnProperty(clientStar.id)) {
-				checkPosition = starMovements[clientStar.id];
+			if(starMovements.hasOwnProperty(clientStar.publicID)) {
+				checkPosition = starMovements[clientStar.publicID];
 			}
 
 			// Get distance between stars:
@@ -150,9 +155,9 @@ function ClientStarsAPI() {
 			}
 
 			// If star is too close and adjustments must be made:
-			if(starDistance < starSpacing) {
+			if(starDistance < config.starSpacing) {
 				// console.log(differenceVector);
-				const marginExcess = starSpacing - starDistance;
+				const marginExcess = config.starSpacing - starDistance;
 
 				// Move this clientStar away from targetStar:
 				var clientStarMovement = differenceVector.normalize().scale(-1 * (marginExcess + 10)/2);
@@ -165,11 +170,11 @@ function ClientStarsAPI() {
 		});
 
 		///REVISIT should this wait until the root attemptPosition resolves?:
-		// console.log('actualize ' + targetStar.id);
-		// console.log(starMovements[targetStar.id]);
-		targetStar.position = starMovements[targetStar.id];
+		// console.log('actualize ' + targetStar.publicID);
+		// console.log(starMovements[targetStar.publicID]);
+		targetStar.position = starMovements[targetStar.publicID];
 		// for(var movingStar of movingStars) {
-		// 	movingStar.position = starMovements[movingStar.id];
+		// 	movingStar.position = starMovements[movingStar.publicID];
 		// }
 	}
 
@@ -178,6 +183,7 @@ function ClientStarsAPI() {
 	 * @param {CONSTANTS.ORDER} order
 	 **/
 	this.getSortedStars = function(order) {
+		///TODO enable cache:
 		// if(me.cachedSorts[order] != null) {
 		// 	////CHECK if there have been changes to the loaded stars, we cannot use cache
 		// 	return true;
@@ -186,20 +192,64 @@ function ClientStarsAPI() {
 		// Rank stars according to order
 		switch(order) {
 			case CONSTS.ORDER.MOST_RECENT: {
-				// me.cachedSorts['most-recent'] = [];
-				me.cachedSorts[order] = me.clientStars.sort((a, b) => {
-					// If B is more recent than A, return true
-					return parseInt(b.element.getAttribute('data-timestamp'))
-						- parseInt(a.element.getAttribute('data-timestamp'));
-				}).map(star => star.element)
-				.filter(starEle => starEle); ///REVISIT is this readable? removes starEle if falsey
+				//me.cachedSorts[order] = [...me.clientStars] ///REVISIT not working
+
+				// // Make a copy of the array:
+				//me.cachedSorts[order] = me.clientStars.slice()
+
+				// Convert clientStars object to array:
+				me.cachedSorts[order] = Object.values(me.clientStars)
+					// Sort by newest:
+					.sort((a, b) => {
+						// If B is more recent than A, return true
+						return parseInt(b.element.getAttribute('data-timestamp'))
+							- parseInt(a.element.getAttribute('data-timestamp'));
+
+					// Abandon star object and just store it's element:
+					}).map(star => star.element)
+
+					// Remove null/false elements:
+					.filter(starEle => starEle); ///REVISIT is this readable?
+
+				return me.cachedSorts[order];
+			} break;
+
+			case CONSTS.ORDER.CONSTELLATIONS: {
+				var constellations = {};
+
+
+				Object.values(me.clientStars).forEach(star => {
+					if(!constellations[star.constellationID]) {
+						constellations[star.constellationID] = [];
+					}
+
+					constellations[star.constellationID].push(star);
+				});
+
+				Object.keys(constellations).forEach(constellationID => {
+					///REVISIT if we return from server and order elements in
+					//sequence of ID, this should be unnecessary:
+					var sortedConstellation = constellations[constellationID]
+						//@REVISIT redundancy:
+						.sort((a, b) => {
+							return a.timestamp - b.timestamp;
+						})
+						.map(star => star.element)
+						.filter(starEle => starEle);
+
+					constellations[constellationID] = sortedConstellation;
+				})
+
+				///REVISIT should we be concerned that this order returns a
+				//different data structure than others?:
+				me.cachedSorts[order] = constellations
 
 				return me.cachedSorts[order];
 			} break;
 
 			case CONSTS.ORDER.MOST_POPULAR: {
-				///REVISIT we rely on the server to have output the stars in popularity order.
-				/// we should at the very least make this semantically clearer... or just leave a comment
+				//TODO-2 we rely on the server to have output the stars in
+				//popularity order. Just a quick-fix.
 				return document.getElementsByClassName('star');
 			} break;
 
@@ -215,16 +265,22 @@ function ClientStarsAPI() {
 
 	/**
 	 * Sort the stars by order and display them according to view.
-	 * @param order {CONSTANTS.ORDER}
-	 * @param view {CONSTANTS.VIEW}
+	 * @param {CONSTANTS.ORDER} order
+	 * @param {CONSTANTS.VIEW} view
 	 **/
-	this.sort = function(order, view) { ///REVISIT maybe separate into its own component? probably rename when we better understand how we will architect things
+	///REVISIT maybe separate into its own component? probably rename when we
+	//better understand how we will architect things:
+	//@REVISIT sameView architecture/naming
+	this.sort = function(order, view, sameView = false) { 
 		// if(!view) view = "list"; // Explicit because we pass in the value of getAttribute('data-view')
+		//me.clearConstellationLines();
 
-		var xOffset = -spc.x;
-		var yOffset = -spc.y;
+		var animationOptions = {};
 
-		me.clearConstellationLines();
+		if(sameView) {
+			// If we're in the same view, don't use elastic easing:
+			animationOptions.easing = "cubicBezier(0.120, 0.620, 0.340, 0.960)";
+		}
 
 		// Reposition each star
 		switch(view) {
@@ -233,71 +289,86 @@ function ClientStarsAPI() {
 
 				// for (var starIndex = 0; starIndex < me.clientStars.length; starIndex++) {
 				// 	var starEle = me.clientStars[starIndex].element;
-				me.clientStars.forEach((clientStar, starIndex) => {
+				Object.values(me.clientStars).forEach((clientStar, starIndex) => {
 					cor.rc(document.body, 'sorting'); ////
 
-					anime({
-						targets: clientStar.element,
-						left: clientStar.element.getAttribute('data-x') + 'px',
-						top: clientStar.element.getAttribute('data-y') + 'px',
-						duration: 500,
-						complete: function() {
-							me.generateConstellationLines();
-						}
-					});
+					beginAnimation([clientStar.element], false, {
+						left: clientStar.position.x + 'px',
+						top: clientStar.position.y + 'px',
+					}, animationOptions);
+
+					// Set the dimensions of the canvas to that of the window:
+					effects.canvas.width = document.body.offsetWidth;
+					effects.canvas.height = document.body.offsetHeight;
 				});
+
+				if(clientState.playingStar) {
+					spc.ctr(
+						clientState.playingStar.position.x,
+						clientState.playingStar.position.y
+					);
+				}
 			} break;
 
-			case CONSTS.VIEW.GRID:
-			case CONSTS.VIEW.LIST: {
+			case CONSTS.VIEW.CONSTELLATIONS: {
 				spc.s = false;
 
+				//@REVISIT kinda weird:
 				var sortedElements = this.getSortedStars(order);
 
-				///REVISIT these variables only used by grid view; sort of odd placed here:
+				var currentRow = 0;
+				for(var constellationID in sortedElements) {
+					var constellationStars = sortedElements[constellationID];
+
+					beginAnimation(constellationStars, (starIndex => {
+						const x = starIndex * styleVars.starGridSquareSize;
+						const y = currentRow * styleVars.starGridSquareSize;
+
+						return { x, y };
+					}), animationOptions);
+
+					currentRow += 1;
+				}
+
+				cor.ac(document.body, 'sorting');
+			} break;
+
+			case CONSTS.VIEW.GRID: {
+				spc.s = false;
+				var sortedElements = this.getSortedStars(order);
+
 				var currentRow = 0;
 				var columnCount = Math.floor(styleVars.starGridWidth / styleVars.starGridSquareSize);
+				beginAnimation(sortedElements, (starIndex => {
+					// Calculate target position of the star
+					const x = styleVars.starGridSquareSize * (starIndex % columnCount);
+					const y = styleVars.starGridSquareSize * currentRow;
+
+					// Wrap grid if row filled
+					if(x >= styleVars.starGridWidth - styleVars.starGridSquareSize) {
+						currentRow += 1;
+					}
+
+					return { x, y };
+				}), animationOptions);
+
+				cor.ac(document.body, 'sorting');
+			} break;
+
+			case CONSTS.VIEW.LIST: {
+				spc.s = false;
+				var sortedElements = this.getSortedStars(order);
+
+				beginAnimation(sortedElements, (starIndex => {
+					// Calculate target position of the star
+					const x = 0;
+					const y = (styleVars.starGridSquareSize + styleVars.starGridMargin) * starIndex;
+
+					return { x, y };
+				}), animationOptions);
 
 				cor.ac(document.body, 'sorting'); ////
 
-				for (var starEleIndex = 0; starEleIndex < sortedElements.length; starEleIndex++) {
-					var starEle = sortedElements[starEleIndex];
-
-					///REVISIT architecture:
-					cor.rc(starEle, 'odd');
-					cor.rc(starEle, 'even');
-					cor.ac(starEle, starEleIndex % 2 ? 'odd' : 'even');
-
-					// Calculate target position of the star
-					var newX;
-					var newY;
-					if(view == CONSTS.VIEW.GRID) {
-						newX = styleVars.starGridSquareSize * (starEleIndex % columnCount);
-						newY = styleVars.starGridSquareSize * currentRow;
-					} else if(view == CONSTS.VIEW.LIST) {
-						newX = 0;
-						newY = (styleVars.starGridSquareSize + styleVars.starGridMargin) * starEleIndex;
-					}
-
-
-					// Animate the star to its target position
-					anime({
-						targets: starEle,
-						left: newX + styleVars.starGridPaddingX + xOffset + 'px',
-						top: newY + styleVars.starGridPaddingY + yOffset + 'px',
-						duration: 500,
-						complete: function() {
-							me.generateConstellationLines();
-						}
-					});
-
-					if(view == CONSTS.VIEW.GRID) {
-						// Wrap grid if row filled
-						if(newX >= styleVars.starGridWidth - styleVars.starGridSquareSize) {
-							currentRow += 1;
-						}
-					}
-				}
 			} break;
 
 			// case 'constellationRows': {
@@ -333,32 +404,62 @@ function ClientStarsAPI() {
 				console.error("Unhandled star view: " + view);
 			}
 		}
+
+		// Redraw constellation lines:
+		//@REVISIT are we good to just use time of animation + 100ms here?:
+		setTimeout(function() {
+			effects.onResize();
+			//me.generateConstellationLines();
+			me.updateConstellationLines();
+		}, 600);
 	}
 
-	// function play(starElement) {
-	// 	// var sid = starElement.id.split('s')[1];
-	// 	// var sid = starElement.getAttribute('data-id').split('s')[1];
+	//@REVISIT naming:
+	function beginAnimation(starEles, positionCallback, animationOptions = {}) {
+		var spcXOffset = -spc.x;
+		var spcYOffset = -spc.y;
 
-	// 	// var infoBox = cor._('#starInfoBox');
-	// 	// infoBox.get
+		// Get origin x based on where CSS has placed layout element:
+		//@TODO revisit this architecture
+		//var originX = document.querySelector('#sorting-header')
+		//    .offsetLeft + styleVars.starSize;
+		var infoPanel = document.querySelector('#playingStarInfo')
+		var originX = infoPanel.offsetWidth + infoPanel.offsetLeft + styleVars.starSize * 4;
 
-	// 	var starTitle = starElement.getAttribute('data-title');
-	// 	cor._('#playingStarTitle').innerHTML = starTitle;
+		// Adjust position of sorting header:
+		var sortingHeader = document.querySelector('#sorting-header');
+		sortingHeader.style.left = (originX - styleVars.starSize * 2) + 'px';
 
-	// 	var creatorName = starElement.getAttribute('data-creatorName');
-	// 	cor._('#playingCreatorName').innerHTML = creatorName;
+		for (var starEleIndex = 0; starEleIndex < starEles.length; starEleIndex++) {
+			var starEle = starEles[starEleIndex];
 
-	// 	var creatorLink = starElement.getAttribute('data-creatorLink');
-	// 	cor._('#playingCreatorLink').innerHTML = creatorLink;
+			///REVISIT architecture:
+			cor.rc(starEle, 'odd');
+			cor.rc(starEle, 'even');
+			cor.ac(starEle, starEleIndex % 2 ? 'odd' : 'even');
 
-	// 	// cor._('#playingStarInfo').style.display = 'block';
-	// 	cor.ac(document.body, 'playing')
+			var defaultAnimationOptions = {
+				targets: starEle,
+				duration: 500,
+				easing: 'easeOutElastic(1, 0.5)',
+				//update: (anim) => me.updateConstellationLines()
+			};
 
-	// 	mediaPlayer.playStar(starElement);
-	// }
+			if(positionCallback) {
+				var position = positionCallback(starEleIndex);
+				defaultAnimationOptions.left = position.x + originX + spcXOffset + 'px';
+				defaultAnimationOptions.top = position.y + styleVars.starGridPaddingY + spcYOffset + 'px';
+			}
 
-	function deleteStar(starElement) { ///REVISIT architecture; can't use delete name unless maybe this.delete because reserved word
-		var starID = clientState.actingStar.id;
+			var starAnimationOptions = Object.assign(defaultAnimationOptions, animationOptions);
+
+			// Animate the star to its target position
+			anime(starAnimationOptions);
+		}
+	}
+
+	function deleteStar(starElement) {
+		var starID = clientState.actingStar.publicID;
 		var p = "starID="+starID;
 		ajx('/ajax/deleteStar', p, function(d) {
 			var r = JSON.parse(d);
@@ -370,18 +471,15 @@ function ClientStarsAPI() {
 		return false;
 	}
 
-//	/**
-//	 * Bookmark a star for the current user.
-//	 * @param {ClientStar} starElement - The star to bookmark.
-//	 **/
-//	function bookmark(starElement) {
-//	}
-
 	/**
 	 * Prepare constellation lines for drawing.
 	 **/
+	//this.generateConstellationLines = function(animating = true) {
 	this.generateConstellationLines = function() {
-		lineDrawStartMS = performance.now();
+		//if(animating) {
+			lineDrawStartMS = performance.now();
+		//}
+
 		constellationLines = [];
 		animatingLines = [];
 		// isAnimating = true;
@@ -390,24 +488,31 @@ function ClientStarsAPI() {
 		var lineIndex = 0;
 		// for (var starIndex = 0; starIndex < me.clientStars.length; starIndex++) {
 		// 	var clientStar = me.clientStars[starIndex];
-		me.clientStars.forEach((clientStar, starIndex) => {
-			var starElement = clientStar.element;
+		Object.values(me.clientStars).forEach((clientStar, starIndex) => {
+			var starEle = clientStar.element;
 
 			if(clientStar.originStarID != -1) { // If this is not an origin star
-				var rootStar = document.getElementById('s' + clientStar.originStarID);
-				rootStar.setAttribute('data-next', clientStar.id); ///TODO figure out what "next" means when there are multiple child stars; also this shouldn't be here if it were being used
+				var originStarEle = document.getElementById('star_' + clientStar.originStarID);
+				if(!originStarEle) {
+					console.error('root star not loaded for ' + clientStar.publicID);
+					throw false;
+				}
+
+				originStarEle.setAttribute('data-next', clientStar.publicID); ///TODO figure out what "next" means when there are multiple child stars; also this shouldn't be here if it were being used
 
 				// We use the star's style.left and .top in case we're in list/grid view:
 				constellationLines.push({
-					startX: parseInt(rootStar.style.left),
-					startY: parseInt(rootStar.style.top),
+					starEle,
+					originStarEle,
+					startX: parseInt(originStarEle.style.left),
+					startY: parseInt(originStarEle.style.top),
 					//endX: clientStar.position.x,
 					//endY: clientStar.position.y,
-					endX: parseInt(starElement.style.left),
-					endY: parseInt(starElement.style.top),
-					startColor: rootStar.getElementsByTagName('a')[0].style.backgroundColor, ///
-					endColor: starElement.getElementsByTagName('a')[0].style.backgroundColor, ///
-					tier: parseInt(starElement.getAttribute('data-tier')),
+					endX: parseInt(starEle.style.left),
+					endY: parseInt(starEle.style.top),
+					startColor: originStarEle.getElementsByTagName('a')[0].style.backgroundColor, ///
+					endColor: starEle.getElementsByTagName('a')[0].style.backgroundColor, ///
+					tier: parseInt(starEle.getAttribute('data-tier')),
 					isAnimating: true /// OPTIMIZATION?
 				});
 
@@ -415,15 +520,30 @@ function ClientStarsAPI() {
 			}
 		});
 
-		window.requestAnimationFrame(me.drawLineStep);
+		me.drawLineStep();
+	}
+
+	/**
+	 * Update the start and end positions of constellation lines.
+	 **/
+	this.updateConstellationLines = function() {
+		constellationLines.forEach(line => {
+			line.startX = parseInt(line.originStarEle.style.left);
+			line.startY = parseInt(line.originStarEle.style.top);
+			line.endX = parseInt(line.starEle.style.left);
+			line.endY = parseInt(line.starEle.style.top);
+		});
+
+		return me.drawLineStep();
+		//window.requestAnimationFrame(me.drawLineStep);
 	}
 
 	/**
 	 * Draw a frame of the branching constellations.
 	 * @param {number} currentMS
+	 * @todo Rename, probably.
 	 **/
-	this.drawLineStep = function(currentMS) {
-		console.log("drawLineStep");
+	this.drawLineStep = function(currentMS = performance.now(), animating = true) {
 
 		effects.context.clearRect(0, 0, effects.canvas.width, effects.canvas.height);
 
@@ -436,7 +556,8 @@ function ClientStarsAPI() {
 			var progress;
 			if(line.isAnimating) {
 				// Slow down line drawing as it goes on:
-				var delay = ((line.tier) * 1000) - ((line.tier * 800));
+				var delay = ((line.tier - 1) * 1000) - ((line.tier - 1) * 915);
+				//var delay = (line.tier * 1000) / (line.tier + 1);
 
 				// var delay = (line.tier - 1) * 1000;
 
@@ -466,10 +587,6 @@ function ClientStarsAPI() {
 			// var lineGradient = effects.context.createLinearGradient(0,0,170,0);
 			// var lineGradient = effects.context.createLinearGradient(line.startX,line.startY,line.endX,line.endY);
 			// var lineGradient = effects.context.createLinearGradient(0, 0, line.endX + line.startX, line.endY + line.startY);
-			if(!drawVec.x) {
-				console.log(line);
-				console.log(drawVec);
-			}
 
 			var lineGradient = effects.context.createLinearGradient( ///TODO maybe save this with the line? or the data involved?
 				line.startX + spc.x,
@@ -490,13 +607,13 @@ function ClientStarsAPI() {
 		}
 
 		/// optimize
-		if(animatingLines.length) {
-			window.requestAnimationFrame(me.drawLineStep); ////
+		if(animatingLines.length && animating) {
+			return window.requestAnimationFrame(me.drawLineStep); ////
 		}
 	}
 
 	/**
-	 * Clear the canvas of the constellation lines.
+	 * Clear the cache and canvas of the constellation lines.
 	 * @todo /// make it not just clear the whole canvas or rename this method
 	 **/
 	this.clearConstellationLines = function() {

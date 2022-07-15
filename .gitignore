@@ -1,19 +1,32 @@
 #///TODO check if we're still using these files/directories
 
+# Library files:
 node_modules/
 .sass-cache/
 .vagrant
 *.css.map
 *.log
 
-telepServer.config.js
+# Telep config files:
+config/telepServer.config.js
+config/telep.config.js
+
+# IBM cloud auth:
+config/.bluemix/cos_credentials
+
+# Telep local uploads:
 uploads/*
 public/music/*
 !public/music/README
 
+# Telep client files:
+public/constellations.css
+public/telephenesis.js
+
+#@TODO delete:
 *.sublime-workspace
 
-#/// maybe commit docs when things are more stable:
+#/// maybe commit docs when things are more stable (to a branch?):
 docs/*
 !docs/telephenesis-jsdoc.config.json
 

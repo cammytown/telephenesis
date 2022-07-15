@@ -1,11 +1,21 @@
 #help-page.uibox
 	p.
-		Telephenesis is a visualization of the metamorphosis of a musical 
+		Welcome to Telephenesis.
+	
+	p.
+		This project is under construction and will be available for public use
+		soon. Feel free to experiment with things; but data may be wiped before
+		our real "launch".
+	
+	hr
+
+	p.
+		Telephenesis is a visualization of the metamorphosis of a musical
 		idea as it is reinterpreted and recreated by different artists.
 
-	p Huh?
-
 	p It's like the game 'Telephone', but with music.
+
+	hr
 
 	.control
 		.mouse.left
@@ -14,6 +24,7 @@
 			span
 
 		div Play / Pause
+		div(style="color: #bbb") Drag Galaxy
 
 	.control
 		.mouse.right
@@ -36,27 +47,27 @@
 		span.key spacebar
 		span Pause / Play
 
+	hr
+
 	//- p.
-	//- 	The ability to contribute to Telephenesis is by invite only. Feel 
+	//- 	The ability to contribute to Telephenesis is by invite only. Feel
 	//- 	free to send us a link to your music.
 
-	p
-		a(href="mailto:contact@telephenesis.com") contact@telephenesis.com
+	//-///TODO rename .credits:
+	div.credits
+		//-h3 contact
+		div
+			a(href="mailto:contact@telephenesis.com") contact@telephenesis.com
 
 	div.credits
-		h3 credits
-		a(href="http://nopiano.com") Chris Marianetti
-			span
-				|
-				| - design
+		//-h3 credits
 
-		br
+		div Dreamed by
+			| 
+			a(href="https://nopiano.com" target="_blank") Chris
+		div Conceptualized by Chris and Cameron
+		div Programmed by
+			| 
+			a(href="https://steelecameron.com" target="_blank") Cameron
 
-		a(href="https://steelecameron.com") Cameron Steele
-			span
-				|
-				| - programming, design
-
-		br
-
-		span Source Code on Github
+		//-span Source Code on Github

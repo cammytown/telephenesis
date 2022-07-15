@@ -1,11 +1,14 @@
 import anime from 'animejs/lib/anime.es.js';
 import cor from '../libs/minlab/cor';
-import spc from '../libs/minlab/spc'; //// ultimately whatever spc becomes probably won't output a singleton
+////REVISIT ultimately whatever spc becomes probably won't output a singleton:
+import spc from '../libs/minlab/spc';
 
-// import clientState from './components/ClientState';
 import Star from '../../../abstract/Star.js';
 import Vector from '../../../abstract/Vector.js';
-import mediaPlayer from './MediaPlayer';
+import MediaPlayer from './MediaPlayer';
+import clientState from './ClientState';
+import Navigation from './Navigation';
+import tlpInterface from './Interface';
 
 export default ClientStar;
 
@@ -14,8 +17,10 @@ export default ClientStar;
  * @param [element] {Element} - Optional pre-existing DOM element which holds the star and attributes.
  * @extends Star
  * @constructor
- */
+ **/
 function ClientStar(element) { ///REVISIT element not in use atm
+	Star.call(this);
+
 	var me = this;
 
 	// Inherits properties from Star.js ...
@@ -26,39 +31,48 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	var animationTimer;
 	var animatingPosition;
 
-	me.element;
-	me.linkElement;
-	me.titleElement;
+	///ARCHITECTURE:
+	this.element;
+	this.linkElement;
+	this.titleElement;
+	this.dateElement;
+	this.uploadProgressElement;
 
 	//this.state = ;
-	me.fileReady = false;
-	me.isPlaced = false;
-	me.isBookmarked = false;
-
+	this.fileReady = false;
+	this.isPlaced = false;
+	this.isUploaded = false;
+	this.isBookmarked = false;
 
 	function init(element = false) {
-		Star.call(me);
 
 		if(element) {
 			me.element = element;
 
-			///TODO I think we should have a more semantically-clear way of expressing that setting these to true is safe:
-			/// for now, we just assume that if we're passing in an element, it's a completed star...
+			///@TODO I think we should have a more semantically-clear way of
+			//expressing that setting these to true is safe:
+			///@REVISIT for now, we just assume that if we're passing in an
+			//element, it's a completed star...
 			me.fileReady = true;
 			me.isPlaced = true;
 
-			if(me.element.classList.contains('bookmarked')) { ///REVISIT improve architecture?
+			///REVISIT improve architecture?
+			if(me.element.classList.contains('bookmarked')) {
 				me.isBookmarked = true;
 			}
 		} else {
 			///REVISIT cleaner solution?:
-			me.element = document.getElementById('placementSymbol').cloneNode(true); /// deep parameter in IE8??
+			/// deep parameter in IE8??
+			me.element = document.getElementById('placementSymbol').cloneNode(true);
 		}
 
+		///REVISIT architecture
 		me.linkElement = me.element.getElementsByTagName('a')[0];
 		me.titleElement = me.element.getElementsByClassName('text title')[0];
+		me.dateElement = me.element.getElementsByClassName('text creationTime')[0];
 
 		// Attach event listeners:
+		me.linkElement.addEventListener('mousedown', onMouseDown);
 		me.linkElement.addEventListener('click', onClick);
 
 		// Create identity properties:
@@ -68,48 +82,53 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		spc.map.appendChild(me.element);
 	}
 
+	function onMouseDown(event) {
+		// If user is placing this star, ignore mousedown to prevent dragging
+		// star intead of space:
+		if(!me.isPlaced) {
+			event.preventDefault();
+		}
+	}
+
 	function onClick(event) {
 		event.preventDefault();
 
 		///REVISIT me.isPlaced feels kinda hacky:
 		if(me.isPlaced) {
-			console.log(me.fileURL);
-			me.play();
+			//me.play();
+			Navigation.navigate("/star/" + me.publicID);
 		} else {
 			return false;
 		}
 	}
 
 	/**
-	 * Moves the star to a 2D coordinate.
+	 * Moves the star to a 2D coordinate over time.
 	 * @param x {number}
 	 * @param y {number}
-	 * @param animate {bool}
+	 * @param animate {boolean}
 	 */
-	this.moveToXY = function(x, y, animate = true) {
+	this.animateToXY = function(x, y) {
 		var newPos = new Vector(x, y);
-		if(!animate) {
-			me.position = newPos;
-		} else {
-			animatingPosition = newPos;
-			animationTimer = animationLength;
 
-			if(!currentAnimation) {
-				var animation = anime({
-					/// move this block somewhere central:
-					targets: me.element,
-					left: () => { return animatingPosition.x + 'px' },
-					top: () => { return animatingPosition.y + 'px' },
-					duration: () => { return animationTimer },
-					complete: () => {
-						// Stars.generateConstellationLines();
-						currentAnimation = false;
-						this.moveToXY(x, y, false);
-					}
-				});
+		animatingPosition = newPos;
+		animationTimer = animationLength;
 
-				return animation.finished;
-			}
+		if(!currentAnimation) {
+			var animation = anime({
+				/// move this block somewhere central:
+				targets: me.element,
+				left: () => { return animatingPosition.x + 'px' },
+				top: () => { return animatingPosition.y + 'px' },
+				duration: () => { return animationTimer },
+				complete: () => {
+					// Stars.generateConstellationLines();
+					currentAnimation = false;
+					me.position = newPos;
+				}
+			});
+
+			return animation.finished;
 		}
 	}
 
@@ -124,18 +143,29 @@ function ClientStar(element) { ///REVISIT element not in use atm
 		cor._('#playingCreatorName').innerHTML = creatorName;
 
 		var creatorLink = me.element.getAttribute('data-creatorLink');
-		cor._('#playingCreatorLink').innerHTML = creatorLink;
+		var creatorExternalLinkEle = cor._('#playingCreatorLink');
+		creatorExternalLinkEle.innerHTML = creatorLink;
+		creatorExternalLinkEle.href = creatorLink;
 
-		// cor._('#playingStarInfo').style.display = 'block';
-		cor.ac(document.body, 'playing')
+		// cor._('#playingStarHeader').style.display = 'block';
+		cor.ac(document.body, 'playing');
 
-		mediaPlayer.playStar(me);
+		var playingStarInputs = document.querySelectorAll('.playing-star-id');
+		for(var playingStarInput of playingStarInputs) {
+			playingStarInput.value = me.publicID;
+		}
+
+		MediaPlayer.playStar(me);
 	}
 
 	/**
 	 * Bookmarks the star for the client's user account.
 	 **/
 	this.bookmark = function() {
+		//@TODO more gracefully handle case where user starts to bookmark
+		//another star before previous receives success response
+		tlpInterface.displayMessage("Bookmarking star...", 0);
+
 		return cor.POST('/ajax/bookmark', { starID: this.id })
 			.then(response => response.json())
 			.then(result => {
@@ -143,8 +173,14 @@ function ClientStar(element) { ///REVISIT element not in use atm
 					throw result.errors;
 				}
 
+				//@TODO handle case where message has changed so we don't hide
+				//wrong message
+				tlpInterface.hideMessage();
+
 				cor.ac(this.element, 'bookmarked');
 				me.isBookmarked = true;
+				clientState.user.bookmarks.push(me);
+				clientState.update();
 			})
 			.catch(err => {
 				console.error(err);
@@ -156,15 +192,25 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	 * Removes bookmark from star for client's user account.
 	 **/
 	this.removeBookmark = function() {
-		return cor.POST('/ajax/removeBookmark', { starID: this.id })
+		//@TODO more gracefully handle case where user starts to bookmark
+		//another star before previous receives success response
+		tlpInterface.displayMessage("Removing bookmark...");
+
+		return cor.POST('/ajax/remove-bookmark', { starID: this.id })
 			.then(response => response.json())
 			.then(result => {
 				if(result.errors) {
 					throw result.errors;
 				}
 
+				//@TODO handle case where message has changed so we don't hide
+				//wrong message
+				tlpInterface.hideMessage();
+
 				this.element.classList.remove('bookmarked');
 				me.isBookmarked = false;
+				clientState.user.bookmarks.splice(clientState.user.bookmarks.indexOf(me), 1);
+				clientState.update();
 			})
 			.catch(err => {
 				console.error(err);
@@ -173,18 +219,32 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	}
 
 	/**
+	 * Load properties into the star from an object (e.g. from the server).
+	 * @param {object} starData
+	 **/
+	//this.loadData = function(starData, additionalProps = []) {
+	//    var importProps = me.identityProps.concat(additionalProps);
+
+	//    for(var identityProp of importProps) {
+	//        //@REVISIT only updating if value is not falsey; always? use flag?:
+	//        if(starData[identityProp]) {
+	//            me[identityProp] = starData[identityProp];
+	//        }
+	//    }
+	//}
+
+	/**
 	 * Set properties according to HTML element attribute values.
 	 **/
 	this.observeAttributes = function() {
 		// Function-scoped variable so we can use getter/setter with same name.
 		var positionValue;
 
-		for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
-			var property = me.identityProps[propIndex];
-
+		for(var property in me.targetProps['client']) {
 			switch(property) {
 				case 'position': {
-					Object.defineProperty(me, 'position', { ///REVISIT architecture
+					///REVISIT architecture
+					Object.defineProperty(me, 'position', {
 						get: function() {
 							return positionValue;
 						},
@@ -203,11 +263,10 @@ function ClientStar(element) { ///REVISIT element not in use atm
 					// console.log(me.position);
 				} break;
 
-				case 'id': {
-					me.id = parseInt(me.element.id.split('s')[1]); ///ARCHITECTURE
+				case 'publicID': {
+					me.publicID = me.element.getAttribute('data-public-id');
 				} break;
 
-				case 'originStarID':
 				case 'constellationID':
 				case 'tier': {
 					me[property] = parseInt(me.element.getAttribute('data-' + property));
@@ -226,12 +285,14 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	 * Set HTML element attributes according to property values.
 	 **/
 	this.observeProperties = function() {
-		for(var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
-			var property = me.identityProps[propIndex];
+		for(var propIndex = 0; propIndex < me.targetProps['client'].length; propIndex++) {
+			var property = me.targetProps['client'][propIndex];
 
 			switch(property) {
-				case 'id': {
-					me.element.id = 's' + me.id;
+				case 'publicID': {
+					me.element.setAttribute('data-public-id', me.publicID);
+					me.element.id = 'star_' + me.publicID;
+					me.linkElement.href = '/star/' + me.publicID;
 				} break;
 
 				case 'position': {
@@ -246,10 +307,24 @@ function ClientStar(element) { ///REVISIT element not in use atm
 
 				case 'fileURL': {
 					me.element.setAttribute('data-fileURL', me.fileURL);
-					me.linkElement.href = me.fileURL;
+					//me.linkElement.href = me.fileURL;
+				} break;
+
+				case 'timestamp': {
+					me.dateElement.innerText = new Date(me.timestamp).toLocaleDateString();
+				} break;
+
+				case 'title': {
+					me.titleElement.innerText = me[property];
+				} // No break. Allow data-* attribute.
+
+				case 'creator': {
+					// Nothing.
 				} break;
 
 				default: {
+					//@TODO all properties should probably be accounted for and this should perhaps error:
+					console.warn('ClientElement.observeProperties unhandled prop: ' + property);
 					me.element.setAttribute('data-' + property, me[property]);
 				}
 			}
@@ -262,33 +337,50 @@ function ClientStar(element) { ///REVISIT element not in use atm
 	 * Convert identity properties to exportable data structure.
 	 * @param dataType {string} - Type of data structure to return.
 	 */
-	this.export = function(dataType = "FormData") {
-		switch(dataType) {
-			case 'FormData': {
-				var formData = new FormData();
+	//@REVISIT dataType not currently in use
+	//this.export = function(dataType = "object") {
+	//    switch(dataType) {
+	//        case 'object': {
+	//            var exportObject = {};
 
-				for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
-					var identityProp = me.identityProps[propIndex];
+	//            for(var identityProp of me.identityProps) {
+	//                exportObject[identityProp] = me[identityProp];
+	//            }
 
-					// If property is an object:
-					if(me.objectProps.indexOf(identityProp) != -1) { ///probably keep array of which properties are objects in Star class
-						formData.append(identityProp, JSON.stringify(me[identityProp]));
+	//            return exportObject;
+	//        } break;
 
-					// Property is a literal value; no need to stringify:
-					} else {
-						formData.append(identityProp, me[identityProp]);
-					}
-				}
+	//        //case 'FormData': {
+	//        //    var formData = new FormData();
 
-				return formData;
-			} break;
+	//        //    for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
+	//        //        var identityProp = me.identityProps[propIndex];
 
-			default: {
-				var error = "ClientStar.export(): Unhandled dataType '" + dataType + "'";
-				console.error(error);
-				throw new Error(error);
-			}
-		}
+	//        //        // If property is an object:
+	//        //        if(me.objectProps.indexOf(identityProp) != -1) { ///probably keep array of which properties are objects in Star class
+	//        //            formData.append(identityProp, JSON.stringify(me[identityProp]));
+
+	//        //        // Property is a literal value; no need to stringify:
+	//        //        } else {
+	//        //            formData.append(identityProp, me[identityProp]);
+	//        //        }
+	//        //    }
+
+	//        //    return formData;
+	//        //} break;
+
+	//        default: {
+	//            var error = "ClientStar.export(): Unhandled dataType '" + dataType + "'";
+	//            console.error(error);
+	//            throw new Error(error);
+	//        }
+	//    }
+	//}
+
+	/** Remove the ClientStar from the client. **/
+	this.delete = function() {
+		////TODO IE needs a polyfill; otherwise use removeChild:
+		me.element.remove();
 	}
 
 	init(element);

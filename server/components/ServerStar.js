@@ -3,57 +3,94 @@ const Vector = require('../../abstract/Vector.js');
 
 /**
  * Star data structure for server use.
- * 
- * @param [starData] {Object} - Initialization properties.
+ * @param {object} [starData] - Initialization properties.
+ * @param {"client"|"server"} [dataSourceTarget]
  * @extends Star
  * @constructor
  */
-function ServerStar(starData) {
+//@REVISIT maybe "dataSourceTarget" can just be "trusted" true or false
+function ServerStar(starData, dataSourceTarget) {
 	var me = this;
 
-	function init(starData) {
-		Star.call(me);
+	Star.call(me);
 
-		me.loadData(starData);
-	}
+	//@REVISIT quick-fix because I don't want it to be in identity props;
+	//change once we have different property sets functioning:
+	me.uploadURL = null;
 
-	me.loadData = function(data, flag = 'client') { ///REVISIT flag architecture
-		if(!data) {
-			return false;
-		}
+	this.targetProps['server'] = Object.assign(this.targetProps['common'], {
+		userPublicID: 'string',
+		active: 'bool',
+		deleted: 'bool',
+		uploadURL: 'string',
+		partialPlays: 'int',
+		longPlays: 'int',
+	});
 
-		// if(flag == 'client') {
-		// Remove keys that the client isn't allowed to modify:
+	init(starData, dataSourceTarget);
 
-		///TODO maybe more value and type validation? log when bad values/props are used
+	function init(starData, dataSourceTarget) {
+		if(starData) {
+			//@REVISIT do we need this here? feels sloppy:
+			const defaults = {
+				'partialPlays': 0,
+				'longPlays': 0
+			};
 
-		// var filteredData = {};
-		var intProps = ['id', 'originStarID', 'tier'];
+			starData = Object.assign(defaults, starData);
 
-		for (var propIndex = 0; propIndex < me.identityProps.length; propIndex++) {
-			var identityProp = me.identityProps[propIndex];
-
-			// If property is an object, convert from string:
-			if(me.objectProps.indexOf(identityProp) != -1) {
-				if(data[identityProp] instanceof Object == false) {
-					data[identityProp] = JSON.parse(data[identityProp]);
-				}
+			if(!dataSourceTarget) {
+				throw new Error("No dataSourceTarget provided to ServerStar() constructor");
 			}
 
-			if(intProps.indexOf(identityProp) != -1) {
-				me[identityProp] = parseInt(data[identityProp]);
-			} else if(identityProp == 'position') {
-				me.position = new Vector(data.position.x, data.position.y);
-			} else {
-				me[identityProp] = data[identityProp];
-			}
+			me.import(starData, dataSourceTarget);
 		}
 
-		// data = filteredData;
-		// }
 	}
 
-	init(starData);
+	///REVISIT dataSourceTarget architecture
+	//me.loadData = function(data, dataFilter = 'client') {
+	//    if(!data) {
+	//        return false;
+	//    }
+
+	//    //@TODO-4 Remove keys that the client isn't allowed to modify.
+
+	//    var intProps = ['tier'];
+
+	//    var importProps = me.identityProps;
+
+	//    switch(dataFilter) {
+	//        case 'client': {
+	//        } break;
+
+	//        case 'server': {
+	//            importProps = importProps.concat(serverProps);
+	//        } break;
+
+	//        default: {
+	//            throw "Unhandled ServerStar data filter '" + dataFilter + '"';
+	//        }
+	//    }
+
+	//    for(var importProp of importProps) {
+	//        // If property value is an object, convert from presumed string:
+	//        if(me.objectProps.indexOf(importProp) != -1) {
+	//            if(data[importProp] instanceof Object == false) {
+	//                data[importProp] = JSON.parse(data[importProp]);
+	//            }
+	//        }
+
+	//        if(intProps.indexOf(importProp) != -1) {
+	//            me[importProp] = parseInt(data[importProp]);
+	//        } else if(importProp == 'position') {
+	//            me.position = new Vector(data.position.x, data.position.y);
+	//        } else {
+	//            me[importProp] = data[importProp];
+	//        }
+	//    }
+	//}
+
 }
 
 module.exports = ServerStar;

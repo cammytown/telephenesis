@@ -58,16 +58,16 @@ module.exports = function Usr(db, vl, bcrypt) {
 				.then(doc => {
 					if(callback) callback(false, doc);
 
-					if(!doc) {
-						throw "No user with sessionString.";
-					}
+					//if(!doc) {
+					//    throw "No user with sessionString.";
+					//}
 
 					return doc;
 				})
 				.catch(error => {
 					// console.log(err);
 					// return false;
-					throw [error];
+					throw error;
 				});
 		}
 	}
@@ -112,7 +112,7 @@ module.exports = function Usr(db, vl, bcrypt) {
 				// var cr = bcrypt.hashSync(pw, s);
 				var sessionCode = generateString(16);
 
-				return collection.update( ///ARCHITECTURE
+				return collection.updateOne( ///ARCHITECTURE
 					{ em: em },
 					{ $set: { ip: ip, ss: sessionCode } }
 				)
@@ -149,7 +149,6 @@ module.exports = function Usr(db, vl, bcrypt) {
 
 				var usrObject = {
 					id: userCount,
-					lv: 0,
 					em: em,
 					pw: cr,
 					ip: ip,

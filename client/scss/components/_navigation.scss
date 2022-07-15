@@ -1,190 +1,173 @@
-/// clean up architecture
-body {
-	&.playing {
-		nav {
-			top: $playerHeight;
-		}
-	}
+///TODO make naming of "in" and "guest" and such clearer; maybe just rename in to user?
 
-	.user, .create { display: none; } ///architecture
+.user {
+	// Hide for guests:
+	display: none;
 
-	&.in {
-		///TODO make naming of "in" and "guest" and such clearer
-
-		.user { display: block; } ///architecture
-		.guest { display: none; }
-
-		#navigation {
-			left: -140px;
-		}
-
-		&.creator {
-			.create { display: block; }
-		}
-
-	}
-
-	nav {
-		ul {
-			li {
-				padding: 5px 10px;
-
-				&.disabled {
-					background: $disabledBackground;
-					color: $disabledText;
-
-					a { ///REVISIT
-						color: $disabledText;
-					}
-				}
-			}
-		}
-	}
-
-	nav.site-nav {
+	body.in & {
+		//@TODO see note in _creation.scss
 		display: block;
-		position: absolute;
-		top: 7px;
-		right: 60px;
-		width: 300px;
-		text-align: right;
-		transition: top 250ms;
-		z-index: 1;
+	}
+}
 
-		a#logo {
-			display: inline;
-			// position: absolute;
-			//z-index: 4;
-			font-family: 'Strait';
-			font-size: 2em;
-			text-decoration: none;
-			text-transform: uppercase;
+.guest {
+	body.in & {
+		// Hide guest elements when logged in:
+		display: none;
+	}
+}
+
+nav {
+	ul {
+		li {
+			a {
+				display: block;
+				padding: 5px 10px;
+			}
+
+			//&.disabled {
+				//background: $disabledBackground;
+				//color: $disabledText;
+
+				//a { ///REVISIT
+					//color: $disabledText;
+				//}
+			//}
+		}
+	}
+
+	body.playing & {
+	}
+}
+
+nav.site-nav {
+	display: block;
+	position: absolute;
+	top: 5px;
+	right: 60px;
+	width: 300px;
+	text-align: right;
+	transition: top 250ms;
+	z-index: 1;
+
+	a#logo {
+		display: inline;
+		// position: absolute;
+		//z-index: 4;
+		font-family: 'Strait';
+		font-size: 1.8em;
+		text-decoration: none;
+		text-transform: uppercase;
+
+		&:hover {
+			color: #edf;
+		}
+	}
+
+	a.menuToggle {
+		position: absolute;
+		top: 1px;
+		right: -35px;
+		//z-index: 3;
+		width: 15px;
+		height: 15px;
+		padding: 7px 10px 7px 7px;
+		color: $link;
+		font-size: 1.25em;
+		text-align: center;
+		line-height: 15px;
+		border-radius: 15px;
+		transition: background-color 0.3s;
+		transform: rotate(90deg);
+		-webkit-transform: rotate(90deg);
+		-ms-transform: rotate(90deg);
+
+		&:hover { background: $link; color: #111; }
+		&.active {
+			transform: none;
+			-webkit-transform: none;
+			-ms-transform: none;
+		}
+	}
+
+	#menu {
+		position: absolute;
+		top: 33px;
+		right: 0;
+		z-index: 5;
+		width: 0;
+		/*height: 100%;*/
+		/*padding: 10px;*/
+		/*background: #e7e7e7;*/
+		overflow: hidden;
+		transition: 0.3s;
+
+		&.active {
+			width: 165px;
+		}
+
+		a {
+			display: block;
+			padding: 3px 0;
+			font-size: 1.25em;
+			white-space: nowrap;
+		}
+	}
+}
+
+#navigation {
+	position: relative;
+	left: 0;
+	width: 280px;
+	font-size: 1.2em;
+	text-align: center;
+	transition: left 0.5s;
+
+	div {
+		float: left;
+		width: 140px;
+	}
+
+	a {
+		margin-left: 10px;
+
+		&:first-child {
+			margin-left: 0;
+		}
+	}
+
+	body.in & {
+		left: -140px;
+	}
+}
+
+/* menu */
+.menu { /* /// name? */
+	position: absolute;
+	z-index: 4;
+	margin: -5px 0 0 3px;
+	background: rgba(0, 0, 0, 0.8);
+
+	a {
+		//display: block;
+		width: 200px;
+		padding: 3px 10px;
+		font-size: 1.2em;
+
+		&.create {
+			color: $create;
+			display: none;
 
 			&:hover {
-				color: #edf;
+				background-color: rgba(0, 150, 0, 0.3);
 			}
 		}
 
-		a.menuToggle {
-			position: absolute;
-			top: 1px;
-			right: -35px;
-			//z-index: 3;
-			width: 15px;
-			height: 15px;
-			padding: 5px;
-			color: $link;
-			font-size: 1.25em;
-			text-align: center;
-			line-height: 15px;
-			border-radius: 15px;
-			transition: background-color 0.3s;
-			transform: rotate(90deg);
-			-webkit-transform: rotate(90deg);
-			-ms-transform: rotate(90deg);
-
-			&:hover { background: $link; color: #111; }
-			&.active {
-				transform: none;
-				-webkit-transform: none;
-				-ms-transform: none;
-			}
-		}
-
-		#menu {
-			position: absolute;
-			top: 33px;
-			right: 0;
-			z-index: 5;
-			width: 0;
-			/*height: 100%;*/
-			/*padding: 10px;*/
-			/*background: #e7e7e7;*/
-			overflow: hidden;
-			transition: 0.3s;
-
-			&.active {
-				width: 165px;
-			}
-
-			a {
-				padding: 3px 0;
-				font-size: 1.25em;
-				white-space: nowrap;
-			}
-		}
 	}
+}
 
-	#navigation {
-		position: relative;
-		left: 0;
-		width: 280px;
-		font-size: 1.2em;
-		text-align: center;
-		transition: left 0.5s;
-
-		div {
-			float: left;
-			width: 140px;
-		}
-
-		a {
-			margin-left: 10px;
-
-			&:first-child {
-				margin-left: 0;
-			}
-		}
-	}
-
-	/* menu */
-	.menu { /* /// name? */
-		position: absolute;
-		z-index: 3;
-		margin: -5px 0 0 3px;
-		background: rgba(0, 0, 0, 0.8);
-
-		a {
-			display: block;
-			width: 200px;
-			padding: 3px 10px;
-			font-size: 1.2em;
-
-			&.create {
-				color: $create;
-
-				&:hover {
-					background-color: rgba(0, 150, 0, 0.3);
-				}
-
-				&.disabled {
-					background: $disabledBackground;
-					color: $disabledText;
-				}
-			}
-
-			&.admin {
-				color: $admin;
-
-				&.danger {
-					color: #e77;
-					&:hover {
-						color: #f8c7c7;
-						background-color: rgba(150, 0, 0, 0.3);
-					}
-				}
-
-				&:hover {
-					color: #f8c7f7;
-					background-color: rgba(150, 0, 150, 0.3);
-				}
-			}
-		}
-	}
-
-	#menu .user, #menu .guest { ///
-		a {
-			display: block;
-		}
+#menu .user, #menu .guest { ///
+	a {
+		display: block;
 	}
 }

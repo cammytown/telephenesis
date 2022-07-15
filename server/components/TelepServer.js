@@ -6,12 +6,18 @@ const MongoClient = require('mongodb').MongoClient;
 const MongoStore = require('connect-mongo')(session);
 const bcrypt = require('bcrypt-nodejs'); /// best?
 const validator = require('validator'); /// best?
+//@REVISIT non-secure because we don't care in this context, right?
+//const nanoid = require('nanoid/non-secure').nanoid;
+const nanoid = require('nanoid/async').nanoid;
 
-const Usr = require('../libs/Usr.js');
+const Usr = require('../libs/Usr.js'); ///REVISIT Usr or usr? changes between files...
 
 const TelepAPI = require('./TelepAPI.js');
-const routes = require('../routes');
-// const config = require('./telepServer.config.js');
+const StarMapper = require('./StarMapper');
+const ArtistMapper = require('./ArtistMapper');
+const AdminMapper = require('./AdminMapper');
+const TelepRouter = require('../routes'); ///REVISIT have a TelepRouter in components/ ?
+const serverConfig = require('../../config/telepServer.config.js');
 
 /**
  * Central component of the server which initializes the database connection, API, and networking.
@@ -21,33 +27,57 @@ function TelepServer() {
 	var me = this;
 
 	///REVISIT architecture:
-	me.config;
-	me.app;
-	me.db;
-	me.usr;
-	me.api;
+	this.app;
+	this.db;
+	this.usr;
+	this.persistorDoc;
+	this.serverConfig = serverConfig;
 
-	me.initialize = function() {
-		///REVISIT why not just require/import it wherever we need it? this might be semantically better?:
-		me.config = require('../telepServer.config.js');
+	var components;
 
+	this.initialize = function() {
 		console.log("initializing telephenesis...");
 
 		initializeDatabase()
 		.then(initializeExpress)
 		.then(initializeTelep)
+		.then(initializeComponents)
 		.then(exposeServer)
 		.catch(err => {
-			//console.error(err); ///
+			console.error(err); ///
 			throw new Error(err);
 		});
 	}
 
 	function initializeDatabase() {
-		return MongoClient.connect("mongodb://mongo:27017", { useUnifiedTopology: true })
+		return MongoClient.connect(serverConfig.database.uri, { useUnifiedTopology: true })
 			.then(mongoClient => {
 				console.log("Database connection established.");
 				me.db = mongoClient.db('telephenesis');
+
+				// Retrieve or create persistorDoc:
+				///TODO maybe refactor into a database initialization file/method
+				var MLMeta = me.db.collection('MLMeta');
+				return MLMeta.find({ id: 'persistors' }).limit(1).next()
+					.then(persistorDoc => {
+						if(!persistorDoc) {
+							me.persistorDoc = {
+								id: 'persistors',
+								userIndex: 1,
+								constellationCount: 0,
+								starCount: 0
+							}
+
+							MLMeta.insertOne(me.persistorDoc);
+						} else {
+							me.persistorDoc = persistorDoc;
+						}
+
+					})
+					.catch(err => {
+						///REVISIT
+						throw err;
+					});
 			})
 			.catch(err => {
 				console.error(err); ///
@@ -58,7 +88,7 @@ function TelepServer() {
 	function initializeExpress() {
 		const app = express();
 
-		app.set('views', './views');
+		app.set('views', __dirname + '/../views');
 		app.set('view engine', 'pug');
 
 		///REVISIT i've heard we should use something other than express to serve static files:
@@ -66,7 +96,7 @@ function TelepServer() {
 
 		app.use(bodyParser.json({ limit: "2400mb" }));
 		app.use(bodyParser.urlencoded({ limit: "2400mb", extended: true }));
-		app.use(cookieParser(me.config.sessionSecret));
+		app.use(cookieParser(serverConfig.sessionSecret));
 
 		me.app = app;
 
@@ -74,27 +104,55 @@ function TelepServer() {
 	}
 
 	function initializeTelep() {
+		///TODO have a generic component initialization method like we
+		//do on the client:
+
 		me.usr = new Usr(me.db, validator, bcrypt);
 		console.log("usr initialized");
 
-		me.api = new TelepAPI(me);
-		console.log("api initialized");
-
+		// Setup user session data storage:
 		me.app.use(session({
-			secret: me.config.sessionSecret, ////
+			///TODO document these options:
+
+			secret: serverConfig.sessionSecret, ////
 			resave: false,
 			saveUninitialized: false, ///
 			store: new MongoStore({
-				url: "mongodb://mongo:27017/telephenesis",
+				url: serverConfig.database.uri
 				// db: db /// ??? not working?
 			})
 			//cookie: { secure: true } /// HTTPS only
 		}));
 
-		routes.initializeRoutes(me);
-		console.log("routes initialized");
+		components = [
+			TelepAPI,
+			StarMapper,
+			ArtistMapper,
+			AdminMapper,
+			TelepRouter,
+		];
 
 		return true;
+	}
+
+	function initializeComponents() {
+		for(var component of components) {
+			// If component has initialize method, run it:
+			if(typeof component.initialize === 'function') {
+				component.initialize(me); ///REVISIT on clientState we use .init() ... keep consistent?
+			}
+		}
+
+		for(var component of components) {
+			///REVISIT does passing `me` in impact performance?
+			//doing this in case people don't want to write an
+			//initialize function but want ref to server:
+			// If component has ready method, run it:
+			if(typeof component.ready === 'function') {
+				component.ready(me);
+			}
+		}
+
 	}
 
 	function exposeServer() {
@@ -103,10 +161,45 @@ function TelepServer() {
 		}
 
 		me.app.listen(
-			me.config.port,
-			() => console.log('telephenesis: listening on port ' + me.config.port)
+			serverConfig.port,
+			() => console.log('telephenesis: listening on port ' + serverConfig.port)
 		);
 	}
+
+	/**
+	 * Generate a unique comment ID that is safe to expose.
+	 * @param {MongoCollection} testCollection
+	 * @returns Promise<string> The unique ID.
+	 **/
+	//@REVISIT placement:
+	this.generatePublicID = function(testCollection) {
+		if(!testCollection) {
+			//@REVISIT
+			throw "No testCollection provided to generatePublicID.";
+		}
+
+		//var unique = false;
+
+		//@TODO consider creating a library that automatically increases
+		//size of nanoid based on number of collisions:
+
+		//@REVISIT should we prefer the non-secure nanoid()? I'm not sure it
+		//allows async but if it's fast enough maybe it doesn't matter??
+		return nanoid(6).then(publicID => {
+			return testCollection.findOne({ publicID })
+				.then(doc => {
+					//@REVISIT kinda weird architecture; maybe better to use await:
+					if(!doc) {
+						return publicID;
+					} else {
+						return me.generatePublicID(testCollection);
+					}
+				});
+		});
+
+		//return publicID;
+	}
+
 }
 
 module.exports = new TelepServer();

@@ -1,11 +1,14 @@
 header#galaxy-ui
 	nav.site-nav
-		a#logo Telephenesis
+		a.nav#logo(href="/") Telephenesis
 		a.menuToggle |||
 
 		#menu
 			.user
-				a.create.nav(href="/settings") profile
+				a.create.nav(href="/account") account
+				if user && user.accessLevel >= config.adminLevel
+					a.nav.admin(href="/admin") admin
+				a.nav(href="/terms") terms
 				a.nav(href="/logout") logout
 
 			.guest
@@ -17,25 +20,31 @@ header#galaxy-ui
 	#sortingUI
 		//-///REVISIT not sure about use of nav in terms of best semantics
 		nav.order-nav
-			span order: 
+			span order:
+			|
+			|
 			span.current-order galaxy
 
 			ul
 				li
 					a.sort(data-order=CONSTS.ORDER.GALAXY) galaxy
 				li
+					a.sort(data-order=CONSTS.ORDER.CONSTELLATIONS) constellations
+				li
 					a.sort(data-order=CONSTS.ORDER.MOST_RECENT) by date
 				li
 					a.sort(data-order=CONSTS.ORDER.MOST_POPULAR) by popularity
-				li(
-					style = { display: user ? "block" : "none" }
-					class = !user || user.bookmarks.length == 0 ? 'disabled' : ''
-				)
-					a.sort(data-order=CONSTS.ORDER.BOOKMARKS) bookmarks
+				li
+					a.sort.bookmarks-sort(
+						style = { display: user ? "block" : "none" }
+						class = !user || user.bookmarks.length == 0 ? 'disabled' : ''
+						data-order = CONSTS.ORDER.BOOKMARKS
+					) bookmarks
 				//- li recently played
 
 		nav.view-nav
-			span view: 
+			span view:
+			| &nbsp;
 			span.current-view galaxy
 
 			ul
@@ -44,14 +53,44 @@ header#galaxy-ui
 				li
 					a.sort(data-view=CONSTS.VIEW.GRID) grid
 
-		header
-			h2.view-header Sorting by Most Recent
 
-	header#playingStarInfo.inactive
+	header#playingStarHeader.inactive
 		div#playbackProgress
 			div#playbackProgressBar
 			// div#playbackProgressAccent
 
-		h2#playingStarTitle Song Title
-		h3#playingCreatorName Artist Name
-		a#playingCreatorLink artistwebsite.com
+header#sorting-header
+	h2.view-header Sorting by Most Recent
+
+//-move into own file probably:
+div#playingStarInfo
+	h2#playingStarTitle Song Title
+	h3#playingCreatorName Artist Name
+	a#playingCreatorLink(target="_blank") artistwebsite.com
+
+	div#starControls
+		a Report
+		a#togglePlayingComments Comments
+
+	div#playingComments
+		//-button + Add Comment
+
+		form#createCommentForm.ajax.user(
+			method='POST'
+			action='/create-comment'
+			data-ajax-action='/ajax/create-comment'
+		)
+			input.playing-star-id(
+				type='hidden'
+				name='starID'
+			)
+
+			textarea.comment-text(
+				placeholder=L['[POSITIVE-COMMENT]'][Date.now() % L['[POSITIVE-COMMENT]'].length]
+				name='commentText'
+				rows='1'
+			)
+
+			button.btn.green.text-left(type='submit') + Add Comment
+
+		ul.comments

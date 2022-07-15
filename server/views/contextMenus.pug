@@ -1,3 +1,6 @@
+//-///TODO various hrefs dont actually point to anything. should adjust for
+//- example /moveStar to /admin/moveStar or /ajax/admin/moveStar
+
 #starContextMenu.menu
 	.user
 		a.ajax.bookmarkToggle(href="/bookmark") Bookmark
@@ -7,10 +10,11 @@
 			class = (user.recreationTickets > 0 ? '' : 'disabled')
 		) Recreate
 
-		a.admin(href="/moveStar") Move
-		a.admin(href="/recolorStar") Recolor
-		a.admin(href="/renameStar") Change Creator
-		a.admin.danger(href="/deleteStar") Delete
+		if user.accessLevel >= config.adminLevel
+			a.admin-nav(href="/admin/moveStar") Move
+			//-a.admin-nav(href="/admin/recolorStar") Recolor
+			//-a.admin-nav(href="/admin/renameStar") Change Creator
+			a.admin-nav.danger(href="/admin/deleteStar") Delete
 
 	.guest
 		a.nav(href="/login") login
@@ -22,6 +26,12 @@
 			href="/create"
 			class = (user.creationTickets > 0 ? '' : 'disabled')
 		) Create Constellation
+
+		if user.accessLevel >= config.adminLevel
+			//-///REVISIT placement:
+			a.nav.admin(href="/admin") Admin
+			a.nav.admin(href="/admin/update-db-schemas") Update Schemas
+			a.nav.admin(href="/admin/generate-demo-stars") Generate Demo Stars
 
 	.guest
 		a.nav(href="/login") login

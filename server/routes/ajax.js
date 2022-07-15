@@ -1,31 +1,106 @@
 const express = require('express');
 
+const config = require('../../config/telep.config.js');
+
 const Telep = require('../components/TelepServer');
-const ServerStar = require('../components/ServerStar.js');
+const Stars = require('../components/StarMapper');
+const ServerStar = require('../components/ServerStar');
+const api = require('../components/TelepAPI');
 
 const routesIndex = require('./index');
 const authRoutes = require('./auth');
+const creationRouter = require('./create').generate(true);
+const adminRoutes = require('./admin');
 
-///REVISIT weird architecture to prevent circular reference:
-var api;
+///REVISIT weird architecture
+//var api;
 function generate(telepServer) {
-	api = telepServer.api;
+	//@REVISIT architecture of this block:
 
 	var ajaxRouter = express.Router();
 
-	ajaxRouter.post('/sync', syncWithClient);
-	ajaxRouter.post('/bookmark', bookmarkStar);
-	ajaxRouter.post('/removeBookmark', removeBookmarkStar);
-	ajaxRouter.post('/actualize', actualizeStar);
+	ajaxRouter.get('/user/:userPublicID', getSingleUser);
 
-	ajaxRouter.post('/login', authRoutes.login, userCheck);
-	ajaxRouter.post('/register', authRoutes.register, authRoutes.login, userCheck);
+	ajaxRouter.post('/login',
+		authRoutes.login,
+		validateUser,
+		authSuccessResponse);
+
+	ajaxRouter.post('/register',
+		authRoutes.register,
+		authRoutes.login,
+		validateUser,
+		authSuccessResponse);
+
 	ajaxRouter.post('/logout', authRoutes.logout);
 
-	//ajaxRouter.post('/upload/:starid', api.auth('creator'), routesIndex.upload.single('submission'), uploadMedia);
+	var userActionRouter = express.Router();
+	userActionRouter.use(validateUser);
+
+	userActionRouter.post('/sync', syncWithClient);
+	userActionRouter.post('/update-account', updateAccount);
+
+	userActionRouter.post('/bookmark', bookmarkStar);
+	userActionRouter.post('/remove-bookmark', removeBookmarkStar);
+
+	userActionRouter.post('/create-comment', createComment);
+	userActionRouter.post('/delete-comment/:commentPublicID', deleteComment);
+
+	//@TODO change to a .get request I think?:
+	userActionRouter.post('/get-star-comments', getStarComments);
+
+	//ajaxRouter.post('/request-upload-url', createRoutes.requestUploadURL);
+	userActionRouter.use(creationRouter);
+
+	userActionRouter.use('/admin', adminRoutes.generate('json'));
+
+	ajaxRouter.use(userActionRouter);
+
+	ajaxRouter.use(ajaxStatusHandler);
 	ajaxRouter.use(ajaxErrorHandler);
 
 	return ajaxRouter;
+}
+
+//function validateUserLevel(level) {
+//    return function(req, res, next) {
+//        if(!req.user) {
+//            res.json({ errors: ["not logged in"] });
+//            return false; ///
+//        }
+
+//        if(!req.user.accessLevel) {
+//            res.json({ errors: ["no creator credentials"] });
+//            return false; ///
+//        }
+
+//        next();
+//    }
+//}
+
+function validateUser(req, res, next) {
+	if(!req.user) { ///TODO moving
+		//res.json({ errors: ["not logged in"] });
+		//return false;
+		next("Not logged in.");
+	} else {
+		next();
+	}
+}
+
+function authSuccessResponse(req, res) { //@REVISIT naming
+	res.json({
+		errors: [],
+		///TODO probably generalize front-end props; maybe a ClientUser class
+		user: req.user.export('client'),
+	});
+}
+
+
+function ajaxStatusHandler(req, res, next) {
+	res.status(404).json({
+		errors: ["Invalid endpoint."], ///REVISIT maybe don't allow people to determine endpoints through trial/error
+	});
 }
 
 /**
@@ -36,6 +111,7 @@ function generate(telepServer) {
  */
 function syncWithClient(req, res) {
 	console.log("syncWithClient");
+	console.log(req.body);
 
 	////TODO security to prevent spoofed plays
 
@@ -62,22 +138,24 @@ function syncWithClient(req, res) {
 
 	return api.syncWithClient(serverUpdates)
 		.then(values => {
-			res.json({ error: false }); ///REVISIT do we really care to wait for server updates?
+			res.json({ errors: false }); ///REVISIT do we really care to wait for server updates?
 		})
 		.catch(err => {
 			throw new Error(err); ///
 		});
 }
 
-function bookmarkStar(req, res) {
-	// if(!req.user || (req.user.id != star.creatorId && req.user.lv != 
-	if(!req.user) {
-		res.json({ error: "not logged in" });
-		return false;
-	}
+function updateAccount(req, res, next) {
+	api.updateAccount(
+		req.user,
+		// Convert to normal object with helper methods like hasOwnProperty:
+		Object.assign({}, req.body)
+	).then(result => {
+		res.json({ errors: [] });
+	});
+}
 
-	//var starID = parseInt(req.body.starID); /// do we need to parseInt now that we pass json??
-
+function bookmarkStar(req, res, next) {
 	return api.bookmark(req.body.starID, req.user.id)
 		.then(result => {
 			res.json({ errors: false });
@@ -85,147 +163,104 @@ function bookmarkStar(req, res) {
 		.catch(err => {
 			///
 			console.error(err);
-			res.json({ error: "Couldn't bookmark." }); ///
+			res.json({ errors: ["Couldn't bookmark."] }); ///
 			return false;
 		});
 }
 
 function removeBookmarkStar(req, res) {
-	if(!req.user) { ///REFACTOR
-		res.json({ error: "not logged in" });
-		return false;
-	}
-
 	return api.removeBookmark(req.body.starID, req.user.id)
 		.then(result => {
 			res.json({ errors: false });
 		})
 		.catch(err => {
 			console.error(err);
-			res.json({ error: "Couldn't remove bookmark." }); ///
+			res.json({ errors: ["Couldn't remove bookmark."] }); ///
 			return false;
 		});
 }
 
-
-function actualizeStar(req, res, next) { ///REVISIT move to a creation-specific set of routes?
-	if(!req.user || req.user.lv != 7) {
-		///REVISIT:
-		res.json({ error: "Not logged in or not permitted." });
-		throw new Error("Not logged in or not permitted.");
-	}
-
-	switch(req.body.hostType) {
-		case 'external': {
-			var newStar = new ServerStar(req.body);
-
-			// Create the star in the database:
-			return api.createStar(req.user, newStar)
-				.then(newStarDoc => {
-					res.json({
-						errors: false,
-						creatorName: req.user.creatorName,
-						newStarID: newStar.id,
-						starMovements: newStarDoc.starMovements,
-					});
-
-					return true;
-				})
-				.catch(err => {
-					//console.error(err); ///
-					//res.json({ error: "Could not create star." }); ///TODO improve error
-					//throw new Error(err);
-					next(err);
-				});
-
-			// api.actualize(starData, function(err, result) {
-			// 	if(err) {
-			// 		res.json({ error: "did not place" });
-			// 		return false;
-			// 	}
-
-			// 	if(star.lsid) {
-			// 		// $lstar = api.sid($star['lsid']);
-			// 		// $luser = $usr->gt($lstar['uid']);
-			// 		// $lmeta = api.meta($lstar['uid']);
-
-			// 		// $content = "Hello, ".$lmeta['name'].".\n\n";
-			// 		// $content .= "Someone has recreated your star on Telephenesis! Check it out here:\n\n";
-			// 		// $content .= URL.'/'.$sid."\n\n";
-			// 		// $content .= "Exciting!\n\n";
-			// 		// $content .= "Don't want these messages? Just reply to this email letting us know."; ///
-
-			// 		// api.email($luser['em'], 'Someone recreated your star', $content);
-			// 	}
-
-			// 	// res.json({ creator: umeta.name });
-			// 	res.json({ errors: false });
-			// });
-		} break;
-
-		// case 'upload': {
-		// 	// Star should already have been created ///REVISIT architecture; maybe it would be better to just have some token associated to the upload that we use when creating the star
-		// 	res.json({ errors: false });
-		// } break;
-
-		default: {
-			console.error('unhandled hostType: ' + req.body.hostType);
-		}
-	}
-
-	// api.getStar(sid, function(err, star) {
-	// 	if(err) {
-	// 		///
-	// 		o.json({ error: "could not get source star" });
-	// 		return false;
-	// 	}
-
-	// 	if(!i.user || i.user.id != star.creator.uid) {
-	// 		o.json({ error: "not logged in" });
-	// 		return false;
-	// 	}
-
-	// 	var x = parseInt(i.body.x);
-	// 	var y = -1 * parseInt(i.body.y);
-	// 	var rgb = i.body.rgb;
-
-	// 	api.actualize(sid, x, y, rgb, function(err, result) {
-	// 		if(err) {
-	// 			o.json({ error: "did not place" });
-	// 			return false;
-	// 		}
-
-	// 		if(star.lsid) {
-	// 			// $lstar = api.sid($star['lsid']);
-	// 			// $luser = $usr->gt($lstar['uid']);
-	// 			// $lmeta = api.meta($lstar['uid']);
-
-	// 			// $content = "Hello, ".$lmeta['name'].".\n\n";
-	// 			// $content .= "Someone has recreated your star on Telephenesis! Check it out here:\n\n";
-	// 			// $content .= URL.'/'.$sid."\n\n";
-	// 			// $content .= "Exciting!\n\n";
-	// 			// $content .= "Don't want these messages? Just reply to this email letting us know."; ///
-
-	// 			// api.email($luser['em'], 'Someone recreated your star', $content);
-	// 		}
-
-	// 		// o.json({ creator: umeta.name });
-	// 		o.json({ errors: false });
-	// 	});
-	// });
+/**
+ * Router handler for posting a new comment.
+ **/
+function createComment(req, res, next) {
+	return api.createComment(
+		req.user,
+		req.body['starID'],
+		req.body['commentText'],
+		req.body['replyingTo']
+	)
+		.then(newComment => {
+			res.json({
+				errors: [],
+				newComment: {
+					//@REVISIT-2 probably create Comment class with export() method:
+					publicID: newComment.publicID,
+					starID: newComment.starID,
+					text: newComment.text,
+					timestamp: new Date(), //@REVISIT sort of hacky
+					user: newComment.user,
+					replyingTo: newComment.replyingTo,
+				},
+			});
+			//return commentID;
+			//next();
+		})
+		.catch(err => {
+			throw err;
+		});
 
 }
 
-function userCheck(req, res) {
-	if(!req.user) {
-		throw ["Not logged in."];
-	}
+/**
+ * Router handler for deleting a comment.
+ **/
+function deleteComment(req, res, next) {
+	return api.deleteComment(
+		req.user,
+		req.params.commentPublicID
+	)
+		.then(success => {
+			res.json({
+				errors: []
+			});
+		})
+		.catch(err => {
+			throw err;
+		});
 
-	res.json({ errors: [] });
-	return true;
+}
+
+
+/** Router handler for retrieving star comments. **/
+function getStarComments(req, res, next) {
+	return api.getStarComments(
+		req.body['starID'],
+	)
+		.then(comments => {
+			res.json({
+				errors: [],
+				comments,
+			});
+		})
+		.catch(err => {
+			next(err);
+		});
+}
+
+/** Router handler for retrieving single user. **/
+function getSingleUser(req, res, next) {
+	api.getUserByPublicID(req.params.userPublicID)
+		.then(singleUser => {
+			res.json({
+				errors: [],
+				user: singleUser.export('client')
+			});
+		});
 }
 
 function ajaxErrorHandler(err, req, res, next) {
+	//console.trace();
 	console.log(err.stack);
 	console.log('ajax error: ' + err);
 	res.json({ errors: err instanceof Error ? [err.message] : err }); ///TODO just always throw Error and get rid of this check

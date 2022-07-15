@@ -1,16 +1,21 @@
 ///TODO convert to ES6 class
 
-import cor from '../libs/minlab/cor';
+import COR from '../libs/minlab/cor';
 // import ajx from '../libs/minlab/ajx';
 import spc from '../libs/minlab/spc';
 import HistoryTime from '../libs/history-time';
-import Navigation from './Navigation';
+
+import CONSTS from '../../../abstract/constants.js';
+import locale from '../../../locale/en_us.json'; ///REVISIT
+import Vector from '../../../abstract/Vector';
+
+import navigation from './Navigation';
 
 import clientState from './ClientState';
 import mediaPlayer from './MediaPlayer';
-import Stars from './Stars';
-import CONSTS from '../../../abstract/constants.js';
-import locale from '../../../locale/en_us.json'; ///REVISIT
+import creator from './Creator';
+//import effects from './ClientEffects';
+import stars from './Stars';
 
 /**
  * Telephenesis class for user interface methods.
@@ -20,117 +25,60 @@ function Interface() {
 	// var currentOrderLink;
 	var me = this;
 
-	me.order = CONSTS.ORDER.GALAXY;
-	me.view = CONSTS.VIEW.GALAXY;
+	this.order = CONSTS.ORDER.GALAXY;
+	this.view = CONSTS.VIEW.GALAXY;
 
 	/** Element which holds messages shown to user. **/
 	var messageElement;
 
 	/**
-	 * The ID of the setTimeout timer being used to display 
+	 * The ID of the setTimeout timer being used to display
 	 * the current message.
 	 * @type {number}
 	 **/
 	var messageTimerID = null;
 
+	/** Whether or not the mouse is being click-dragged. **/
+	var draggingMouse = false;
+
+	/** The last saved position of the mouse. **/
+	var lastMousePos = null;
+
+	/** The function to run pending user confirmation. **/
+	var confirmationCallback = null;
+
 	this.init = function() {
 		messageElement = document.getElementById('notification');
 
-		// var closes = document.getElementsByClassName('close');
-		// if(closes.length) for(var i=0, j=closes.length; i<j; i++) {
-		// 	cor.al(closes[i], 'click', function(event) {
-		// 		event.preventDefault();
-		// 		navigate('/');
-		// 	});
-		// }
+		spc.moveCallbacks.push(stars.drawLineStep);
 
-		spc.moveCallbacks.push(Stars.drawLineStep);
+		//@REVISIT belongs in Navigation.js?:
+		COR.addClassListener('sort', 'click', onSortClick);
 
-		/* NAVIGATION */
+		window.addEventListener('mousedown', onMouseDown);
+		window.addEventListener('mousemove', onMouseMove);
+		window.addEventListener('mouseup', onMouseUp);
+
+		window.addEventListener('scroll', function(eve) {
+			window.requestAnimationFrame(stars.drawLineStep);
+		});
+
+		////REVISIT can we guarantee this will run AFTER
+		//clientEffects's listener does on every browser?  if it
+		//doesn't, the canvas will be cleared after we draw the stars:
+		window.addEventListener('resize', () => {
+			window.requestAnimationFrame(stars.drawLineStep);
+		});
+
 		var menuToggleElement = document.getElementsByClassName('menuToggle')[0]; ////
 		// currentOrderLink = document.getElementsByClassName('sort active')[0]; ///REVISIT naming/architecture
 
 		// Open header menu when button is clicked
-		cor.al(menuToggleElement, 'click', toggleMenu);
-		function toggleMenu(e) {
-			var menu = document.getElementById('menu');
-			var isActive = cor.cc(menu, 'active');
-			if(isActive) {
-				e.target.innerHTML = '|||';
-				cor.rc(e.target, 'active');
-				cor.rc(menu, 'active');
-			} else {
-				e.target.innerHTML = '&rarr;';
-				cor.ac(e.target, 'active');
-				cor.ac(menu, 'active');
-			}
-		}
+		menuToggleElement.addEventListener('click', toggleMenu);
 
-		/* SHORTCUTS */
-		cor.al(window, 'keydown', function(e) {
-			if(e.target.tagName.toUpperCase() == "INPUT") { // .toUpperCase() out of paranoia
-				return true;
-			}
+		COR.addClassListener('confirmation-link', 'click', onConfirmationLinkClick);
 
-			switch(e.keyCode) {
-				// Left arrow:
-				case 37: {
-					e.preventDefault();
-
-					// If a star is currently active in the media player:
-					if(clientState.playingStar) {
-						// If there's a previous star:
-						if(clientState.playingStar.originStarID != -1) {
-							var previousStar = Stars.clientStars[clientState.playingStar.originStarID];
-							mediaPlayer.playStar(previousStar);
-						}
-					}
-				} break;
-
-				// Right arrow:
-				case 39: {
-					e.preventDefault();
-
-					if(clientState.playingStar) {
-						///TODO better solution:
-						var nsid = parseInt(clientState.playingStar.element.getAttribute('data-next'));
-						/// if next star isn't loaded? if there is no next star?
-						var nextStar = Stars.clientStars[nsid];
-						if(!nextStar) {
-							///REVISIT
-							return false;
-						}
-
-						mediaPlayer.playStar(nextStar);
-					}
-				} break;
-
-				// Spacebar:
-				case 32: {
-					if(!clientState.activeWindow) {
-						e.preventDefault();
-
-						mediaPlayer.audio.element.paused ? mediaPlayer.audio.play() : mediaPlayer.audio.pause();
-					}
-				} break;
-
-				// ESC / Escape:
-				case 27: {
-					if(HistoryTime.state.url != '/') {
-						Navigation.navigate('/'); //// page title
-
-						if(me.view != CONSTS.VIEW.GALAXY) {
-							me.sort(CONSTS.VIEW.GALAXY);
-						}
-					}
-				} break;
-			}
-		});
-
-		/* SORTING */
-		for(var sortLinks of cor._('.sort')) {
-			cor.al(sortLinks, 'click', onSortClick);
-		}
+		window.addEventListener('keydown', onKeyDown);
 	}
 
 	/**
@@ -138,22 +86,32 @@ function Interface() {
 	 * @see ClientState#addComponent
 	 **/
 	this.ready = function() {
-		Stars.generateConstellationLines();
+		stars.generateConstellationLines();
 
-		///TODO revisit implementation; probably render on the server:
-		// If loaded URL contains a query string:
-		if(location.search.length) {
-			// Check for view and/or order in query string:
-			var params = new URLSearchParams(location.search);
-			var initialOrder = params.get('order');
-			var initialView = params.get('view');
 
-			// If there's a view or order in the query string:
-			if(initialOrder || initialView) {
-				// Display the view and/or order:
-				me.sort(initialOrder, initialView);
-			}
+		if(localStorage.getItem('firstVisit') == null) {
+			// Open help page on first visit:
+			//@REVISIT-3 probably temporary
+			navigation.navigate('/help');
+
+			localStorage.setItem('firstVisit', true);
 		}
+
+		// If loaded URL contains a query string:
+		//@TODO-1 revisit implementation; probably render on the server:
+		//if(window.location.search.length) {
+		//    // Check for view and/or order in query string:
+		//    //@TODO-2 ensure IE support:
+		//    var params = new URLSearchParams(location.search);
+		//    var initialOrder = params.get('order');
+		//    var initialView = params.get('view');
+
+		//    // If there's a view or order in the query string:
+		//    if(initialOrder || initialView) {
+		//        // Display the view and/or order:
+		//        me.sort(initialOrder, initialView);
+		//    }
+		//}
 	}
 
 	/**
@@ -161,7 +119,7 @@ function Interface() {
 	 * @param {string} message - The message to display.
 	 * @param {string} [type="notification"] - The type of message.
 	 * @param {number} [duration=5000] - How long to display the message for.
-	 */
+	 **/
 	this.displayMessage = function(message, type = "notification", duration = 5000) { ///REVISIT naming
 		clearMessageTimer();
 
@@ -180,7 +138,7 @@ function Interface() {
 	/**
 	 * Hide the message displayed to the user, if any.
 	 **/
-	this.hideMessage = function() {
+	this.hideMessage = function() { ///REVISIT rename to clearMessage ?
 		clearMessageTimer();
 
 		limbo.appendChild(messageElement);
@@ -214,21 +172,186 @@ function Interface() {
 		me.displayMessage(errorMessage, "error");
 	}
 
+	this.confirmAction = function(message, action) {
+		var confirmActionEle = COR._('#confirmAction-page');
+		confirmActionEle.querySelector('.confirmation-message').innerText = message;
+		confirmationCallback = action;
+
+		navigation.open('confirmAction');
+	}
+
+	function onConfirmationLinkClick(event) {
+		event.preventDefault();
+
+		if(confirmationCallback) {
+			confirmationCallback();
+		}
+
+		//@TODO improve architecture:
+		navigation.close(document.getElementById('confirmAction-page'));
+	}
+
+	function onMouseDown(event) {
+		draggingMouse = true;
+		lastMousePos = new Vector(event.clientX, event.clientY);
+	}
+
+	function onMouseMove(event) {
+		// If dragging the mouse on a non-galaxy view:
+		if(draggingMouse && me.view != CONSTS.VIEW.GALAXY) {
+			// Scroll the window by mouse delta:
+			var currentMousePos = new Vector(event.clientX, event.clientY);
+			var difference = currentMousePos.subtract(lastMousePos);
+			window.scrollBy(-difference.x, -difference.y);
+			lastMousePos = currentMousePos;
+		}
+	}
+
+	function onMouseUp(event) {
+		draggingMouse = false;
+	}
+
+	function onKeyDown(e) {
+		// Ignore key presses with modifier keys:
+		if(e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) {
+			return true;
+		}
+
+		///REVISIT better way to check if it's a form element?
+		if(["INPUT", "TEXTAREA"].includes(e.target.tagName.toUpperCase())) { // .toUpperCase() out of paranoia
+			return true;
+		}
+
+		switch(e.keyCode) {
+			// Left arrow:
+			case 37: {
+				e.preventDefault();
+
+				// If a star is currently active in the media player:
+				if(clientState.playingStar) {
+					// If there's a previous star:
+					if(clientState.playingStar.originStarID != -1) {
+					//    var previousStar = stars.clientStars[clientState.playingStar.originStarID];
+					//    mediaPlayer.playStar(previousStar);
+						navigation.navigate('/star/' + clientState.playingStar.originStarID);
+					}
+				}
+			} break;
+
+			// Right arrow:
+			case 39: {
+				e.preventDefault();
+
+				if(clientState.playingStar) {
+					///TODO better solution:
+					var nsid = clientState.playingStar.element.getAttribute('data-next');
+					/// if next star isn't loaded? if there is no next star?
+					//var nextStar = stars.clientStars[nsid];
+					//console.log(stars.clientStars);
+					//if(!nextStar) {
+					//    ///REVISIT
+					//    console.log('no next star');
+					//    return false;
+					//}
+
+					//mediaPlayer.playStar(nextStar);
+
+					navigation.navigate('/star/' + nsid);
+				}
+			} break;
+
+			// Spacebar:
+			case 32: {
+				if(!clientState.activeWindow) {
+					e.preventDefault();
+
+					mediaPlayer.audio.element.paused ? mediaPlayer.audio.play() : mediaPlayer.audio.pause();
+				}
+			} break;
+
+			// ESC / Escape:
+			case 27: {
+				///@TODO probably come up with prettier check:
+				if(creator.workingStar) {
+					creator.cancel();
+				} else {
+					if(HistoryTime.state.url != '/') {
+						navigation.navigate('/'); //// page title
+
+						if(me.view != CONSTS.VIEW.GALAXY) {
+							me.sort(CONSTS.VIEW.GALAXY);
+						}
+					}
+				}
+			} break;
+		}
+	};
+
+	function toggleMenu(e) {
+		var menu = document.getElementById('menu');
+		var isActive = COR.cc(menu, 'active');
+		if(isActive) {
+			e.target.innerHTML = '|||';
+			COR.rc(e.target, 'active');
+			COR.rc(menu, 'active');
+		} else {
+			e.target.innerHTML = '&rarr;';
+			COR.ac(e.target, 'active');
+			COR.ac(menu, 'active');
+		}
+	}
+
 	function onSortClick(event) {
-		me.sort(
-			event.currentTarget.getAttribute('data-order'),
-			event.currentTarget.getAttribute('data-view'),
-			event.currentTarget
-		);
+		event.preventDefault();
+
+		var sortLinkEle = event.target;
+
+		if(event.target.classList.contains('disabled')) {
+			return false;
+		}
+
+		//me.sort(
+		//    event.target.getAttribute('data-order'),
+		//    event.target.getAttribute('data-view'),
+		//    event.target
+		//);
+
+		var order = event.target.getAttribute('data-order');
+		if(!order) {
+			order = me.order;
+		}
+
+		var view = event.target.getAttribute('data-view');
+		if(!view) {
+			if(order == CONSTS.ORDER.GALAXY) {
+				view = CONSTS.VIEW.GALAXY;
+			} else {
+				view = me.view;
+			}
+		}
 
 		// Update the URI:
 		var newURI = "/";
-		if(me.view != CONSTS.VIEW.GALAXY) {
-			newURI += '?view=' + me.view.toLowerCase()
-				+ '&order=' + me.order.toLowerCase();
+
+		if(order != CONSTS.ORDER.GALAXY) {
+			newURI += order.toLowerCase();
+
+			//if(view) {
+			//    newURI += '&';
+			//} else {
+			//    newURI += '?';
+			//}
+
+			//newURI += 'order=' + order.toLowerCase();
+
+			//@REVISIT architecture:
+			if(view && view != CONSTS.VIEW.GALAXY) {
+				newURI += '?view=' + view;
+				//newURI += '?view=' + view.toLowerCase();
+			}
 		}
 
-		Navigation.navigate(newURI);
+		navigation.navigate(newURI);
 	}
 
 	/**
@@ -238,27 +361,32 @@ function Interface() {
 	 * @param {Element} [clickedEle = false] - The sort link that was clicked to run this method.
 	 **/
 	this.sort = function(order, view, clickedEle = false) {
+
 		///REVISIT not into all this .toLowerCase() business... better design?
 
 		if(order) {
+			// Ensure uppercase:
+			//order = order.toUpperCase();
+
 			// If there's an order already, remove its class from document.body:
 			if(me.order) {
-				cor.rc(document.body, me.order.toLowerCase() + '-order'); ////
+				COR.rc(document.body, me.order.toLowerCase() + '-order'); ////
 			}
 
 			// Add the new order's class to document.body:
-			cor.ac(document.body, order.toLowerCase() + '-order'); ////
+			COR.ac(document.body, order.toLowerCase() + '-order'); ////
 
-			// If the order is GALAXY, so is the view:
-			if(order == CONSTS.ORDER.GALAXY) {
-				view = CONSTS.VIEW.GALAXY; ///REVISIT this solution; not sure it's best architecture
+			// If the order is GALAXY or CONSTELLATIONS, so is the view:
+			if(order == CONSTS.ORDER.GALAXY || order == CONSTS.ORDER.CONSTELLATIONS) {
+				////REVISIT this solution; not sure it's best architecture; for
+				//one, we're not referencing CONSTS.VIEW but CONSTS.ORDER:
+				view = order;
 
 			// If view is not GALAXY:
 			} else {
 				// If no view was provided to sort():
 				if(!view) {
-					// If we're already in a non-galaxy view (i.e. list/grid):
-					if(me.view != CONSTS.VIEW.GALAXY) {
+					if(me.view != CONSTS.VIEW.GALAXY && me.view != CONSTS.VIEW.CONSTELLATIONS) { ///TODO remove constellations
 						// Do nothing; keep current view.
 
 					// If we're in galaxy view, default to 'list' so that new order can be shown:
@@ -269,43 +397,50 @@ function Interface() {
 				}
 			}
 
-
-			me.order = order.toUpperCase();
+			// Convert to upper in case of user input:
+			//me.order = order.toUpperCase();
+			me.order = order;
 		}
+
+		var sameView = view == me.view; //@REVISIT architecture/naming
 
 		// If a view was supplied to sort() and it is different from the current one:
 		if(view && view != me.view) {
+			// Ensure uppercase:
+			//view = view.toUpperCase();
+
 			// If there's already a view, remove its class from document.body:
 			if(me.view) {
-				cor.rc(document.body, me.view.toLowerCase() + '-view'); ////
+				COR.rc(document.body, me.view.toLowerCase() + '-view'); ////
 			}
 
 			// Add the new view's class to document.body:
-			cor.ac(document.body, view.toLowerCase() + '-view'); ////
+			COR.ac(document.body, view.toLowerCase() + '-view'); ////
 
-
-			me.view = view.toUpperCase();
+			// Convert to upper in case of user input:
+			//me.view = view.toUpperCase();
+			me.view = view;
 		}
 
 		///TODO only do this stuff if the value has changed:
 
 		// Update labels that display the current order:
 		for(var orderLabelEle of document.getElementsByClassName('current-order')) {
-			orderLabelEle.innerText = locale[me.order].toLowerCase();
+			orderLabelEle.innerText = locale[me.order.toUpperCase()].toLowerCase();
 		}
 
 		// Update any labels that display the current view:
 		for(var viewLabelEle of document.getElementsByClassName('current-view')) {
-			viewLabelEle.innerText = locale[me.view].toLowerCase();
+			viewLabelEle.innerText = locale[me.view.toUpperCase()].toLowerCase();
 		}
 
 		// Update the header of the view (to reflect the order):
 		for(var viewHeaderEle of document.getElementsByClassName('view-header')) {
-			viewHeaderEle.innerText = locale['SORT-BY-' + me.order];
+			viewHeaderEle.innerText = locale['SORT-BY-' + me.order.toUpperCase()];
 		}
 
 		// Actually sort and position the stars:
-		Stars.sort(me.order, me.view);
+		stars.sort(me.order, me.view, sameView);
 	}
 
 	// me.invite = function(event) {
@@ -321,6 +456,20 @@ function Interface() {
 
 	// 	event.preventDefault();
 	// }
+
+	/**
+	 * Create a loading graphic element.
+	 * @returns Element
+	 **/
+	//@TODO revisit naming/implementation:
+	this.createLoaderElement = function() {
+		return (
+			<span>
+				<img class="loading-img" src="/images/loading-orbit_001.gif" />
+				<span>Loading...</span>
+			</span>
+		);
+	}
 }
 
 export default new Interface();

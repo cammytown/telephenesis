@@ -10,8 +10,8 @@
 export default new Spc();
 // export default Spc;
 
-import cor from './cor';
-import Anm from './anm';
+//import cor from './cor';
+//import Anm from './anm';
 
 function Spc(elementID = "spc") {
 	/// a blurred animation for going to a point over space that isn't loaded
@@ -23,10 +23,13 @@ function Spc(elementID = "spc") {
 	document.addEventListener("DOMContentLoaded", init); //// backwards-compatibility
 
 	var targetCenter = false;
-	var centering = false;
+	var animating = false;
 
 	var bfr = 3; ///
 	var seg = 500; ///
+	var centerStartTime = 0;
+	var centerStartPos;
+	var centerPosDiff;
 
 	var lastX;
 	var lastY;
@@ -36,14 +39,16 @@ function Spc(elementID = "spc") {
 
 	me.moveCallbacks = [];
 
+	var animationUpdateCallback = false;
+
 	function init() {
 		me.element = document.getElementById(elementID);
 		me.map = document.getElementById('map'); ///
 		lyr = document.getElementsByClassName('lyr'); /// ByClassName
 
-		cor.al(me.element, 'mousedown', grb);
-		cor.al(window, 'mouseup', rls);
-		//al(window, 'mouseout', rls);
+		me.element.addEventListener('mousedown', grb);
+		window.addEventListener('mouseup', rls);
+		window.addEventListener('dragend', rls);
 
 		me.s = 1;
 		me.x = me.map.offsetLeft;
@@ -61,6 +66,10 @@ function Spc(elementID = "spc") {
 		constructor(x, y) {
 			this.x = x;
 			this.y = y;
+		}
+
+		add(otherVec2) {
+			return new me.Vec2(this.x + otherVec2.x, this.y + otherVec2.y);
 		}
 
 		subtract(otherVec2) {
@@ -96,37 +105,65 @@ function Spc(elementID = "spc") {
 		}
 	}
 
-	function stepCenter(ms) {
-		var curPos = new me.Vec2(me.x, me.y); /// use globally later
-		var diff = targetCenter.subtract(curPos);
-		var distance = diff.getMagnitude();
-		// console.log(distance);
-		// var speed = 9;
-		var speed = Math.max(Math.min(distance / 25, 25), 1);
+	function stepTowardsPos(ms) {
+		// If animation has been cancelled (i.e. user clicked):
+		if(!animating) {
+			return false;
+		}
 
-		if(distance > speed) {
-			var change = diff.normalize().scale(speed);
-			me.set(me.x + change.x, me.y + change.y); ///
-			window.requestAnimationFrame(stepCenter);
+		//window.requestAnimationFrame(stepTowardsPos);
+		//me.set(me.x + 1, me.y + 1);
+		//return false;
+
+		var centerTimer = ms - centerStartTime;
+		var progress = Math.min(centerTimer / 1000, 1);
+		progress = 1 - Math.pow(1 - progress, 3);
+		var progressVec = centerPosDiff.scale(progress);
+		var curPos = centerStartPos.add(progressVec);
+		me.set(curPos.x, curPos.y);
+
+		if(progress >= 1) {
+			animating = false;
 		} else {
-			me.set(targetCenter.x, targetCenter.y);
-			centering = false;
+			window.requestAnimationFrame(stepTowardsPos);
+		}
+
+		//var curPos = new me.Vec2(me.x, me.y); /// use globally later
+		//var diff = targetCenter.subtract(curPos);
+		//var distance = diff.getMagnitude();
+		//var speed = Math.max(Math.min(distance / 25, 25), 1);
+
+		//// If there's still distance to move after this frame:
+		//if(distance > speed) {
+		//    var change = diff.normalize().scale(speed);
+		//    me.set(me.x + change.x, me.y + change.y); ///
+		//    window.requestAnimationFrame(stepTowardsPos);
+		//// Otherwise, just set it to the target position:
+		//} else {
+		//    me.set(targetCenter.x, targetCenter.y);
+		//    animating = false;
+		//}
+
+		if(animationUpdateCallback) {
+			animationUpdateCallback(ms);
 		}
 	}
 
-	/// requires anm
-	/// if ctr is called again before anm is finished, stop first anm and start a new one
-	me.ctr = function(x, y) {
+	me.ctr = function(x, y, callback = false) {
 		/// get rid of these / fix up architecture:
 		x = -x; y = -y;
 		x += window.innerWidth/2;
 		y += window.innerHeight/2;
 
 		targetCenter = new me.Vec2(x, y);
+		animationUpdateCallback = callback; //@TODO probably improve architecture
 
-		if(!centering) {
-			centering = true;
-			window.requestAnimationFrame(stepCenter);
+		if(!animating) {
+			animating = true;
+			centerStartTime = performance.now();
+			centerStartPos = new me.Vec2(me.x, me.y);
+			centerPosDiff = new me.Vec2(x, y).subtract(centerStartPos);
+			window.requestAnimationFrame(stepTowardsPos);
 		}
 
 		// for(var i = lyr.length - 1; i >= 0; i--) {
@@ -153,45 +190,46 @@ function Spc(elementID = "spc") {
 
 			tickFrame();
 
-			function tickFrame(ms) {
-				var msSinceStart = performance.now() - fltStartTime;
+		}
+	}
 
-				/// optimization:
-				if(msSinceStart < 1000) {
-					var v = msSinceStart / 1000;
+	function tickFrame(ms) {
+		var msSinceStart = performance.now() - fltStartTime;
+
+		/// optimization:
+		if(msSinceStart < 1000) {
+			var v = msSinceStart / 1000;
+			fltVelocity.x = fltDirection * v;
+			fltVelocity.y = fltDirection * v;
+		} else {
+			fltVelocity.x = fltDirection;
+			fltVelocity.y = fltDirection;
+
+			if(msSinceStart > 19000) {
+				if(msSinceStart < 20000) {
+					var v = (1000 - (msSinceStart % 19000)) / 1000;
 					fltVelocity.x = fltDirection * v;
 					fltVelocity.y = fltDirection * v;
 				} else {
-					fltVelocity.x = fltDirection;
-					fltVelocity.y = fltDirection;
-
-					if(msSinceStart > 19000) {
-						if(msSinceStart < 20000) {
-							var v = (1000 - (msSinceStart % 19000)) / 1000;
-							fltVelocity.x = fltDirection * v;
-							fltVelocity.y = fltDirection * v;
-						} else {
-							fltDirection *= -1;
-							fltStartTime = new Date();
-						}
-
-					}
+					fltDirection *= -1;
+					fltStartTime = new Date();
 				}
 
-				var x = me.x += fltVelocity.x;
-				var y = me.y += fltVelocity.y;
-				me.x = x;
-				me.y = y;
-
-				me.set(x, y);
-
-				if(me.s == 'flt') {
-					window.requestAnimationFrame(tickFrame);
-				}
-
-				// if(me.s == 'flt') setTimeout(l, 50);
 			}
 		}
+
+		var x = me.x += fltVelocity.x;
+		var y = me.y += fltVelocity.y;
+		me.x = x;
+		me.y = y;
+
+		me.set(x, y);
+
+		if(me.s == 'flt') {
+			window.requestAnimationFrame(tickFrame);
+		}
+
+		// if(me.s == 'flt') setTimeout(l, 50);
 	}
 
 	/// wip
@@ -217,19 +255,23 @@ function Spc(elementID = "spc") {
 	}
 
 	function grb(e) {
+		///@TODO check if e.target == .spc or .lyr at least as config option
 		if(!me.s || e.button == 2) {
 			return false;
 		}
 
+		// Cancel any panning animation:
+		animating = false;
+
 		lastX = e.clientX;
 		lastY = e.clientY;
 
-		cor.al(me.element, 'mousemove', drg);
+		me.element.addEventListener('mousemove', drg);
 		me.element.className = 'act';
 	}
 
 	function rls(e) {
-		cor.rl(me.element, 'mousemove', drg);
+		me.element.removeEventListener('mousemove', drg);
 		me.element.removeAttribute('class');
 	}
 
@@ -243,7 +285,7 @@ function Spc(elementID = "spc") {
 
 		me.set(x, y);
 		// me.ctr(Math.floor(x), Math.floor(y));
-		// centering = true;
+		// animating = true;
 		// targetCenter = new me.Vec2(x, y);
 		// mov(x, y);
 	}

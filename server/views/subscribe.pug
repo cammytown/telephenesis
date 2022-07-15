@@ -1,0 +1,37 @@
+form#subscribe-page.ajax.uibox(
+	method='POST',
+	action='/subscribe'
+	data-ajax-action='/ajax/subscribe'
+)
+	p.
+		All accounts have the same functionality. Subscribing to Telephenesis
+		supports artists and the platform.
+
+	p.
+		After paying for data hosting and transaction fees, 99% of all profits
+		go to artists. 1% goes to the creators. To view current numbers, see
+		[[here]].
+
+	// @TODO-4 [[here]] above
+
+	label.floatBeside Subscription [?]
+	section.money
+		ul.subscriptions
+			li Free
+			li Monthly
+				ul
+					li monthly tokens to decide where your funds go
+					li support the website's hosting and development
+
+	label.floatBeside(for="payment") Payment Info
+	input#account_email.center-text(
+		type="text"
+		name="email"
+		placeholder="payment info"
+		value=""
+		disabled
+	)
+
+
+	button.btn.main(type="submit") Submit
+

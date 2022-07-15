@@ -1,51 +1,98 @@
-div#typeSettings.double
-	div What type of art is this?
+//-div#typeSettings.double
+//-    div What type of art is this?
 
-	#musicTypeButton.btn.blue.text-left.active Music
-	#visualTypeButton.btn.red.text-left Visual
-	//- #videoTypeButton.btn.purple.text-left Video
-	//- #anythingTypeButton.btn.orange.text-left Anything
+//-    #musicTypeButton.btn.blue.text-left.active Music
+//-    #visualTypeButton.btn.red.text-left Visual
+//-    //- #videoTypeButton.btn.purple.text-left Video
+//-    //- #anythingTypeButton.btn.orange.text-left Anything
 
-	input#typeSetting(type="hidden" name="art-type" value="music")
+//-    input#typeSetting(type="hidden" name="art-type" value="music")
 
 
-//- div.double
-//- 	.btn.green
-//- 		| File URL
+//-div.double
+//-    input.host-type-input(type="hidden" name="host-type" value="upload")
 
-//- 	.btn.green.upload
-//- 		input#submission(name="submission" type="file")
-//- 		| Upload <small>(mp3)</small>
+//-    .btn.green.upload.active
+//-        | Upload <small>(mp3)</small>
+
+//-    .btn.green
+//-        | File URL
 
 section.starTitle
-	h3 Star Title 
-		small (optional)
+	label.floatBeside
+		Star Title&nbsp;
+			small (optional)
 
-	input(type="text" class="star-title" name="star-title" placeholder="Star #0028")
+	input.star-title-input(
+		type="text"
+		name="star-title"
+		placeholder="Star #0028"
+	)
 
 section.fileUpload
-	h3 MP3 File URL
-	em We recommend 
-		a(href="https://archive.org/" target="_blank") archive.org
+	label.floatBeside MP3 File
+	input.submission-file-input(name="submission" type="file")
 
-	input(type="text" class="file-url" name="file-url" class="file-url" placeholder="Enter the URL of an MP3 file.")
+	//-h3 MP3 File URL
+	//-em We recommend
+	//-    a(href="https://archive.org/" target="_blank") archive.org
+
+	input.file-url-input(
+		type="url"
+		name="file-url"
+		placeholder="Enter the URL of an MP3 file."
+		style="display: none;"
+	)
+
+section.artist-id-section
+	label.floatBeside Artist Identity
+	select.artist-id-input(name="artist-id")
+		if user && user.artists.length
+			each artist in user.artists
+				option(
+					value=artist.publicID
+				)= artist.name
+		option(value="display_name")= user.displayName + " (profile name)"
+		option(value="create_new_artist") [create a new artist identity]
+
+	div.artist-id-creation-section(style="display: none;")
+		label.floatBeside Artist Name
+		input.artist-name-input(
+			type="text"
+			placeholder="My Band's Name"
+			name="artist-name"
+		)
+
+		label.floatBeside Artist External Link&nbsp;
+			small (optional)
+		input.artist-external-link(
+			type="url"
+			placeholder="https://myband.com"
+			name="artist-external-link"
+		)
 
 label.rightsAgreement
-	input(type="checkbox" name="rights-confirmation" class="rights-confirmation")
+	input(
+		type="checkbox"
+		name="rights-confirmation"
+		class="rights-confirmation"
+		required
+	)
 	| I have the rights to post this and permit others to use it in their recreations.
 
 //- This constellation is set to public. All recreations follow the same license.
 
 //- .btn.green.upload
-//- 	input#submission(name="submission" type="file")
+//- 	input.submission-file-input(name="submission" type="file")
 //- 	| Upload <small>(mp3)</small>
 
 //- .btn.green Public
 //- .btn.blue Private
 
-div.double
-	button.btn.green(type="submit")
-		| Finish
-		//- | Finish and Place Star
+section
+	div.double
+		button.btn.green(type="submit")
+			| Create
+			//- | Finish and Place Star
 
-	a.btn.red.close cancel
+		a.btn.red.close Cancel

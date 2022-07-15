@@ -1,62 +1,122 @@
 /**
  * User class for server use.
- * @param [usrDoc] {Object} - Entry in Usr collection which represents this user.
+ * @param [usrDoc] {object} - Entry in Usr collection which represents this user.
  * @constructor
- */
+ **/
 function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta architecture
-	var me = this;
+	const me = this;
 
-	/* PROPERTIES: */
+	const exportLists = {
+		identity: [
+			'id', //@TODO replacing with publicID
+			'publicID',
+			'email',
+			'accessLevel',
+			'sessionCode',
+			'displayName',
+			//'creatorName', //@TODO removing
+			'artists', //@REVISIT naming
+			'creationTickets',
+			'recreationTickets',
+			'bookmarks',
+			'comments',
+		],
 
-	/** Properties relevant to import/export. **/
-	var identityProps = [
-		"userID",
-		"email",
-		"creatorName",
-		"creationTickets",
-		"recreationTickets",
-	];
+		usrMeta: [
+			'publicID',
+			'email',
+			'displayName',
+			//'creatorName', //@TODO removing
+			'artists',
+			'creationTickets',
+			'recreationTickets',
+			'bookmarks',
+			'comments',
+		],
 
-	init(usrDoc, userMeta);
+		client: [
+			'publicID',
+			'email',
+			'accessLevel',
+			'displayName',
+			'artists',
+			'creationTickets',
+			'recreationTickets',
+			'bookmarks',
+			'comments',
+		],
 
-	function init(usrDoc = false, userMeta = false) {
-		var userObject = {};
+		commentCache: [
+			'publicID',
+			'displayName',
+		]
+	};
 
+	function init(usrDoc = null, userMeta = null) {
+		//var proposedValues = {};
+	
 		if(usrDoc) {
-			userObject["userID"] = usrDoc.id;
-			userObject["email"] = usrDoc.em;
+			me.loadData({
+				'id': usrDoc.id,
+				'email': usrDoc.em,
+				'sessionCode': usrDoc.ss, //@REVISIT maybe don't always include
+			});
 		}
+		//me.loadData(usrDoc);
 
 		if(userMeta) {
-			Object.assign(userObject, userMeta);
+			//if(userMeta['id']) {
+			//    userMeta['id'] = userMeta.userID; ///REVISIT architecture
+			//}
+
+			me.loadData(userMeta);
 		}
 
-		for (var propIndex = 0; propIndex < identityProps.length; propIndex++) {
-			var identityProp = identityProps[propIndex];
+		//me.loadData(proposedValues);
 
-			if(userObject.hasOwnProperty(identityProp)) {
-				me[identityProp] = userObject[identityProp];
+		//console.log(me);
+	}
+
+	/**
+	 * Safely loads new values and properties into the object by simply
+	 * filtering out non-identity props.
+	 * @param {object} data - An object of new properties/values to load.
+	 **/
+	///@TODO initializeProps not currently in use:
+	this.loadData = function(data, initializeProps = false) {
+		for(var identityProp of exportLists.identity) {
+			if(data.hasOwnProperty(identityProp)) {
+				me[identityProp] = data[identityProp];
 			} else {
-				me[identityProp] = null;
+				if(initializeProps) {
+					me[identityProp] = null;
+				}
 			}
 		}
-
 	}
 
 	/**
 	 * Convert properties to object for use with database.
-	 * @returns {Object}
+	 * @returns {object}
 	 **/
-	me.export = function() {
+	this.export = function(exportType = 'identity') {
 		var returnObject = {};
 
-		for (var propIndex = 0; propIndex < identityProps.length; propIndex++) {
-			var identityProp = identityProps[propIndex];
-			returnObject[identityProp] = me[identityProp];
+		for(var prop of exportLists[exportType]) {
+			returnObject[prop] = me[prop];
+		}
+
+		///@RE-1 architecture:
+		if(exportType == 'usrMeta') {
+			if(me.hasOwnProperty('id')) {
+				returnObject['userID'] = me['id'];
+			}
 		}
 
 		return returnObject;
 	}
+
+	init(usrDoc, userMeta);
 }
 
 module.exports = TelepUser;

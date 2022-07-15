@@ -1,33 +1,54 @@
 form#login-page.uibox.ajax(action="/login" method="POST" data-ajax-action="/ajax/login")
-	label.floatBeside(for="email") Email
-	input(type="text" name="email" placeholder="email")
+	label.floatBeside(for="login_email") Email
+	input#login_email(type="text" name="email" placeholder="email")
 
-	label.floatBeside(for="password") Password
-	input(type="password" name="password" placeholder="password")
+	label.floatBeside(for="login_password") Password
+	input#login_password(type="password" name="password" placeholder="password")
 
 	button.btn.main(type="submit") Login
 
 	ul.errors
 
 
-form#register-page.uibox.ajax(action="/register" method="POST" data-ajax-action="/ajax/register")
-	label.floatBeside(for="email") Email
-	input(name="email" value=user.em type="text" placeholder="email")
+form#register-page.uibox.ajax(
+	action='/register'
+	method='POST'
+	data-ajax-action='/ajax/register'
+)
+	label.floatBeside(for='register_email') Email
+	input#register_email(name='email' type='text' placeholder='email')
 
-	label.floatBeside(for="creatorName") Creator Name (optional)
-	input(
-		name="creatorName"
-		type="text"
-		placeholder="creator name (optional)"
-		value= user.usrMeta ? user.usrMeta.creatorName : ''
-	)
+	label.floatBeside(for='register_display-name') Display Name
+	input#register_display-name(name='displayName' type='text' placeholder='display name')
 
-	label.floatBeside(for="password") Password
-	input(type="password" name="password" placeholder="password")
+	label.floatBeside(for='register_password') Password
+	input#register_password(type='password' name='password' placeholder='password')
 
-	label.floatBeside(for="password-confirm") Confirm Password
-	input(type="password" name="password-confirm" placeholder="password again")
+	label.floatBeside(for='register_password-confirm') Confirm Password
+	input#register_password-confirm(type='password' name='password-confirm' placeholder='password again')
 
-	button.btn.main(type="submit") Register
+	//-label
+	//-    input(type='checkbox' name='artist-account')
+	//-    | I would like to contribute art.
+
+	//-label.floatBeside(for='register_creator-name') Creator Name (optional)
+	//-input#register_creator-name(
+	//-    name='creatorName'
+	//-    type='text'
+	//-    placeholder="creator name (optional)"
+	//-)
+
+	//-fieldset
+	//-    legend Account Type
+
+	//-    div
+	//-        input(type='radio' name='account-type' value='listener' id='listener-account-option')
+	//-        label(for='listener-account-option') Listener Account
+
+	//-    div
+	//-        input(type='radio' name='account-type' value='artist' id='artist-account-option')
+	//-        label(for='artist') Artist Account
+
+	button.btn.main(type='submit') Register
 
 	ul.errors

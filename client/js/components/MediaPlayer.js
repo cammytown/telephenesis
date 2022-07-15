@@ -11,8 +11,9 @@ function MediaPlayer() {
 	me.audio;
 
 	var lastSyncTime;
-	var config = {
-		syncInterval: 30 * 1000,
+	var playerConfig = {
+		//syncInterval: 30 * 1000,
+		syncInterval: 5 * 1000,
 		partialPlaySeconds: 5,
 		longPlayPercent: 50,
 	};
@@ -34,7 +35,7 @@ function MediaPlayer() {
 		// pendingServerUpdates.push({ type: 'longPlay', starID: 42 });
 		// serverSync();
 
-		setInterval(serverSync, config.syncInterval); ////TODO probably don't use or use something in addition to setInterval
+		setInterval(serverSync, playerConfig.syncInterval); ////TODO probably don't use or use something in addition to setInterval
 	}
 
 	this.playStar = function(clientStar) {
@@ -54,15 +55,16 @@ function MediaPlayer() {
 			cor.ac(clientStar.element, "active");
 
 			// Load the new star's media:
-			me.audio.load(clientStar.element.getElementsByTagName('a')[0].href);
+			//me.audio.load(clientStar.linkElement.getAttribute('data-mediaURL'));
+			me.audio.load(clientStar.fileURL);
 			// me.audio.load('/music/'+sid+'.mp3');
 
 			if(activeMediaState) {
-				mediaStates[clientStar.id] = activeMediaState;
+				mediaStates[clientStar.publicID] = activeMediaState;
 			}
 
-			if(mediaStates[clientStar.id]) {
-				activeMediaState = mediaStates[clientStar.id];
+			if(mediaStates[clientStar.publicID]) {
+				activeMediaState = mediaStates[clientStar.publicID];
 			} else {
 				activeMediaState = {
 					lastUpdateMediaTime: 0,
@@ -84,7 +86,6 @@ function MediaPlayer() {
 	}
 
 	function onMediaTimeUpdate(event) {
-
 		// Update playback time label:
 		clientState.playingStar.element.getElementsByClassName('playbackTime')[0].innerHTML = me.audio.timeString;
 
@@ -99,20 +100,20 @@ function MediaPlayer() {
 		activeMediaState.totalMediaPlaySeconds += delta;
 
 		// Check if played long enough to ping server:
-		if(!activeMediaState.flags.longPlay) {
-			if(!activeMediaState.flags.partialPlay) {
-				// If played long enough to flag partial play:
-				if(activeMediaState.totalMediaPlaySeconds >= config.partialPlaySeconds) {
-					activeMediaState.flags.partialPlay = true;
-					pendingServerUpdates.push({ type: 'partialPlay', starID: clientState.playingStar.id });
-				}
+		if(!activeMediaState.flags.partialPlay) {
+			// If played long enough to flag partial play:
+			if(activeMediaState.totalMediaPlaySeconds >= playerConfig.partialPlaySeconds) {
+				activeMediaState.flags.partialPlay = true;
+				pendingServerUpdates.push({ type: 'partialPlay', starID: clientState.playingStar.publicID });
 			}
+		}
 
+		if(!activeMediaState.flags.longPlay) {
 			// If played long enough to flag long play:
 			var totalPlayTimeFloat = activeMediaState.totalMediaPlaySeconds / me.audio.element.duration;
-			if(totalPlayTimeFloat >= config.longPlayPercent / 100) {
+			if(totalPlayTimeFloat >= playerConfig.longPlayPercent / 100) {
 				activeMediaState.flags.longPlay = true;
-				pendingServerUpdates.push({ type: 'longPlay', starID: clientState.playingStar.id });
+				pendingServerUpdates.push({ type: 'longPlay', starID: clientState.playingStar.publicID });
 			}
 		}
 	}
@@ -121,7 +122,7 @@ function MediaPlayer() {
 		cor.rc(clientState.playingStar.element, 'active');
 
 		if(clientState.playingStar.element.getAttribute('data-next')) {
-			var star = document.getElementById('s' + clientState.playingStar.element.getAttribute('data-next'));
+			var star = document.getElementById('star_' + clientState.playingStar.element.getAttribute('data-next'));
 			load(star);
 		} else {
 			clientState.playingStar = false;

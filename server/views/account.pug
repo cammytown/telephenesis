@@ -1,0 +1,59 @@
+input#user-bookmarks( ///REVISIT architecture
+	type="hidden"
+	value= user ? user.bookmarks.join(",") : ""
+)
+
+form#account-page.ajax.uibox.center-text(
+	method='POST',
+	action='/update-account'
+	data-ajax-action='/ajax/update-account'
+)
+	label.floatBeside(for="account_email") Email
+	input#account_email.center-text(
+		type="text"
+		name="email"
+		placeholder="email"
+		value=user.email
+		disabled
+	)
+
+	label.floatBeside(for="account_display-name") Display Name
+	input#account_display-name.center-text(
+		type="text"
+		name="displayName"
+		placeholder="display name"
+		value= user.displayName
+	)
+
+	//-label.floatBeside(for="account_creator-name") Creator Name
+	//-input#account_creator-name(
+	//-    type="text"
+	//-    name="creator-name"
+	//-    placeholder="creator name"
+	//-    value= user.creatorName
+	//-)
+
+	.ticketCount.floatBeside Tickets [?]
+	section.short
+		.ticketCount.creationTickets Tickets:
+			input#creation-tickets(type="hidden" value=user.creationTickets)
+			.count= user.creationTickets
+		.ticketCount.recreationTickets Recreation Tickets:
+			input#recreation-tickets(type="hidden" value=user.recreationTickets)
+			.count= user.recreationTickets
+
+	// label(for="password") Password
+	// input(name="password" placeholder="password")
+	// label(for="password-confirm") Confirm
+	// input(name="password-confirm" placeholder="password again")
+
+	label.floatBeside Subscription [?]
+	section.money
+		ul.subscriptions
+			li Free
+			li 10 tokens Monthly
+				a.nav(href="/subscribe") Subscribe
+			li 20 tokens Monthly
+
+	button.btn.main(type="submit") Submit
+

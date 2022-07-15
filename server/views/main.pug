@@ -27,8 +27,17 @@ html(lang="en")
 			include contextMenus.pug
 			include creation.pug
 			include auth.pug
+			//-include about.pug
 			include help.pug
-			include profile.pug
+
+			include account.pug
+			include subscribe.pug
+			include terms.pug
+			include singleUser.pug
+			include confirmAction.pug
+
+			if user && user.accessLevel >= config.adminLevel
+				include admin.pug
 
 			div#notification
 

@@ -4,8 +4,9 @@ html, body {
 }
 
 body {
-	// background: #000;
-	background: #000 linear-gradient(to bottom, #111 0%, #000 30%) no-repeat;
+	background-color: #000;
+	//background-image: linear-gradient(to bottom, #0a0a0a 0%, #000 30%);
+	//background-repeat: no-repeat;
 	color: $text;
 	font-size: 16px; ///
 	font-family: 'Monda', sans-serif;
@@ -21,11 +22,31 @@ a {
 	&:hover {
 		color: $linkHover;
 	}
+
+	&.disabled {
+		background: $disabledBackground;
+		color: $disabledText;
+	}
 }
 
 h1, h2, h3, h4, h5, h6 {
 	font-family: 'Strait', sans-serif;
 	margin: 0;
+}
+
+.center-text {
+	text-align: center;
+}
+
+.floatBeside {
+	$labelWidth: 200px;
+	padding: 3px 0;
+	position: absolute;
+	left: -$labelWidth;
+	display: block;
+	width: $labelWidth;
+	background: $uiBackground;
+	text-align: right;
 }
 
 .clearfix { /// placement

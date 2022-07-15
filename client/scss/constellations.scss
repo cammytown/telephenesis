@@ -17,17 +17,20 @@
 @import 'components/uibox';
 @import 'components/star';
 @import 'components/player';
+@import 'components/comments';
 
 @import 'spc';
 
 @import 'pages/help';
 //@import 'pages/tutorial';
-@import 'pages/profile';
+@import 'pages/account';
 @import 'pages/creation';
 @import 'pages/sorting';
+@import 'pages/admin';
 
 @import 'shame';
 
+//@TODO move this stuff:
 div#notification {
 	position: absolute;
 	top: 100px;
@@ -44,11 +47,17 @@ div#notification {
 	}
 }
 
+#confirmAction-page {
+	.confirmation-message {
+		margin-bottom: 20px;
+	}
+}
+
 canvas#uiEffects {
 	position: absolute;
 	z-index: 0; ////
 	width: 100%;
-	height: 100%;
+	//height: 100%;
 }
 
 #limbo { display: none; }

@@ -1,11 +1,13 @@
 const express = require('express');
 //const Telep = require('../components/TelepServer');
+const api = require('../components/TelepAPI');
+const config = require('../../config/telep.config.js');
 
 ///REVISIT weird architecture so we can access api without circular reference:
-var api;
+//var api;
 var usr;
-function generate(telepServer) { 
-	api = telepServer.api;
+function generate(telepServer) {
+	//api = telepServer.api;
 	usr = telepServer.usr;
 
 	var authRouter = express.Router();
@@ -15,22 +17,24 @@ function generate(telepServer) {
 }
 
 function login(req, res, next) {
-	return usr.li(req.body.email, req.body.password, req.ip)
-		.then(userDoc => {
-			res.cookie('usr_ss', userDoc.ss, {
+	return api.login(req.body.email, req.body.password, req.ip)
+		.then(telepUser => {
+			var cookieOptions = {
+				//@REVISIT uncomment?:
 				// secure: true /// https only
-			});
+ 			};
 
-			return usr.in(userDoc.ss);
+			//if(config.mode == 'development') {
+			//    cookieOptions.sameSite = 'none';
+			//}
+
+			// Send cookie to client for saving:
+			res.cookie('session_code', telepUser.sessionCode, cookieOptions);
+
+			req.user = telepUser;
+			next();
 		})
-		.then(user => {
-			if(user) {
-				req.user = user;
-			} else {
-				
-			}
-		})
-		.then(next)
+		//.then(observeSessionCode)
 		.catch(errors => {
 			// res.render('login', { p: req.body, errors: err });
 			console.error(errors);
@@ -49,10 +53,15 @@ function register(req, res, next) {
 	return api.register(
 		req.body.email,
 		req.body.password,
+		req.body.displayName,
 		req.body.creatorName,
 		req.ip
 	)
-		.then(() => next())
+		//.then(observeSessionCode)
+		.then(newUser => {
+			req.user = newUser;
+			next();
+		})
 		.catch(err => next(err));
 		// .catch(err => {
 		// 	// res.json({ error: err });
@@ -61,13 +70,33 @@ function register(req, res, next) {
 }
 
 function logout(req, res, next) {
-	res.clearCookie('usr_ss', {});
+	res.clearCookie('session_code', {});
 
 	///TODO confine json responses to ./ajax.js i think
-	res.json({ errors: false });
+	res.json({ errors: []});
 
-	next();
+	//next();
 }
+
+/**
+ * Attempt to log user in using a session code, if they have one. Sets req.user
+ * to a TelepUser representing authenticated user if there was one.
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
+ **/
+function observeSessionCookie(req, res, next) {
+	console.log(req.cookies.session_code);
+	return api.getUserBySessionCode(req.cookies.session_code)
+		.then(telepUser => {
+			// User is either TelepUser or false:
+			req.user = telepUser;
+
+			next();
+		})
+		.catch(err => next(err));
+}
+
 
 
 ///TODO improve architecture:
@@ -77,5 +106,6 @@ module.exports = {
 	login,
 	register,
 	logout,
+	observeSessionCookie,
 }
 
