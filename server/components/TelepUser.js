@@ -25,6 +25,7 @@ function TelepUser(usrDoc = false, userMeta = false) { ///REVISIT userMeta archi
 		usrMeta: [
 			'publicID',
 			'email',
+			'accessLevel', //@REVISIT yes?
 			'displayName',
 			//'creatorName', //@TODO removing
 			'artists',

@@ -129,6 +129,10 @@ function AdminMapper() {
 	}
 
 	this.generateDemoStars = async function(user, count = 10) {
+		if(!user.artists.length) {
+			throw("Admin user requires artist info to generate demo stars.");
+		}
+
 		var area = 4000;
 		var starInserts = [];
 

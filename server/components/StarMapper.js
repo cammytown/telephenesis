@@ -3,7 +3,8 @@
 const Lame = require('node-lame').Lame;
 const fs = require('fs');
 
-const config = require('../../config/telep.config')
+const config = require('../../config/telep.config');
+const CONSTS = require('../../abstract/constants');
 const Star = require('../../abstract/Star');
 const Vector = require('../../abstract/Vector');
 const ServerStar = require('./ServerStar');
@@ -260,6 +261,7 @@ function StarMapper() {
 					serverStar.uploadURL = null;
 					serverStar.fileURL = server.serverConfig.storage.servingUrl
 						+ 'star-' + serverStar.publicID
+						// + (config.mode == 'development' ? '-sandbox' : '')
 						+ serverStar.file.extension;
 
 					// Star should have been initialized in the database when

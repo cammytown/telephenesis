@@ -17,6 +17,7 @@ const StarMapper = require('./StarMapper');
 const ArtistMapper = require('./ArtistMapper');
 const AdminMapper = require('./AdminMapper');
 const TelepRouter = require('../routes'); ///REVISIT have a TelepRouter in components/ ?
+const config = require('../../config/telep.config');
 const serverConfig = require('../../config/telepServer.config.js');
 
 /**
@@ -186,6 +187,9 @@ function TelepServer() {
 		//@REVISIT should we prefer the non-secure nanoid()? I'm not sure it
 		//allows async but if it's fast enough maybe it doesn't matter??
 		return nanoid(6).then(publicID => {
+			// Add sandbox tag if in development mode:
+ 			if(config.mode == 'development') publicID += '-sandbox';
+
 			return testCollection.findOne({ publicID })
 				.then(doc => {
 					//@REVISIT kinda weird architecture; maybe better to use await:
