@@ -27,6 +27,9 @@ function Comments() {
 	/** Loading graphic for loading comments. **/
 	var commentsLoadingEle;
 
+	/** Element with message to user when there are no comments. **/
+	var commentsEmptyEle;
+
 	this.init = function() {
 		createCommentTextarea = document.querySelector('#createCommentForm textarea.comment-text');
 
@@ -38,6 +41,8 @@ function Comments() {
 		commentsListEle = document.querySelector('#playingComments ul.comments');
 
 		commentsLoadingEle = tlpInterface.createLoaderElement();
+
+		commentsEmptyEle = document.querySelector('#playingComments div.noComments')
 	}
 
 	//this.ready = function() {
@@ -78,9 +83,18 @@ function Comments() {
 				// Replace loading image with comments:
 				commentsLoadingEle.replaceWith(commentsListEle);
 
-				result.comments.forEach(comment => {
-					new ClientComment(comment);
-				});
+				if(result.comments.length) {
+					// Hide empty comments message:
+					commentsEmptyEle.style.display = 'none';
+					console.log(commentsEmptyEle);
+
+					result.comments.forEach(comment => {
+						new ClientComment(comment);
+					});
+				} else { // If there are no comments on the star.
+					// Show empty comments message:
+					commentsEmptyEle.style.display = 'block';
+				}
 			})
 			.catch(err => {
 				///REVISIT

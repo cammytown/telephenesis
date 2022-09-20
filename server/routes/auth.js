@@ -87,6 +87,7 @@ function logout(req, res, next) {
  **/
 function observeSessionCookie(req, res, next) {
 	console.log(req.cookies.session_code);
+
 	return api.getUserBySessionCode(req.cookies.session_code)
 		.then(telepUser => {
 			// User is either TelepUser or false:

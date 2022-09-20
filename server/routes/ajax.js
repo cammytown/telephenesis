@@ -34,6 +34,10 @@ function generate(telepServer) {
 
 	ajaxRouter.post('/logout', authRoutes.logout);
 
+	//@TODO change to a .get request I think?
+	//@TODO i think we want to pass in logged in user if there is one
+	ajaxRouter.post('/get-star-comments', getStarComments);
+
 	var userActionRouter = express.Router();
 	userActionRouter.use(validateUser);
 
@@ -46,8 +50,6 @@ function generate(telepServer) {
 	userActionRouter.post('/create-comment', createComment);
 	userActionRouter.post('/delete-comment/:commentPublicID', deleteComment);
 
-	//@TODO change to a .get request I think?:
-	userActionRouter.post('/get-star-comments', getStarComments);
 
 	//ajaxRouter.post('/request-upload-url', createRoutes.requestUploadURL);
 	userActionRouter.use(creationRouter);

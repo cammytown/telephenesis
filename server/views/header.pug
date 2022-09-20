@@ -93,4 +93,15 @@ div#playingStarInfo
 
 			button.btn.green.text-left(type='submit') + Add Comment
 
+		div.noComments
+			div There are no comments on this star, yet.
+			div.guest
+				a(href='/login') Login
+				| 
+				| or
+				| 
+				a(href='/register') register
+				| 
+				| to leave one.
+
 		ul.comments
